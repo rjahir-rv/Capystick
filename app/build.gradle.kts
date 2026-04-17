@@ -7,9 +7,10 @@ plugins {
 android {
     namespace = "com.capystick.app"
     compileSdk {
-        version = release(37) {
-            minorApiLevel = 0
-        }
+        version =
+            release(37) {
+                minorApiLevel = 0
+            }
     }
 
     defaultConfig {
@@ -27,7 +28,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
