@@ -1,4 +1,4 @@
-package com.capystick.app.ui.theme
+package com.capystick.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

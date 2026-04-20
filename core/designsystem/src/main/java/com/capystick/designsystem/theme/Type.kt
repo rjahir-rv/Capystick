@@ -1,4 +1,4 @@
-package com.capystick.app.ui.theme
+package com.capystick.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

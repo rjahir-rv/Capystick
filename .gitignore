@@ -372,3 +372,6 @@ obj/
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/androidstudio,kotlin,gradle,intellij,windows,linux,macos,visualstudiocode
+/.vscode/settings.json
+/.idea/kotlinc.xml
+/.idea/deviceManager.xml

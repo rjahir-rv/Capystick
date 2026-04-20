@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -24,3 +25,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Capystick"
 include(":app")
+include(":core:designsystem")
+include(":core:model")
+include(":core:database")
