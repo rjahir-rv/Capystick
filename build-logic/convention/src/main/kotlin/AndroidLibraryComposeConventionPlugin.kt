@@ -32,6 +32,7 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("androidx-compose-ui-graphics").get())
                 add("implementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
                 add("implementation", libs.findLibrary("androidx-compose-material3").get())
+                add("implementation", libs.findLibrary("androidx-ui-text-google-fonts").get())
             }
         }
     }
