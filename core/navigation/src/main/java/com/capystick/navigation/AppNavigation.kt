@@ -24,6 +24,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.capystick.collections.CollectionsScreen
@@ -73,27 +77,52 @@ fun AppNavigation(
     ) {
         Scaffold(
             topBar = {
-                CapyTopAppBar(
-                    title = selectedRoute.title,
-                    onMenuClick = {
-                        scope.launch { drawerState.open() }
-                    }
-                )
+                if (selectedRoute != NotepadRoute) {
+                    CapyTopAppBar(
+                        title = selectedRoute.title,
+                        onMenuClick = {
+                            scope.launch { drawerState.open() }
+                        }
+                    )
+                }
             }
         ) { innerPadding ->
             NavDisplay(
-                modifier = Modifier.padding(innerPadding),
+                modifier = modifier,
                 backStack = topLevelBackStack.backStack,
                 onBack = { topLevelBackStack.removeLast() },
+                transitionSpec = {
+                    slideInHorizontally(
+                        animationSpec = tween(300),
+                        initialOffsetX = { -it }
+                    ) togetherWith slideOutHorizontally(
+                        animationSpec = tween(300),
+                        targetOffsetX = { it }
+                    )
+                },
+                popTransitionSpec = {
+                    slideInHorizontally(
+                        animationSpec = tween(300),
+                        initialOffsetX = { -it }
+                    ) togetherWith slideOutHorizontally(
+                        animationSpec = tween(300),
+                        targetOffsetX = { it }
+                    )
+                },
                 entryProvider = entryProvider {
                     entry<NotepadRoute> {
-                        NotepadScreen()
+                        NotepadScreen(
+                            innerPadding = innerPadding,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            }
+                        )
                     }
                     entry<CollectionsRoute> {
-                        CollectionsScreen()
+                        CollectionsScreen(innerPadding = innerPadding)
                     }
                     entry<SettingsRoute> {
-                        SettingsScreen()
+                        SettingsScreen(innerPadding = innerPadding)
                     }
                 }
             )
