@@ -5,11 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.capystick.designsystem.components.ColorShowcase
 import com.capystick.designsystem.theme.CapystickTheme
+import com.capystick.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,11 +15,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CapystickTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ColorShowcase(
-                        modifier = Modifier.padding(innerPadding),
-                    )
-                }
+                AppNavigation(
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }
