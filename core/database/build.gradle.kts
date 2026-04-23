@@ -1,7 +1,6 @@
 plugins {
     id("capystick.android.library.compose")
-    alias(libs.plugins.ksp)
-
+    id("capystick.android.hilt")
 }
 
 android {

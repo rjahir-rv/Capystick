@@ -32,6 +32,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.capystick.collections.CollectionsScreen
 import com.capystick.notepad.NotepadScreen
+import com.capystick.notepad.NotesScreen
 import com.capystick.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 fun AppNavigation(
     modifier: Modifier = Modifier
 ) {
-    val levelRoutes = listOf(NotepadRoute, CollectionsRoute, SettingsRoute)
+    val levelRoutes = listOf(NotepadRoute, NotesRoute, CollectionsRoute, SettingsRoute)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val topLevelBackStack = remember { TopLevelBackStack<TopLevelRoute>(NotepadRoute) }
@@ -62,6 +63,7 @@ fun AppNavigation(
                         icon = {
                             val iconRes = when(item.title){
                                 "Crear nota" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_new_note)
+                                "Todas las notas" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_all_notes)
                                 "Colecciones" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_collection)
                                 "Ajustes" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_settings)
                                 else -> null
@@ -77,9 +79,10 @@ fun AppNavigation(
     ) {
         Scaffold(
             topBar = {
-                if (selectedRoute != NotepadRoute) {
+                val currentRoute = topLevelBackStack.backStack.lastOrNull()
+                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute) {
                     CapyTopAppBar(
-                        title = selectedRoute.title,
+                        title = currentRoute.title,
                         onMenuClick = {
                             scope.launch { drawerState.open() }
                         }
@@ -115,14 +118,33 @@ fun AppNavigation(
                             innerPadding = innerPadding,
                             onMenuClick = {
                                 scope.launch { drawerState.open() }
+                            },
+                            onNoteSaved = {
+                                // Navigate to NotesRoute
+                                topLevelBackStack.addTopLevel(NotesRoute)
                             }
                         )
                     }
                     entry<CollectionsRoute> {
                         CollectionsScreen(innerPadding = innerPadding)
                     }
+                    entry<NotesRoute> {
+                        NotesScreen(
+                            innerPadding = innerPadding,
+                            onNoteClick = { noteId ->
+                                topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                            }
+                        )
+                    }
                     entry<SettingsRoute> {
                         SettingsScreen(innerPadding = innerPadding)
+                    }
+                    entry<NotePreviewRoute> { args ->
+                        com.capystick.notepad.NotePreviewScreen(
+                            noteId = args.noteId,
+                            innerPadding = innerPadding,
+                            onBack = { topLevelBackStack.removeLast() }
+                        )
                     }
                 }
             )
@@ -131,14 +153,14 @@ fun AppNavigation(
 }
 
 class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
-    private var topLevelStacks : LinkedHashMap<T, SnapshotStateList<T>> = linkedMapOf(
-        startKey to mutableStateListOf(startKey)
+    private var topLevelStacks : LinkedHashMap<T, SnapshotStateList<Any>> = linkedMapOf(
+        startKey to mutableStateListOf<Any>(startKey)
     )
 
     var topLevelKey by mutableStateOf(startKey)
         private set
 
-    val backStack = mutableStateListOf(startKey)
+    val backStack = mutableStateListOf<Any>(startKey)
 
     private fun updateBackStack() =
         backStack.apply {
@@ -148,7 +170,7 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
 
     fun addTopLevel(key: T){
         if (topLevelStacks[key] == null){
-            topLevelStacks[key] = mutableStateListOf(key)
+            topLevelStacks[key] = mutableStateListOf<Any>(key)
         } else {
             topLevelStacks.apply {
                 remove(key)?.let { put(key, it) }
@@ -158,19 +180,20 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
         updateBackStack()
     }
 
-    fun add(key: T){
+    fun addRoute(key: Any){
         topLevelStacks[topLevelKey]?.add(key)
         updateBackStack()
     }
 
     fun removeLast(){
-        val removedKey = topLevelStacks[topLevelKey]?.removeLastOrNull()
-        topLevelStacks.remove(removedKey)
-        if (topLevelStacks.isNotEmpty()) {
-            topLevelKey = topLevelStacks.keys.last()
-            updateBackStack()
-        } else {
-            backStack.clear()
+        val currentStack = topLevelStacks[topLevelKey]
+        currentStack?.removeLastOrNull()
+        if (currentStack?.isEmpty() == true) {
+            topLevelStacks.remove(topLevelKey)
+            if (topLevelStacks.isNotEmpty()) {
+                topLevelKey = topLevelStacks.keys.last()
+            }
         }
+        updateBackStack()
     }
 }

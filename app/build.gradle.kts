@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ktlint)
+    id("capystick.android.hilt")
 }
 
 android {
@@ -44,6 +45,8 @@ android {
 dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:navigation"))
+    implementation(project(":core:data"))
+    implementation(project(":core:database"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
