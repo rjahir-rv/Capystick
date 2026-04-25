@@ -21,3 +21,5 @@ data object NotesRoute : TopLevelRoute {
 }
 
 data class NotePreviewRoute(val noteId: Int)
+
+data class EditNoteRoute(val noteId: Int)

@@ -26,4 +26,11 @@ class NotePreviewViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteNote(note: Note, onComplete: () -> Unit) {
+        viewModelScope.launch {
+            repository.deleteNote(note)
+            onComplete()
+        }
+    }
 }

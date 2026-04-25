@@ -28,11 +28,20 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.capystick.collections.CollectionsScreen
+import com.capystick.notepad.NotePreviewScreen
 import com.capystick.notepad.NotepadScreen
 import com.capystick.notepad.NotesScreen
+import com.capystick.core.designsystem.R
 import com.capystick.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
@@ -44,34 +53,51 @@ fun AppNavigation(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val topLevelBackStack = remember { TopLevelBackStack<TopLevelRoute>(NotepadRoute) }
-    val selectedRoute =  topLevelBackStack.topLevelKey
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                Spacer(Modifier.height(12.dp))
-                levelRoutes.forEach { item ->
-                    val isSelected = item == topLevelBackStack.topLevelKey
-                    NavigationDrawerItem(
-                        label = { Text(item.title) },
-                        selected = isSelected,
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                            topLevelBackStack.addTopLevel(item)
-                        },
-                        icon = {
-                            val iconRes = when(item.title){
-                                "Crear nota" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_new_note)
-                                "Todas las notas" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_all_notes)
-                                "Colecciones" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_collection)
-                                "Ajustes" -> painterResource(com.capystick.core.designsystem.R.drawable.ic_settings)
-                                else -> null
-                            }
-                            Icon(painter = iconRes!!, contentDescription = item.title)
-                        },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(modifier.height(12.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.capystick_logo),
+                        contentDescription = "Capystick logo",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        alignment = Alignment.Center,
+                        contentScale = ContentScale.Crop
                     )
+
+                    Spacer(modifier.height(12.dp))
+
+                    levelRoutes.forEach { item ->
+                        val isSelected = item == topLevelBackStack.topLevelKey
+                        NavigationDrawerItem(
+                            label = { Text(item.title) },
+                            selected = isSelected,
+                            onClick = {
+                                scope.launch { drawerState.close() }
+                                topLevelBackStack.addTopLevel(item)
+                            },
+                            icon = {
+                                val iconRes = when (item.title) {
+                                    "Crear nota" -> painterResource(id = R.drawable.ic_new_note)
+                                    "Todas las notas" -> painterResource(id = R.drawable.ic_all_notes)
+                                    "Colecciones" -> painterResource(id = R.drawable.ic_collection)
+                                    "Ajustes" -> painterResource(id = R.drawable.ic_settings)
+                                    else -> null
+                                }
+                                Icon(painter = iconRes!!, contentDescription = item.title)
+                            },
+                            modifier = Modifier.padding(paddingValues = NavigationDrawerItemDefaults.ItemPadding)
+                        )
+                    }
                 }
             }
         },
@@ -80,7 +106,7 @@ fun AppNavigation(
         Scaffold(
             topBar = {
                 val currentRoute = topLevelBackStack.backStack.lastOrNull()
-                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute) {
+                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute != NotesRoute) {
                     CapyTopAppBar(
                         title = currentRoute.title,
                         onMenuClick = {
@@ -120,7 +146,6 @@ fun AppNavigation(
                                 scope.launch { drawerState.open() }
                             },
                             onNoteSaved = {
-                                // Navigate to NotesRoute
                                 topLevelBackStack.addTopLevel(NotesRoute)
                             }
                         )
@@ -131,6 +156,9 @@ fun AppNavigation(
                     entry<NotesRoute> {
                         NotesScreen(
                             innerPadding = innerPadding,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId))
                             }
@@ -140,10 +168,25 @@ fun AppNavigation(
                         SettingsScreen(innerPadding = innerPadding)
                     }
                     entry<NotePreviewRoute> { args ->
-                        com.capystick.notepad.NotePreviewScreen(
+                       NotePreviewScreen(
                             noteId = args.noteId,
                             innerPadding = innerPadding,
-                            onBack = { topLevelBackStack.removeLast() }
+                            onBack = { topLevelBackStack.removeLast() },
+                            onEditNote = { noteId ->
+                                topLevelBackStack.addRoute(EditNoteRoute(noteId))
+                            }
+                        )
+                    }
+                    entry<EditNoteRoute> { args ->
+                        NotepadScreen(
+                            noteId = args.noteId,
+                            innerPadding = innerPadding,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onNoteSaved = {
+                                topLevelBackStack.removeLast()
+                            }
                         )
                     }
                 }
@@ -154,7 +197,7 @@ fun AppNavigation(
 
 class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
     private var topLevelStacks : LinkedHashMap<T, SnapshotStateList<Any>> = linkedMapOf(
-        startKey to mutableStateListOf<Any>(startKey)
+        startKey to mutableStateListOf(startKey)
     )
 
     var topLevelKey by mutableStateOf(startKey)
@@ -170,7 +213,7 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
 
     fun addTopLevel(key: T){
         if (topLevelStacks[key] == null){
-            topLevelStacks[key] = mutableStateListOf<Any>(key)
+            topLevelStacks[key] = mutableStateListOf(key)
         } else {
             topLevelStacks.apply {
                 remove(key)?.let { put(key, it) }

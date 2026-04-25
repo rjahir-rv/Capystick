@@ -19,7 +19,7 @@ fun CapyPrimaryButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary, // Tu NeonRed
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         shape = RoundedCornerShape(8.dp),

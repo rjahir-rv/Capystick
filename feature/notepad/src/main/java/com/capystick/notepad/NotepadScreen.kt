@@ -32,6 +32,7 @@ import com.capystick.core.designsystem.R
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,12 +40,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.notepad.viewmodel.NotepadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotepadScreen(
     modifier: Modifier = Modifier,
+    noteId: Int? = null,
     innerPadding: PaddingValues,
     onMenuClick: () -> Unit,
     onNoteSaved: () -> Unit = {},
@@ -53,6 +56,26 @@ fun NotepadScreen(
     val richTextState = rememberRichTextState()
     var title by rememberSaveable { mutableStateOf("Nueva nota") }
 
+    LaunchedEffect(noteId) {
+        if (noteId != null) {
+            viewModel.loadNote(noteId)
+        } else {
+            viewModel.clearNotepad()
+            title = "Nueva nota"
+            richTextState.setHtml("")
+        }
+    }
+
+    val note by viewModel.note.collectAsStateWithLifecycle()
+    LaunchedEffect(note) {
+        if (noteId != null) {
+            note?.let {
+                title = it.title
+                richTextState.setHtml(it.content)
+            }
+        }
+    }
+    
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -69,16 +92,32 @@ fun NotepadScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_menu),
-                            contentDescription = "Menu",
-                            modifier = Modifier.size(28.dp)
-                        )
+                    if (noteId == null) {
+                        IconButton(onClick = onMenuClick) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_menu),
+                                contentDescription = "Menu",
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = onNoteSaved) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_arrow_back),
+                                contentDescription = "Back",
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.saveNote(title, richTextState.toHtml()) { onNoteSaved() } }) {
+                    IconButton(onClick = { 
+                        viewModel.saveNote(title, richTextState.toHtml()) { 
+                            title = "Nueva nota"
+                            richTextState.setHtml("")
+                            onNoteSaved() 
+                        } 
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_saved),
                             contentDescription = "Guardar nota",
@@ -137,7 +176,7 @@ fun NotepadScreen(
                     IconButton(
                         onClick = { richTextState.toggleSpanStyle(SpanStyle(fontStyle = FontStyle.Italic)) },
                         modifier = Modifier.background(
-                            if (isItalic) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
+                            color = if (isItalic) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
                             CircleShape
                         )
                     ) {
@@ -172,7 +211,11 @@ fun NotepadScreen(
                         )
                     }
                     IconButton(onClick = { /* TODO: Implement List */ }) {
-                        Icon(painterResource(R.drawable.ic_format_streamline), contentDescription = "List")
+                        Icon(
+                            painterResource(R.drawable.ic_format_streamline),
+                            contentDescription = "List",
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
             }
