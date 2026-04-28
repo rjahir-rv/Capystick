@@ -9,6 +9,8 @@ dependencies {
     compileOnly(libs.findLibrary("android.gradlePlugin").get())
     compileOnly(libs.findLibrary("kotlin.gradlePlugin").get())
     compileOnly(libs.findLibrary("compose.compiler.gradlePlugin").get())
+    compileOnly(libs.findLibrary("hilt.gradlePlugin").get())
+    compileOnly(libs.findLibrary("ksp.gradlePlugin").get())
 }
 
 gradlePlugin {
@@ -16,6 +18,10 @@ gradlePlugin {
         register("androidLibraryCompose") {
             id = "capystick.android.library.compose"
             implementationClass = "com.capystick.buildlogic.AndroidLibraryComposeConventionPlugin"
+        }
+        register("androidHilt") {
+            id = "capystick.android.hilt"
+            implementationClass = "com.capystick.buildlogic.AndroidHiltConventionPlugin"
         }
     }
 }

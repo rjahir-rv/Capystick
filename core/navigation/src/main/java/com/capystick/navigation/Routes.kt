@@ -15,3 +15,11 @@ data object CollectionsRoute : TopLevelRoute {
 data object SettingsRoute : TopLevelRoute {
     override val title = "Ajustes"
 }
+
+data object NotesRoute : TopLevelRoute {
+    override val title = "Todas las notas"
+}
+
+data class NotePreviewRoute(val noteId: Int)
+
+data class EditNoteRoute(val noteId: Int)

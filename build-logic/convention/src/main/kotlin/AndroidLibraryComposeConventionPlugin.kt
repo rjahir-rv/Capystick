@@ -17,6 +17,7 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
                 defaultConfig{
                     compileSdk = 37
                     minSdk = 28
+                    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 }
 
                 buildFeatures {
@@ -33,6 +34,15 @@ class AndroidLibraryComposeConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
                 add("implementation", libs.findLibrary("androidx-compose-material3").get())
                 add("implementation", libs.findLibrary("androidx-ui-text-google-fonts").get())
+
+                // Common Test Dependencies
+                add("testImplementation", libs.findLibrary("junit").get())
+                add("androidTestImplementation", libs.findLibrary("androidx-junit").get())
+                add("androidTestImplementation", libs.findLibrary("androidx-espresso-core").get())
+                add("androidTestImplementation", platform(libs.findLibrary("androidx-compose-bom").get()))
+                add("androidTestImplementation", libs.findLibrary("androidx-compose-ui-test-junit4").get())
+                add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
+                add("debugImplementation", libs.findLibrary("androidx-compose-ui-test-manifest").get())
             }
         }
     }
