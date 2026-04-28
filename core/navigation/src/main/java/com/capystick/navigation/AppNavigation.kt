@@ -155,7 +155,12 @@ fun AppNavigation(
                         )
                     }
                     entry<CollectionsRoute> {
-                        CollectionsScreen(innerPadding = innerPadding)
+                        CollectionsScreen(
+                            innerPadding = innerPadding,
+                            onCollectionClick = { id, name ->
+                                topLevelBackStack.addRoute(CollectionNotesRoute(id, name))
+                            }
+                        )
                     }
                     entry<NotesRoute> {
                         NotesScreen(
@@ -165,6 +170,39 @@ fun AppNavigation(
                             },
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                            },
+                            onAddNoteClick = {
+                                topLevelBackStack.addTopLevel(NotepadRoute)
+                            }
+                        )
+
+                    }
+                    entry<CollectionNotesRoute> { args ->
+                        NotesScreen(
+                            innerPadding = innerPadding,
+                            collectionId = args.collectionId,
+                            collectionName = args.collectionName,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onNoteClick = { noteId ->
+                                topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                            },
+                            onAddNoteClick = {
+                                topLevelBackStack.addRoute(CreateCollectionNoteRoute(args.collectionId))
+                            }
+                        )
+                    }
+                    entry<CreateCollectionNoteRoute> { args ->
+                        NotepadScreen(
+                            noteId = null,
+                            collectionId = args.collectionId,
+                            innerPadding = innerPadding,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onNoteSaved = {
+                                topLevelBackStack.removeLast()
                             }
                         )
                     }
@@ -215,8 +253,9 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
             addAll(topLevelStacks.flatMap { it.value })
         }
 
-    fun addTopLevel(key: T){
-        if (topLevelStacks[key] == null){
+    fun addTopLevel(key: T, resetToRoot: Boolean = true){
+        if (topLevelStacks[key] == null || resetToRoot){
+            topLevelStacks.remove(key)
             topLevelStacks[key] = mutableStateListOf(key)
         } else {
             topLevelStacks.apply {

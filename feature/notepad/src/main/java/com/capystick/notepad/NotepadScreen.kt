@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 fun NotepadScreen(
     modifier: Modifier = Modifier,
     noteId: Int? = null,
+    collectionId: Int? = null,
     innerPadding: PaddingValues,
     onMenuClick: () -> Unit,
     onNoteSaved: () -> Unit = {},
@@ -165,7 +166,7 @@ fun NotepadScreen(
                     }
 
                     IconButton(onClick = { 
-                        viewModel.saveNote(title, richTextState.toHtml()) { 
+                        viewModel.saveNote(title, richTextState.toHtml(), collectionId) { 
                             title = "Nueva nota"
                             richTextState.setHtml("")
                             onNoteSaved() 

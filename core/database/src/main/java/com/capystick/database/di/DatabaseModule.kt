@@ -2,6 +2,7 @@ package com.capystick.database.di
 
 import android.content.Context
 import androidx.room.Room
+import com.capystick.database.dao.CollectionDao
 import com.capystick.database.dao.NoteDao
 import com.capystick.database.db.CapystickDB
 import com.capystick.database.db.CreateDatabase
@@ -30,5 +31,10 @@ object DatabaseModule {
     @Provides
     fun provideNoteDao(database: CapystickDB): NoteDao {
         return database.noteDao()
+    }
+
+    @Provides
+    fun provideCollectionDao(database: CapystickDB): CollectionDao {
+        return database.collectionDao()
     }
 }

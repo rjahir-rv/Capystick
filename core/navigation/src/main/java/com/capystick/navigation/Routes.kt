@@ -23,3 +23,10 @@ data object NotesRoute : TopLevelRoute {
 data class NotePreviewRoute(val noteId: Int)
 
 data class EditNoteRoute(val noteId: Int)
+
+data class CollectionNotesRoute(
+    val collectionId: Int,
+    val collectionName: String
+)
+
+data class CreateCollectionNoteRoute(val collectionId: Int)

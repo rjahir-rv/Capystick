@@ -3,13 +3,17 @@ package com.capystick.notepad
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -23,6 +27,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +36,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.notepad.viewmodel.NoteSortOrder
@@ -44,20 +54,35 @@ import com.capystick.designsystem.components.CapyNoteCard
 fun NotesScreen(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    collectionId: Int? = null,
+    collectionName: String? = null,
     onMenuClick: () -> Unit = {},
     onNoteClick: (Int) -> Unit = {},
+    onAddNoteClick: () -> Unit = {},
     viewModel: NotesViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(collectionId, collectionName) {
+        viewModel.initialize(collectionId, collectionName)
+    }
+
     val notes by viewModel.notes.collectAsStateWithLifecycle()
+    val title by viewModel.title.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val isSearchActive by viewModel.isSearchActive.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
+
+    val collections by viewModel.collections.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+    var selectedNoteId by remember { mutableStateOf<Int?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
         topBar = {
             NotesTopAppBar(
+                title = title,
                 isSearchActive = isSearchActive,
                 searchQuery = searchQuery,
                 sortOrder = sortOrder,
@@ -75,7 +100,7 @@ fun NotesScreen(
         ) {
             if (notes.isEmpty()) {
                 Text(
-                    text = "No hay notas aún",
+                    text = if (collectionId != null) "Aun no hay notas en esta coleccion" else "No hay notas aún",
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
@@ -98,10 +123,133 @@ fun NotesScreen(
                             title = note.title,
                             dateString = dateString,
                             plainText = plainText,
-                            onClick = { onNoteClick(note.id) }
+                            onClick = { onNoteClick(note.id) },
+                            onLongClick = {
+                                selectedNoteId = note.id
+                                showBottomSheet = true
+                            }
                         )
                     }
                 }
+            }
+            
+            androidx.compose.material3.FloatingActionButton(
+                onClick = onAddNoteClick,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(24.dp),
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_new_note),
+                    contentDescription = "Crear nota"
+                )
+            }
+        }
+
+        if (showBottomSheet && selectedNoteId != null) {
+            ModalBottomSheet(
+                onDismissRequest = { 
+                    showBottomSheet = false 
+                    selectedNoteId = null
+                },
+                sheetState = sheetState
+            ) {
+                CollectionAssignmentContent(
+                    collections = collections,
+                    onCollectionSelected = { collectionId ->
+                        viewModel.addNoteToCollection(selectedNoteId!!, collectionId)
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            showBottomSheet = false
+                            selectedNoteId = null
+                        }
+                    },
+                    onCreateCollection = { name ->
+                        viewModel.createCollectionAndAddNote(name, selectedNoteId!!)
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            showBottomSheet = false
+                            selectedNoteId = null
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CollectionAssignmentContent(
+    collections: List<com.capystick.model.Collection>,
+    onCollectionSelected: (Int) -> Unit,
+    onCreateCollection: (String) -> Unit
+) {
+    var newCollectionName by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .padding(bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Añadir a colección",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+        )
+
+        if (collections.isEmpty()) {
+            Text(text = "No tienes colecciones. Crea una nueva:")
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(collections) { collection ->
+                    androidx.compose.material3.Surface(
+                        onClick = { onCollectionSelected(collection.id) },
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = collection.name,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+            Text(text = "O crea una nueva:")
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = newCollectionName,
+                onValueChange = { newCollectionName = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Nombre de la colección") },
+                singleLine = true
+            )
+            IconButton(
+                onClick = {
+                    if (newCollectionName.isNotBlank()) {
+                        onCreateCollection(newCollectionName)
+                    }
+                },
+                enabled = newCollectionName.isNotBlank()
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_new_note),
+                    contentDescription = "Crear",
+                    tint = if (newCollectionName.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Gray
+                )
             }
         }
     }
@@ -110,6 +258,7 @@ fun NotesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesTopAppBar(
+    title: String,
     isSearchActive: Boolean,
     searchQuery: String,
     sortOrder: NoteSortOrder,
@@ -153,7 +302,7 @@ fun NotesTopAppBar(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Todas las notas",
+                        text = title,
                         style = MaterialTheme.typography.titleLarge
                     )
                 },

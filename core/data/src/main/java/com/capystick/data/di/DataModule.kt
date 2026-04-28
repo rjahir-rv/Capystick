@@ -1,6 +1,8 @@
 package com.capystick.data.di
 
+import com.capystick.data.repository.CollectionRepositoryImpl
 import com.capystick.data.repository.NoteRepositoryImpl
+import com.capystick.domain.repository.CollectionRepository
 import com.capystick.domain.repository.NoteRepository
 import dagger.Binds
 import dagger.Module
@@ -15,4 +17,9 @@ abstract class DataModule {
     abstract fun bindNoteRepository(
         noteRepositoryImpl: NoteRepositoryImpl
     ): NoteRepository
+
+    @Binds
+    abstract fun bindCollectionRepository(
+        collectionRepositoryImpl: CollectionRepositoryImpl
+    ): CollectionRepository
 }
