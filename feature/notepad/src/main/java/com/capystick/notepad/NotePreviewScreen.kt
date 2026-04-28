@@ -133,7 +133,6 @@ fun NotePreviewScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val plainText = remember(note?.content) {

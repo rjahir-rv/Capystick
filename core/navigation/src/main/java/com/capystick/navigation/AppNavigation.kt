@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation3.runtime.entryProvider
@@ -69,9 +70,9 @@ fun AppNavigation(
                         contentDescription = "Capystick logo",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(100.dp),
-                        alignment = Alignment.Center,
-                        contentScale = ContentScale.Crop
+                            .height(80.dp),
+                        alignment = Alignment.CenterStart,
+                        contentScale = ContentScale.Fit
                     )
 
                     Spacer(modifier.height(12.dp))
@@ -95,6 +96,9 @@ fun AppNavigation(
                                 }
                                 Icon(painter = iconRes!!, contentDescription = item.title)
                             },
+                            colors = NavigationDrawerItemDefaults.colors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
+                            ),
                             modifier = Modifier.padding(paddingValues = NavigationDrawerItemDefaults.ItemPadding)
                         )
                     }
