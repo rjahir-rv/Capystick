@@ -32,16 +32,20 @@ fun CapyNoteCard(
     title: String,
     dateString: String,
     plainText: String,
+    isSelected: Boolean = false,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {}
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(size = 16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 2.dp),
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+        ),
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
@@ -71,7 +75,7 @@ fun CapyNoteCard(
                 Surface(
                     shape = RoundedCornerShape(50),
                     color = MaterialTheme.colorScheme.surfaceVariant,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                    border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
                 ) {
                     Text(
                         text = dateString,

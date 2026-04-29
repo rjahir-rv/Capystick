@@ -99,9 +99,60 @@ class NotesViewModel @Inject constructor(
         _sortOrder.value = order
     }
 
-    fun addNoteToCollection(noteId: Int, collectionId: Int) {
+    private val _selectedNoteIds = MutableStateFlow<Set<Int>>(emptySet())
+    val selectedNoteIds = _selectedNoteIds.asStateFlow()
+
+    val isSelectionMode = _selectedNoteIds.map { it.isNotEmpty() }
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            initialValue = false
+        )
+
+    fun toggleSelection(noteId: Int) {
+        _selectedNoteIds.value = _selectedNoteIds.value.toMutableSet().apply {
+            if (contains(noteId)) remove(element = noteId) else add(noteId)
+        }
+    }
+
+    fun clearSelection() {
+        _selectedNoteIds.value = emptySet()
+    }
+
+    fun deleteSelectedNotes() {
         viewModelScope.launch {
-            collectionRepository.addNoteToCollection(noteId, collectionId)
+            val colId = _collectionId.value
+            val selectedIds = _selectedNoteIds.value
+            if (colId != null) {
+                selectedIds.forEach { noteId ->
+                    collectionRepository.removeNoteFromCollection(noteId, colId)
+                }
+            } else {
+                val notesToDelete = notes.value.filter { selectedIds.contains(it.id) }
+                notesToDelete.forEach { note ->
+                    noteRepository.deleteNote(note)
+                }
+            }
+            clearSelection()
+        }
+    }
+
+    fun addSelectedNotesToCollection(collectionId: Int) {
+        viewModelScope.launch {
+            _selectedNoteIds.value.forEach { noteId ->
+                collectionRepository.addNoteToCollection(noteId, collectionId)
+            }
+            clearSelection()
+        }
+    }
+
+    fun createCollectionAndAddSelectedNotes(name: String) {
+        viewModelScope.launch {
+            val collectionId = collectionRepository.saveCollection(Collection(name = name))
+            _selectedNoteIds.value.forEach { noteId ->
+                collectionRepository.addNoteToCollection(noteId, collectionId.toInt())
+            }
+            clearSelection()
         }
     }
 

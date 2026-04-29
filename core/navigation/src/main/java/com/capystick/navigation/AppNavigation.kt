@@ -110,7 +110,7 @@ fun AppNavigation(
         Scaffold(
             topBar = {
                 val currentRoute = topLevelBackStack.backStack.lastOrNull()
-                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute != NotesRoute) {
+                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute) {
                     CapyTopAppBar(
                         title = currentRoute.title,
                         onMenuClick = {
@@ -157,6 +157,9 @@ fun AppNavigation(
                     entry<CollectionsRoute> {
                         CollectionsScreen(
                             innerPadding = innerPadding,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
                             onCollectionClick = { id, name ->
                                 topLevelBackStack.addRoute(CollectionNotesRoute(id, name))
                             }
