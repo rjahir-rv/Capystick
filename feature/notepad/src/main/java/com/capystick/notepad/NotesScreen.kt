@@ -201,7 +201,7 @@ fun NotesScreen(
                 CollectionAssignmentContent(
                     collections = collections,
                     onCollectionSelected = { collectionId ->
-                        viewModel.addSelectedNotesToCollection(collectionId)
+                        viewModel.selectedNotesToCollection(collectionId)
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             showBottomSheet = false
                         }
@@ -340,7 +340,7 @@ fun NotesTopAppBar(
 ) {
     var expandedFilter by remember { mutableStateOf(false) }
 
-    AnimatedContent(targetState = isSearchActive, label = "search_bar_anim") { searchActive ->
+    AnimatedContent(targetState = isSearchActive, label = "search_bar_animate") { searchActive ->
         if (searchActive) {
             TopAppBar(
                 title = {

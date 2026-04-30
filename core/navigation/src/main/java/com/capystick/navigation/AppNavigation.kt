@@ -44,6 +44,7 @@ import com.capystick.notepad.NotepadScreen
 import com.capystick.notepad.NotesScreen
 import com.capystick.core.designsystem.R
 import com.capystick.settings.SettingsScreen
+import com.capystick.settings.TrashScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -210,7 +211,18 @@ fun AppNavigation(
                         )
                     }
                     entry<SettingsRoute> {
-                        SettingsScreen(innerPadding = innerPadding)
+                        SettingsScreen(
+                            innerPadding = innerPadding,
+                            onTrashClick = {
+                                topLevelBackStack.addRoute(TrashRoute)
+                            },
+                        )
+                    }
+                    entry<TrashRoute> {
+                        TrashScreen(
+                            innerPadding = innerPadding,
+                            onBack = { topLevelBackStack.removeLast() },
+                        )
                     }
                     entry<NotePreviewRoute> { args ->
                        NotePreviewScreen(

@@ -30,3 +30,5 @@ data class CollectionNotesRoute(
 )
 
 data class CreateCollectionNoteRoute(val collectionId: Int)
+
+data object TrashRoute

@@ -11,8 +11,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM notes ORDER BY timestamp DESC")
+    @Query("SELECT * FROM notes WHERE isDeleted = 0 ORDER BY timestamp DESC")
     fun getAllNotes(): Flow<List<NoteEntity>>
+
+    @Query("SELECT * FROM notes WHERE isDeleted = 1 ORDER BY timestamp DESC")
+    fun getDeletedNotes(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes WHERE id = :id")
     fun getNoteById(id: Int): Flow<NoteEntity?>
@@ -25,4 +28,16 @@ interface NoteDao {
 
     @Delete
     suspend fun deleteNote(note: NoteEntity)
+
+    @Query("UPDATE notes SET isDeleted = 1 WHERE id = :id")
+    suspend fun softDeleteNote(id: Int)
+
+    @Query("UPDATE notes SET isDeleted = 0 WHERE id = :id")
+    suspend fun restoreNote(id: Int)
+
+    @Query("UPDATE notes SET isDeleted = 0 WHERE isDeleted = 1")
+    suspend fun restoreAllNotes()
+
+    @Query("DELETE FROM notes WHERE isDeleted = 1")
+    suspend fun permanentlyDeleteAllTrashed()
 }

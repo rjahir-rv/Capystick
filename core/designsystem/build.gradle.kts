@@ -11,4 +11,6 @@ dependencies {
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.ui.graphics)
     api(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.core)
 }

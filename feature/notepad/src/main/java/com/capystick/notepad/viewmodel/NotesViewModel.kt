@@ -29,7 +29,7 @@ class NotesViewModel @Inject constructor(
     private val _collectionName = MutableStateFlow<String?>(null)
 
     val title: StateFlow<String> = _collectionName.map { it ?: "Todas las notas" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Todas las notas")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed( stopTimeoutMillis = 5000), "Todas las notas")
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
@@ -37,13 +37,13 @@ class NotesViewModel @Inject constructor(
     private val _isSearchActive = MutableStateFlow(false)
     val isSearchActive = _isSearchActive.asStateFlow()
 
-    private val _sortOrder = MutableStateFlow(NoteSortOrder.DATE_DESC)
+    private val _sortOrder = MutableStateFlow( value = NoteSortOrder.DATE_DESC)
     val sortOrder = _sortOrder.asStateFlow()
 
     val collections: StateFlow<List<Collection>> = collectionRepository.getAllCollections()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed( stopTimeoutMillis = 5000),
             initialValue = emptyList()
         )
 
@@ -51,7 +51,7 @@ class NotesViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val notes: StateFlow<List<Note>> = _collectionId.flatMapLatest { colId ->
         val sourceFlow = if (colId != null) {
-            collectionRepository.getNotesInCollection(colId)
+            collectionRepository.getNotesInCollection( collectionId = colId)
         } else {
             noteRepository.getAllNotes()
         }
@@ -125,19 +125,18 @@ class NotesViewModel @Inject constructor(
             val selectedIds = _selectedNoteIds.value
             if (colId != null) {
                 selectedIds.forEach { noteId ->
-                    collectionRepository.removeNoteFromCollection(noteId, colId)
+                    collectionRepository.removeNoteFromCollection(noteId,  collectionId = colId)
                 }
             } else {
-                val notesToDelete = notes.value.filter { selectedIds.contains(it.id) }
-                notesToDelete.forEach { note ->
-                    noteRepository.deleteNote(note)
+                selectedIds.forEach { noteId ->
+                    noteRepository.softDeleteNote(noteId)
                 }
             }
             clearSelection()
         }
     }
 
-    fun addSelectedNotesToCollection(collectionId: Int) {
+    fun selectedNotesToCollection(collectionId: Int) {
         viewModelScope.launch {
             _selectedNoteIds.value.forEach { noteId ->
                 collectionRepository.addNoteToCollection(noteId, collectionId)
@@ -153,13 +152,6 @@ class NotesViewModel @Inject constructor(
                 collectionRepository.addNoteToCollection(noteId, collectionId.toInt())
             }
             clearSelection()
-        }
-    }
-
-    fun createCollectionAndAddNote(name: String, noteId: Int) {
-        viewModelScope.launch {
-            val id = collectionRepository.saveCollection(Collection(name = name))
-            collectionRepository.addNoteToCollection(noteId, id.toInt())
         }
     }
 }
