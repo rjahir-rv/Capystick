@@ -39,4 +39,22 @@ interface CollectionDao {
 
     @Query("DELETE FROM note_collection_cross_ref WHERE noteId = :noteId AND collectionId = :collectionId")
     suspend fun deleteNoteCollectionCrossRef(noteId: Int, collectionId: Int)
+
+    // ── Backup / restore ─────────────────────────────────────────────────────
+
+    /** Returns ALL collections as a one-shot list for backup export. */
+    @Query("SELECT * FROM collections ORDER BY name ASC")
+    suspend fun getAllCollectionsSnapshot(): List<CollectionEntity>
+
+    /** Returns ALL cross-refs as a one-shot list for backup export. */
+    @Query("SELECT * FROM note_collection_cross_ref")
+    suspend fun getAllCrossRefs(): List<NoteCollectionCrossRef>
+
+    /** Deletes all collections — called during backup import (replace strategy). */
+    @Query("DELETE FROM collections")
+    suspend fun deleteAllCollections()
+
+    /** Deletes all cross-refs — called during backup import (replace strategy). */
+    @Query("DELETE FROM note_collection_cross_ref")
+    suspend fun deleteAllCrossRefs()
 }

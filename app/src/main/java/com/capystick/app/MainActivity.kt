@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val themeOption by themePreferences.themeOption.collectAsStateWithLifecycle(
-                initialValue = ThemeOption.SYSTEM
+                initialValue = ThemeOption.SYSTEM,
             )
 
             CapystickTheme(themeOption = themeOption) {

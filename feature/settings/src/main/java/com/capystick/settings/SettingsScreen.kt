@@ -50,6 +50,7 @@ fun SettingsScreen(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     onTrashClick: () -> Unit = {},
+    onBackupClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val currentTheme by viewModel.themeOption.collectAsStateWithLifecycle()
@@ -71,7 +72,7 @@ fun SettingsScreen(
         SettingsItem(
             icon = painterResource(id = R.drawable.ic_backup),
             title = "Copia de seguridad",
-            onClick = {},
+            onClick = onBackupClick,
         )
         SettingsItem(
             icon = painterResource(id = R.drawable.ic_trash),

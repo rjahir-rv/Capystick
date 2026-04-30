@@ -19,12 +19,10 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val themePreferences = ThemePreferences(context)
-
-    /** Currently saved theme option, collected as a hot StateFlow. */
     val themeOption: StateFlow<ThemeOption> = themePreferences.themeOption
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed( stopTimeoutMillis = 5_000),
             initialValue = ThemeOption.SYSTEM,
         )
 
