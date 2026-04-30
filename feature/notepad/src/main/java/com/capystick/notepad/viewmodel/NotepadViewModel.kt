@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotepadViewModel @Inject constructor(
-    private val repository: NoteRepository
+    private val repository: NoteRepository,
+    private val collectionRepository: com.capystick.domain.repository.CollectionRepository
 ) : ViewModel() {
 
     private var currentNoteId: Int? = null
@@ -33,7 +34,7 @@ class NotepadViewModel @Inject constructor(
         _note.value = null
     }
 
-    fun saveNote(title: String, content: String, onComplete: () -> Unit = {}) {
+    fun saveNote(title: String, content: String, collectionId: Int? = null, onComplete: () -> Unit = {}) {
         viewModelScope.launch {
             val note = Note(
                 id = currentNoteId ?: 0,
@@ -42,7 +43,12 @@ class NotepadViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis(), // Updating timestamp on edit
                 colorHex = 0xFFFFFFFF // TODO: Add color selection support
             )
-            repository.saveNote(note)
+            val noteId = repository.saveNote(note).toInt()
+            
+            if (collectionId != null && currentNoteId == null) {
+                collectionRepository.addNoteToCollection(noteId, collectionId)
+            }
+            
             onComplete()
         }
     }
