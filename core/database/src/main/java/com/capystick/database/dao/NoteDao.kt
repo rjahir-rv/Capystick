@@ -41,17 +41,16 @@ interface NoteDao {
     @Query("DELETE FROM notes WHERE isDeleted = 1")
     suspend fun permanentlyDeleteAllTrashed()
 
-    // ── Backup / restore ─────────────────────────────────────────────────────
-
-    /** Returns ALL notes (including soft-deleted) as a one-shot list for backup export. */
+    // Returns ALL notes
     @Query("SELECT * FROM notes ORDER BY timestamp DESC")
     suspend fun getAllNotesSnapshot(): List<NoteEntity>
 
-    /** Counts notes that are NOT soft-deleted, used to guard empty-backup exports. */
+    @Query("SELECT * FROM notes WHERE isDeleted = 0 ORDER BY timestamp DESC")
+    suspend fun getActiveNotesSnapshot(): List<NoteEntity>
+
     @Query("SELECT COUNT(*) FROM notes WHERE isDeleted = 0")
     suspend fun countActiveNotes(): Int
 
-    /** Deletes every row in the notes table — called during backup import (replace strategy). */
     @Query("DELETE FROM notes")
     suspend fun deleteAllNotes()
 }

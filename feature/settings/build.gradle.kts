@@ -16,4 +16,5 @@ dependencies {
     implementation(libs.material)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.documentfile)
 }

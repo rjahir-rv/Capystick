@@ -50,28 +50,16 @@ class NotesViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val notes: StateFlow<List<Note>> = _collectionId.flatMapLatest { colId ->
-        val sourceFlow = if (colId != null) {
-            collectionRepository.getNotesInCollection( collectionId = colId)
-        } else {
-            noteRepository.getAllNotes()
-        }
-        
+        val sourceFlow = notesSourceFor(colId)
+
         combine(
             flow = sourceFlow,
             flow2 = _searchQuery,
             flow3 = _sortOrder
         ) { notesList, query, order ->
-            var result = notesList
-            if (query.isNotBlank()) {
-                result = result.filter { it.title.contains(query, ignoreCase = true) }
-            }
-            result = when (order) {
-                NoteSortOrder.DATE_DESC -> result.sortedByDescending { it.timestamp }
-                NoteSortOrder.DATE_ASC -> result.sortedBy { it.timestamp }
-                NoteSortOrder.TITLE_ASC -> result.sortedBy { it.title.lowercase() }
-                NoteSortOrder.TITLE_DESC -> result.sortedByDescending { it.title.lowercase() }
-            }
-            result
+            notesList
+                .filterByQuery(query)
+                .sortBy(order)
         }
     }.stateIn(
         scope = viewModelScope,
@@ -124,13 +112,9 @@ class NotesViewModel @Inject constructor(
             val colId = _collectionId.value
             val selectedIds = _selectedNoteIds.value
             if (colId != null) {
-                selectedIds.forEach { noteId ->
-                    collectionRepository.removeNoteFromCollection(noteId,  collectionId = colId)
-                }
+                removeSelectedNotesFromCollection(selectedIds, colId)
             } else {
-                selectedIds.forEach { noteId ->
-                    noteRepository.softDeleteNote(noteId)
-                }
+                softDeleteSelectedNotes(selectedIds)
             }
             clearSelection()
         }
@@ -138,20 +122,57 @@ class NotesViewModel @Inject constructor(
 
     fun selectedNotesToCollection(collectionId: Int) {
         viewModelScope.launch {
-            _selectedNoteIds.value.forEach { noteId ->
-                collectionRepository.addNoteToCollection(noteId, collectionId)
-            }
+            addSelectedNotesToCollection(collectionId)
             clearSelection()
         }
     }
 
     fun createCollectionAndAddSelectedNotes(name: String) {
         viewModelScope.launch {
-            val collectionId = collectionRepository.saveCollection(Collection(name = name))
-            _selectedNoteIds.value.forEach { noteId ->
-                collectionRepository.addNoteToCollection(noteId, collectionId.toInt())
-            }
+            val collectionId = collectionRepository.saveCollection(Collection(name = name)).toInt()
+            addSelectedNotesToCollection(collectionId)
             clearSelection()
+        }
+    }
+
+    private fun notesSourceFor(collectionId: Int?) = if (collectionId != null) {
+        collectionRepository.getNotesInCollection(collectionId = collectionId)
+    } else {
+        noteRepository.getAllNotes()
+    }
+
+    private fun List<Note>.filterByQuery(query: String): List<Note> {
+        if (query.isBlank()) return this
+        return filter { it.title.contains(query, ignoreCase = true) }
+    }
+
+    private fun List<Note>.sortBy(order: NoteSortOrder): List<Note> {
+        return when (order) {
+            NoteSortOrder.DATE_DESC -> sortedByDescending { it.timestamp }
+            NoteSortOrder.DATE_ASC -> sortedBy { it.timestamp }
+            NoteSortOrder.TITLE_ASC -> sortedBy { it.title.lowercase() }
+            NoteSortOrder.TITLE_DESC -> sortedByDescending { it.title.lowercase() }
+        }
+    }
+
+    private suspend fun addSelectedNotesToCollection(collectionId: Int) {
+        _selectedNoteIds.value.forEach { noteId ->
+            collectionRepository.addNoteToCollection(noteId, collectionId)
+        }
+    }
+
+    private suspend fun removeSelectedNotesFromCollection(
+        selectedIds: Set<Int>,
+        collectionId: Int,
+    ) {
+        selectedIds.forEach { noteId ->
+            collectionRepository.removeNoteFromCollection(noteId, collectionId = collectionId)
+        }
+    }
+
+    private suspend fun softDeleteSelectedNotes(selectedIds: Set<Int>) {
+        selectedIds.forEach { noteId ->
+            noteRepository.softDeleteNote(noteId)
         }
     }
 }
