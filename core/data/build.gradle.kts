@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":core:database"))
     implementation(project(":core:domain"))
     implementation(libs.androidx.room.ktx)
+    implementation(libs.mlkit.text.recognition)
     testImplementation(libs.junit)
     testImplementation(libs.json)
 }

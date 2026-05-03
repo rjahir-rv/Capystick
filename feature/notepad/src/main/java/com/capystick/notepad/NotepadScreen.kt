@@ -3,6 +3,8 @@ package com.capystick.notepad
 import android.content.ClipData
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -17,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -98,7 +101,11 @@ fun NotepadScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(scaffoldPadding)
-                .padding(innerPadding)
+                .padding(
+                    start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
+                    end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
                 .consumeWindowInsets(scaffoldPadding)
                 .imePadding(),
         ) {

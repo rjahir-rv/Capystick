@@ -8,6 +8,8 @@ import com.capystick.domain.repository.BackupRepository
 import com.capystick.domain.repository.CollectionRepository
 import com.capystick.domain.repository.NoteRepository
 import com.capystick.domain.repository.NotesExportRepository
+import com.capystick.data.scan.MlKitTextRecognizer
+import com.capystick.domain.scan.TextRecognizer
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -36,4 +38,9 @@ abstract class DataModule {
     abstract fun bindNotesExportRepository(
         notesExportRepositoryImpl: NotesExportRepositoryImpl,
     ): NotesExportRepository
+
+    @Binds
+    abstract fun bindTextRecognizer(
+        mlKitTextRecognizer: MlKitTextRecognizer,
+    ): TextRecognizer
 }

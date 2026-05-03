@@ -20,6 +20,10 @@ data object NotesRoute : TopLevelRoute {
     override val title = "Todas las notas"
 }
 
+data object ScanRoute : TopLevelRoute {
+    override val title = "Escanear nota"
+}
+
 data class NotePreviewRoute(val noteId: Int)
 
 data class EditNoteRoute(val noteId: Int)

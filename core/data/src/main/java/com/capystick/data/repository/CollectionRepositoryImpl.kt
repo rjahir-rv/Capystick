@@ -18,14 +18,16 @@ class CollectionRepositoryImpl @Inject constructor(
     override fun getAllCollections(): Flow<List<Collection>> {
         return collectionDao.getAllCollectionsWithNotes().map { entities ->
             entities.map { 
-                it.collection.toDomain().copy(noteCount = it.notes.size)
+                it.collection.toDomain().copy(noteCount = it.notes.count { note -> !note.isDeleted })
             }
         }
     }
 
     override fun getNotesInCollection(collectionId: Int): Flow<List<Note>> {
         return collectionDao.getCollectionWithNotes(collectionId).map { collectionWithNotes ->
-            collectionWithNotes?.notes?.map { it.toDomain() } ?: emptyList()
+            collectionWithNotes?.notes
+                ?.filter { !it.isDeleted }
+                ?.map { it.toDomain() } ?: emptyList()
         }
     }
 

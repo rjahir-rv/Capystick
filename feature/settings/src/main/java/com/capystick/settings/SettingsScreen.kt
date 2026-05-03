@@ -103,7 +103,7 @@ fun SettingsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = scaffoldPadding.calculateTopPadding() + 4.dp)
+                    .padding(top = scaffoldPadding.calculateTopPadding() + 14.dp)
                     .padding(horizontal = 16.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {

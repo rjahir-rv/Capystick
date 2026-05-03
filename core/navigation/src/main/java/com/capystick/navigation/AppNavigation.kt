@@ -46,13 +46,14 @@ import com.capystick.core.designsystem.R
 import com.capystick.settings.SettingsScreen
 import com.capystick.settings.TrashScreen
 import com.capystick.backup.BackupScreen
+import com.capystick.scan.ScanScreen
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier
 ) {
-    val levelRoutes = listOf(NotepadRoute, NotesRoute, CollectionsRoute, SettingsRoute)
+    val levelRoutes = listOf(NotepadRoute, NotesRoute, ScanRoute, CollectionsRoute, SettingsRoute)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val topLevelBackStack = remember { TopLevelBackStack<TopLevelRoute>(NotepadRoute) }
@@ -94,6 +95,7 @@ fun AppNavigation(
                                     "Todas las notas" -> painterResource(id = R.drawable.ic_all_notes)
                                     "Colecciones" -> painterResource(id = R.drawable.ic_collection)
                                     "Ajustes" -> painterResource(id = R.drawable.ic_settings)
+                                    "Escanear nota" -> painterResource(id = R.drawable.ic_document_scann)
                                     else -> null
                                 }
                                 Icon(painter = iconRes!!, contentDescription = item.title)
@@ -112,7 +114,7 @@ fun AppNavigation(
         Scaffold(
             topBar = {
                 val currentRoute = topLevelBackStack.backStack.lastOrNull()
-                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute) {
+                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute && currentRoute != ScanRoute) {
                     CapyTopAppBar(
                         title = currentRoute.title,
                         onMenuClick = {
@@ -181,6 +183,17 @@ fun AppNavigation(
                             }
                         )
 
+                    }
+                    entry<ScanRoute> {
+                        ScanScreen(
+                            innerPadding = innerPadding,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onNoteSaved = {
+                                topLevelBackStack.addTopLevel(NotesRoute)
+                            }
+                        )
                     }
                     entry<CollectionNotesRoute> { args ->
                         NotesScreen(

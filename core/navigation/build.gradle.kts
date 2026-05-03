@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":feature:collections"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:backup"))
+    implementation(project(":feature:scan"))
     implementation(project(":core:designsystem"))
 
     implementation(libs.androidx.appcompat)
