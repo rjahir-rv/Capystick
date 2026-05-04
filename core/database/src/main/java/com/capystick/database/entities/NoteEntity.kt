@@ -1,5 +1,6 @@
 package com.capystick.database.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.capystick.model.Note
@@ -11,7 +12,9 @@ data class NoteEntity(
     val title: String,
     val content: String,
     val timestamp: Long,
-    val colorHex: Long
+    val colorHex: Long,
+    @ColumnInfo(defaultValue = "0")
+    val isDeleted: Boolean = false,
 )
 
 fun NoteEntity.toDomain(): Note = Note(
@@ -19,7 +22,8 @@ fun NoteEntity.toDomain(): Note = Note(
     title = title,
     content = content,
     timestamp = timestamp,
-    colorHex = colorHex
+    colorHex = colorHex,
+    isDeleted = isDeleted,
 )
 
 fun Note.toEntity(): NoteEntity = NoteEntity(
@@ -27,5 +31,6 @@ fun Note.toEntity(): NoteEntity = NoteEntity(
     title = title,
     content = content,
     timestamp = timestamp,
-    colorHex = colorHex
+    colorHex = colorHex,
+    isDeleted = isDeleted,
 )

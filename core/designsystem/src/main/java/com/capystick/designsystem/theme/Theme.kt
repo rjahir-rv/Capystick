@@ -251,24 +251,31 @@ data class ColorFamily(
 
 @Composable
 fun CapystickTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,
-    content: @Composable() () -> Unit
+    themeOption: ThemeOption = ThemeOption.SYSTEM,
+    content: @Composable () -> Unit,
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val systemIsDark = isSystemInDarkTheme()
 
-        darkTheme -> darkScheme
+    val isDynamic = themeOption == ThemeOption.DYNAMIC && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    val isDark = when (themeOption) {
+        ThemeOption.DARK -> true
+        ThemeOption.LIGHT -> false
+        ThemeOption.SYSTEM -> systemIsDark
+        ThemeOption.DYNAMIC -> systemIsDark
+    }
+
+    val colorScheme = when {
+        isDynamic -> {
+            val context = LocalContext.current
+            if (isDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        isDark -> darkScheme
         else -> lightScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
-}
+}

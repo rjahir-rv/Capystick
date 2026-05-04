@@ -30,4 +30,32 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun deleteNote(note: Note) {
         noteDao.deleteNote(note.toEntity())
     }
+
+    // Trash / soft-delete operations
+
+    override fun getDeletedNotes(): Flow<List<Note>> {
+        return noteDao.getDeletedNotes().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun softDeleteNote(noteId: Int) {
+        noteDao.softDeleteNote(noteId)
+    }
+
+    override suspend fun restoreNote(noteId: Int) {
+        noteDao.restoreNote(noteId)
+    }
+
+    override suspend fun restoreAllNotes() {
+        noteDao.restoreAllNotes()
+    }
+
+    override suspend fun permanentlyDeleteNote(note: Note) {
+        noteDao.deleteNote(note.toEntity())
+    }
+
+    override suspend fun permanentlyDeleteAllTrashed() {
+        noteDao.permanentlyDeleteAllTrashed()
+    }
 }
