@@ -1,6 +1,6 @@
 package com.capystick.notepad
 
-import android.text.Html
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.capystick.notepad.util.noteContentToPlainText
 import com.capystick.notepad.viewmodel.NotePreviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,6 +53,7 @@ fun NotePreviewScreen(
 ) {
     val note by viewModel.note.collectAsStateWithLifecycle()
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(noteId) {
         viewModel.loadNote(noteId)
@@ -78,10 +81,18 @@ fun NotePreviewScreen(
                             contentDescription = "Delete note"
                         )
                     }
-                    IconButton(onClick = { onEditNote(noteId) }) {
+                    IconButton(onClick = {
+                        note?.let {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, "${it.title}\n\n${noteContentToPlainText(it.content)}")
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "Compartir nota"))
+                        }
+                    }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_edit),
-                            contentDescription = "Edit note"
+                            painter = painterResource(id = R.drawable.ic_share),
+                            contentDescription = "Share note"
                         )
                     }
                 }
@@ -128,6 +139,7 @@ fun NotePreviewScreen(
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Card(
+                    onClick = { onEditNote(noteId) },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -135,7 +147,7 @@ fun NotePreviewScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val plainText = remember(note?.content) {
-                        Html.fromHtml(note?.content ?: "", Html.FROM_HTML_MODE_COMPACT).toString().trim()
+                        noteContentToPlainText(note?.content ?: "")
                     }
                     Text(
                         text = plainText,

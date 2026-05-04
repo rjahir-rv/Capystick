@@ -26,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.notepad.components.FormattingToolbar
 import com.capystick.notepad.components.NotepadTopBar
 import com.capystick.notepad.components.RichNoteEditor
-import com.capystick.notepad.ui.rememberNotepadEditorState
+import com.capystick.notepad.util.rememberNotepadEditorState
 import com.capystick.notepad.viewmodel.NotepadViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

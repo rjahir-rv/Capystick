@@ -1,4 +1,4 @@
-package com.capystick.notepad.ui
+package com.capystick.notepad.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.capystick.model.Note
-import com.capystick.notepad.util.TextUndoManager
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 

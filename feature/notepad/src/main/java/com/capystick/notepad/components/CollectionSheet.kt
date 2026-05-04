@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -36,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CollectionAssignmentSheet(
+internal fun CollectionSheet(
     collections: List<Collection>,
     onDismiss: () -> Unit,
     onCollectionSelected: (Int) -> Unit,
@@ -79,7 +81,8 @@ private fun CollectionAssignmentContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .padding(bottom = 32.dp),
+            .navigationBarsPadding()
+            .imePadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
@@ -136,7 +139,7 @@ private fun CollectionAssignmentContent(
                 enabled = newCollectionName.isNotBlank(),
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_new_note),
+                    painter = painterResource(id = R.drawable.ic_save),
                     contentDescription = "Crear",
                     tint = if (newCollectionName.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Gray,
                 )

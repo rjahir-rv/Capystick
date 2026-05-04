@@ -1,4 +1,4 @@
-package com.capystick.notepad.ui
+package com.capystick.notepad.util
 
 import android.text.Html
 import com.capystick.model.Note

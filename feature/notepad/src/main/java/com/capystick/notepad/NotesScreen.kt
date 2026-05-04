@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,16 +27,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.BackHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.core.designsystem.R
 import com.capystick.model.Note
-import com.capystick.notepad.components.CollectionAssignmentSheet
-import com.capystick.notepad.components.DeleteNotesDialog
+import com.capystick.notepad.components.CollectionSheet
 import com.capystick.notepad.components.NotesContent
 import com.capystick.notepad.components.NotesTopBar
 import com.capystick.notepad.components.SelectionTopBar
-import com.capystick.notepad.ui.buildShareNotesText
+import com.capystick.notepad.util.buildShareNotesText
 import com.capystick.notepad.viewmodel.NotesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +67,10 @@ fun NotesScreen(
     val selectedNotes = rememberSelectedNotes(notes, selectedNoteIds)
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = isSelectionMode) {
+        viewModel.clearSelection()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -134,7 +141,7 @@ fun NotesScreen(
         }
 
         if (showBottomSheet) {
-            CollectionAssignmentSheet(
+            CollectionSheet(
                 collections = collections,
                 onDismiss = { showBottomSheet = false },
                 onCollectionSelected = viewModel::selectedNotesToCollection,
@@ -176,3 +183,44 @@ private fun shareSelectedNotes(
     }
     context.startActivity(Intent.createChooser(intent, "Compartir notas"))
 }
+
+
+@Composable
+fun DeleteNotesDialog(
+    selectedCount: Int,
+    isRemovingFromCollection: Boolean,
+    onDismiss: () -> Unit,
+    onConfirmDelete: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = if (isRemovingFromCollection) "Quitar de la colección" else "Eliminar notas",
+            )
+        },
+        text = {
+            Text(
+                text = if (isRemovingFromCollection) {
+                    "¿Estás seguro de que deseas quitar las $selectedCount notas de esta colección? Seguirán estando disponibles en 'Todas las notas'."
+                } else {
+                    "¿Estás seguro de que deseas eliminar las $selectedCount notas seleccionadas?"
+                },
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirmDelete) {
+                Text(
+                    text = if (isRemovingFromCollection) "Quitar" else "Eliminar",
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = "Cancelar")
+            }
+        },
+    )
+}
+

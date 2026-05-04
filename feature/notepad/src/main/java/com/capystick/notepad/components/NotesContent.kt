@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.capystick.designsystem.components.CapyNoteCard
 import com.capystick.model.Note
-import com.capystick.notepad.ui.formatNoteDate
-import com.capystick.notepad.ui.noteContentToPlainText
+import com.capystick.notepad.util.formatNoteDate
+import com.capystick.notepad.util.noteContentToPlainText
 
 @Composable
 internal fun NotesContent(
