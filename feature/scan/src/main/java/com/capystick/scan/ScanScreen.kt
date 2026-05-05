@@ -1,6 +1,7 @@
 package com.capystick.scan
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -9,6 +10,8 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -26,6 +29,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.designsystem.components.CapyTopAppBar
+import com.capystick.scan.viewmodel.ScanUiState
+import com.capystick.scan.viewmodel.ScanViewModel
 import java.util.concurrent.Executors
 
 @Composable
@@ -39,7 +44,7 @@ fun ScanScreen(
     val context = LocalContext.current
     var hasCameraPermission by remember { 
         mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         ) 
     }
 
@@ -77,7 +82,7 @@ fun ScanScreen(
             if (hasCameraPermission) {
                 when (val state = uiState) {
                     is ScanUiState.Idle -> {
-                        CameraPreviewView(
+                        CameraPreview(
                             onPhotoCaptured = viewModel::onPhotoCaptured
                         )
                     }
@@ -128,7 +133,7 @@ fun ScanScreen(
 }
 
 @Composable
-fun CameraPreviewView(onPhotoCaptured: (Bitmap) -> Unit) {
+fun CameraPreview(onPhotoCaptured: (Bitmap) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
@@ -136,10 +141,10 @@ fun CameraPreviewView(onPhotoCaptured: (Bitmap) -> Unit) {
     val previewView = remember { PreviewView(context) }
 
     LaunchedEffect(Unit) {
-        val cameraProviderFuture = androidx.camera.lifecycle.ProcessCameraProvider.getInstance(context)
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
-            val preview = androidx.camera.core.Preview.Builder().build().also {
+            val preview = Preview.Builder().build().also {
                 it.surfaceProvider = previewView.surfaceProvider
             }
 
@@ -159,7 +164,6 @@ fun CameraPreviewView(onPhotoCaptured: (Bitmap) -> Unit) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(factory = { previewView }, modifier = Modifier.fillMaxSize())
-        
         Button(
             onClick = {
                 imageCapture.takePicture(

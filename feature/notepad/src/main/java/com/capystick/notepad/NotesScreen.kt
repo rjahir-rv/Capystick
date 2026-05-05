@@ -1,5 +1,8 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package com.capystick.notepad
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -174,7 +177,7 @@ private fun rememberSelectedNotes(
 }
 
 private fun shareSelectedNotes(
-    context: android.content.Context,
+    context: Context,
     selectedNotes: List<Note>,
 ) {
     val intent = Intent(Intent.ACTION_SEND).apply {

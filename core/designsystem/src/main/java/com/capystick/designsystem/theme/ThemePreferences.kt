@@ -27,6 +27,7 @@ class ThemePreferences(private val context: Context) {
 
     companion object {
         private val THEME_KEY = stringPreferencesKey("theme_option")
+        private val PALETTE_KEY = stringPreferencesKey("palette_option")
     }
 
     val themeOption: Flow<ThemeOption> = context.dataStore.data.map { preferences ->
@@ -34,10 +35,22 @@ class ThemePreferences(private val context: Context) {
         ThemeOption.entries.find { it.name == saved } ?: ThemeOption.SYSTEM
     }
 
+    val paletteOption: Flow<ColorPaletteOption> = context.dataStore.data.map { preferences ->
+        val saved = preferences[PALETTE_KEY]
+        ColorPaletteOption.entries.find { it.name == saved } ?: ColorPaletteOption.DEFAULT
+    }
+
     /** Persists the given [ThemeOption] to DataStore. */
     suspend fun setTheme(option: ThemeOption) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = option.name
+        }
+    }
+
+    /** Persists the given [ColorPaletteOption] to DataStore. */
+    suspend fun setPalette(option: ColorPaletteOption) {
+        context.dataStore.edit { preferences ->
+            preferences[PALETTE_KEY] = option.name
         }
     }
 }

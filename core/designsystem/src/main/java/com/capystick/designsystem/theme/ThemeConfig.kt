@@ -14,6 +14,22 @@ enum class ThemeOption {
     /** Always uses the dark color scheme. */
     DARK,
 
-    /** Uses Material You dynamic colors from the device wallpaper (Android 12+ only). */
+    /** Uses Material You dynamic colors (Android 12+ only). */
     DYNAMIC,
+}
+
+enum class ColorPaletteOption(
+    val displayName: String,
+) {
+    DEFAULT(displayName = "Capystick"),
+
+    FOREST(displayName = "Bosque"),
+
+    OCEAN(displayName = "Océano"),
+
+    YELLOW(displayName = "Desierto"),
+
+    ROSE(displayName = "Lavanda"),
+
+    RED(displayName = "Fuego"),
 }

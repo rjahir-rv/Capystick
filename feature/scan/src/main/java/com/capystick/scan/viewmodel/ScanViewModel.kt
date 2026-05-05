@@ -1,4 +1,4 @@
-package com.capystick.scan
+package com.capystick.scan.viewmodel
 
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
@@ -12,14 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface ScanUiState {
-    data object Idle : ScanUiState
-    data class PhotoPreview(val bitmap: Bitmap) : ScanUiState
-    data object Processing : ScanUiState
-    data class TextExtracted(val text: String) : ScanUiState
-    data class Error(val message: String) : ScanUiState
-}
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
@@ -63,4 +55,12 @@ class ScanViewModel @Inject constructor(
     fun onRetry() {
         _uiState.value = ScanUiState.Idle
     }
+}
+
+sealed interface ScanUiState {
+    data object Idle : ScanUiState
+    data class PhotoPreview(val bitmap: Bitmap) : ScanUiState
+    data object Processing : ScanUiState
+    data class TextExtracted(val text: String) : ScanUiState
+    data class Error(val message: String) : ScanUiState
 }

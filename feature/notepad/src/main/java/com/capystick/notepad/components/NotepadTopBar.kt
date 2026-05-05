@@ -64,14 +64,14 @@ internal fun NotepadTopBar(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_copy),
                     contentDescription = "Copiar todo",
-                    tint = MaterialTheme.colorScheme.primaryContainer,
+                    tint = MaterialTheme.colorScheme.secondary,
                 )
             }
             IconButton(onClick = onSaveClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_saved),
                     contentDescription = "Guardar nota",
-                    tint = MaterialTheme.colorScheme.primaryContainer,
+                    tint = MaterialTheme.colorScheme.secondary,
                 )
             }
         },

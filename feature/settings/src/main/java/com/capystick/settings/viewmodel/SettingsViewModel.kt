@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capystick.designsystem.theme.ColorPaletteOption
 import com.capystick.designsystem.theme.ThemeOption
 import com.capystick.designsystem.theme.ThemePreferences
 import com.capystick.domain.repository.NotesExportRepository
@@ -35,6 +36,12 @@ class SettingsViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed( stopTimeoutMillis = 5_000),
             initialValue = ThemeOption.SYSTEM,
         )
+    val paletteOption: StateFlow<ColorPaletteOption> = themePreferences.paletteOption
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+            initialValue = ColorPaletteOption.DEFAULT,
+        )
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -43,6 +50,13 @@ class SettingsViewModel @Inject constructor(
     fun setTheme(option: ThemeOption) {
         viewModelScope.launch {
             themePreferences.setTheme(option)
+        }
+    }
+
+    /** Persists the selected color palette. */
+    fun setPalette(option: ColorPaletteOption) {
+        viewModelScope.launch {
+            themePreferences.setPalette(option)
         }
     }
 
