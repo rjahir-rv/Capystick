@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,19 +20,27 @@ class NotepadViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var currentNoteId: Int? = null
-    private val _note = MutableStateFlow<Note?>(null)
-    val note: StateFlow<Note?> = _note.asStateFlow()
+    private val _editorState = MutableStateFlow(NotepadEditorUiState())
+    val editorState: StateFlow<NotepadEditorUiState> = _editorState.asStateFlow()
 
     fun loadNote(id: Int) {
         currentNoteId = id
+        _editorState.value = NotepadEditorUiState(isLoading = true)
         viewModelScope.launch {
-            _note.value = repository.getNoteById(id).firstOrNull()
+            val loadedNote = repository.getNoteById(id).firstOrNull()
+            _editorState.update {
+                it.copy(
+                    note = loadedNote,
+                    isLoading = false,
+                    noteMissing = loadedNote == null,
+                )
+            }
         }
     }
 
     fun clearNotepad() {
         currentNoteId = null
-        _note.value = null
+        _editorState.value = NotepadEditorUiState()
     }
 
     fun saveNote(title: String, content: String, collectionId: Int? = null, onComplete: () -> Unit = {}) {
@@ -53,3 +62,9 @@ class NotepadViewModel @Inject constructor(
         }
     }
 }
+
+data class NotepadEditorUiState(
+    val note: Note? = null,
+    val isLoading: Boolean = false,
+    val noteMissing: Boolean = false,
+)

@@ -4,10 +4,12 @@ import com.capystick.data.repository.BackupRepositoryImpl
 import com.capystick.data.repository.CollectionRepositoryImpl
 import com.capystick.data.repository.NoteRepositoryImpl
 import com.capystick.data.repository.NotesExportRepositoryImpl
+import com.capystick.data.repository.WidgetRepositoryImpl
 import com.capystick.domain.repository.BackupRepository
 import com.capystick.domain.repository.CollectionRepository
 import com.capystick.domain.repository.NoteRepository
 import com.capystick.domain.repository.NotesExportRepository
+import com.capystick.domain.repository.WidgetRepository
 import com.capystick.data.scan.MlKitTextRecognizer
 import com.capystick.domain.scan.TextRecognizer
 import dagger.Binds
@@ -38,6 +40,11 @@ abstract class DataModule {
     abstract fun bindNotesExportRepository(
         notesExportRepositoryImpl: NotesExportRepositoryImpl,
     ): NotesExportRepository
+
+    @Binds
+    abstract fun bindWidgetRepository(
+        widgetRepositoryImpl: WidgetRepositoryImpl,
+    ): WidgetRepository
 
     @Binds
     abstract fun bindTextRecognizer(

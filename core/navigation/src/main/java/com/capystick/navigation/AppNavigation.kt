@@ -45,18 +45,29 @@ import com.capystick.notepad.NotesScreen
 import com.capystick.core.designsystem.R
 import com.capystick.settings.SettingsScreen
 import com.capystick.settings.TrashScreen
+import com.capystick.widget.WidgetConfigurationScreen
+import com.capystick.widget.WidgetManagementScreen
 import com.capystick.backup.BackupScreen
 import com.capystick.scan.ScanScreen
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    externalNavigationCommand: ExternalNavigationCommand? = null,
+    onExternalNavigationHandled: () -> Unit = {},
 ) {
     val levelRoutes = listOf(NotepadRoute, NotesRoute, ScanRoute, CollectionsRoute, SettingsRoute)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val topLevelBackStack = remember { TopLevelBackStack<TopLevelRoute>(NotepadRoute) }
+    val topLevelBackStack = remember {
+        TopLevelBackStack<TopLevelRoute>(NotepadRoute).apply {
+            externalNavigationCommand?.let(::applyExternalNavigationCommand)
+        }
+    }
+    var skipInitialExternalNavigationHandling by remember {
+        mutableStateOf(externalNavigationCommand != null)
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -124,6 +135,18 @@ fun AppNavigation(
                 }
             }
         ) { innerPadding ->
+            androidx.compose.runtime.LaunchedEffect(externalNavigationCommand) {
+                val command = externalNavigationCommand ?: return@LaunchedEffect
+                if (skipInitialExternalNavigationHandling) {
+                    skipInitialExternalNavigationHandling = false
+                    onExternalNavigationHandled()
+                    return@LaunchedEffect
+                }
+
+                topLevelBackStack.applyExternalNavigationCommand(command)
+                onExternalNavigationHandled()
+            }
+
             NavDisplay(
                 modifier = modifier,
                 backStack = topLevelBackStack.backStack,
@@ -233,6 +256,25 @@ fun AppNavigation(
                             onBackupClick = {
                                 topLevelBackStack.addRoute(BackupRoute)
                             },
+                            onWidgetsClick = {
+                                topLevelBackStack.addRoute(WidgetManagementRoute)
+                            },
+                        )
+                    }
+                    entry<WidgetManagementRoute> {
+                        WidgetManagementScreen(
+                            innerPadding = innerPadding,
+                            onBack = { topLevelBackStack.removeLast() },
+                            onEditWidget = { appWidgetId ->
+                                topLevelBackStack.addRoute(WidgetConfigurationRoute(appWidgetId))
+                            },
+                        )
+                    }
+                    entry<WidgetConfigurationRoute> { args ->
+                        WidgetConfigurationScreen(
+                            appWidgetId = args.appWidgetId,
+                            innerPadding = innerPadding,
+                            onBack = { topLevelBackStack.removeLast() },
                         )
                     }
                     entry<TrashRoute> {
@@ -273,6 +315,82 @@ fun AppNavigation(
             )
         }
     }
+}
+
+private fun TopLevelBackStack<TopLevelRoute>.applyExternalNavigationCommand(
+    command: ExternalNavigationCommand,
+) {
+    when (command) {
+        is ExternalNavigationCommand.OpenNotes -> {
+            addTopLevel(NotesRoute)
+        }
+
+        is ExternalNavigationCommand.OpenCreateNote -> {
+            addTopLevel(NotepadRoute)
+        }
+
+        is ExternalNavigationCommand.OpenCollections -> {
+            addTopLevel(CollectionsRoute)
+        }
+
+        is ExternalNavigationCommand.OpenCollection -> {
+            addTopLevel(CollectionsRoute)
+            addRoute(
+                CollectionNotesRoute(
+                    collectionId = command.collectionId,
+                    collectionName = command.collectionName,
+                ),
+            )
+        }
+
+        is ExternalNavigationCommand.OpenEditRecentNote -> {
+            addTopLevel(NotesRoute)
+            addRoute(EditNoteRoute(command.noteId))
+        }
+
+        is ExternalNavigationCommand.OpenEditCollectionNote -> {
+            addTopLevel(CollectionsRoute)
+            addRoute(
+                CollectionNotesRoute(
+                    collectionId = command.collectionId,
+                    collectionName = command.collectionName,
+                ),
+            )
+            addRoute(EditNoteRoute(command.noteId))
+        }
+
+        is ExternalNavigationCommand.OpenWidgetManagement -> {
+            addTopLevel(SettingsRoute)
+            addRoute(WidgetManagementRoute)
+        }
+
+        is ExternalNavigationCommand.OpenWidgetEditor -> {
+            addTopLevel(SettingsRoute)
+            addRoute(WidgetManagementRoute)
+            addRoute(WidgetConfigurationRoute(command.appWidgetId))
+        }
+    }
+}
+
+sealed interface ExternalNavigationCommand {
+    data object OpenNotes : ExternalNavigationCommand
+    data object OpenCreateNote : ExternalNavigationCommand
+    data object OpenCollections : ExternalNavigationCommand
+    data object OpenWidgetManagement : ExternalNavigationCommand
+    data class OpenCollection(
+        val collectionId: Int,
+        val collectionName: String,
+    ) : ExternalNavigationCommand
+
+    data class OpenEditRecentNote(val noteId: Int) : ExternalNavigationCommand
+
+    data class OpenEditCollectionNote(
+        val noteId: Int,
+        val collectionId: Int,
+        val collectionName: String,
+    ) : ExternalNavigationCommand
+
+    data class OpenWidgetEditor(val appWidgetId: Int) : ExternalNavigationCommand
 }
 
 class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {

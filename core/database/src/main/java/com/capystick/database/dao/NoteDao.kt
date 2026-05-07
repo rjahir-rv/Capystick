@@ -17,7 +17,7 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE isDeleted = 1 ORDER BY timestamp DESC")
     fun getDeletedNotes(): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes WHERE id = :id")
+    @Query("SELECT * FROM notes WHERE id = :id AND isDeleted = 0")
     fun getNoteById(id: Int): Flow<NoteEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -3,6 +3,7 @@ package com.capystick.data.repository
 import com.capystick.database.dao.NoteDao
 import com.capystick.database.entities.toDomain
 import com.capystick.database.entities.toEntity
+import com.capystick.data.widget.WidgetRefreshRequester
 import com.capystick.domain.repository.NoteRepository
 import com.capystick.model.Note
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
-    private val noteDao: NoteDao
+    private val noteDao: NoteDao,
+    private val widgetRefreshRequester: WidgetRefreshRequester,
 ) : NoteRepository {
 
     override fun getAllNotes(): Flow<List<Note>> {
@@ -24,11 +26,14 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveNote(note: Note): Long {
-        return noteDao.insertNote(note.toEntity())
+        return noteDao.insertNote(note.toEntity()).also {
+            widgetRefreshRequester.requestRefresh()
+        }
     }
 
     override suspend fun deleteNote(note: Note) {
         noteDao.deleteNote(note.toEntity())
+        widgetRefreshRequester.requestRefresh()
     }
 
     // Trash / soft-delete operations
@@ -41,21 +46,26 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun softDeleteNote(noteId: Int) {
         noteDao.softDeleteNote(noteId)
+        widgetRefreshRequester.requestRefresh()
     }
 
     override suspend fun restoreNote(noteId: Int) {
         noteDao.restoreNote(noteId)
+        widgetRefreshRequester.requestRefresh()
     }
 
     override suspend fun restoreAllNotes() {
         noteDao.restoreAllNotes()
+        widgetRefreshRequester.requestRefresh()
     }
 
     override suspend fun permanentlyDeleteNote(note: Note) {
         noteDao.deleteNote(note.toEntity())
+        widgetRefreshRequester.requestRefresh()
     }
 
     override suspend fun permanentlyDeleteAllTrashed() {
         noteDao.permanentlyDeleteAllTrashed()
+        widgetRefreshRequester.requestRefresh()
     }
 }

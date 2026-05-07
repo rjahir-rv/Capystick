@@ -48,6 +48,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     onTrashClick: () -> Unit = {},
     onBackupClick: () -> Unit = {},
+    onWidgetsClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val currentTheme by viewModel.themeOption.collectAsStateWithLifecycle()
@@ -117,6 +118,12 @@ fun SettingsScreen(
                     icon = painterResource(id = R.drawable.ic_backup),
                     title = "Copia de seguridad",
                     onClick = onBackupClick,
+                )
+                SettingsItem(
+                    icon = painterResource(id = R.drawable.ic_collection),
+                    title = "Widgets",
+                    subtitle = "Configura widgets de notas recientes o por coleccion",
+                    onClick = onWidgetsClick,
                 )
                 SettingsItem(
                     icon = painterResource(id = R.drawable.ic_trash),

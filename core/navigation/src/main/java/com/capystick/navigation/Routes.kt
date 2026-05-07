@@ -38,3 +38,7 @@ data class CreateCollectionNoteRoute(val collectionId: Int)
 data object TrashRoute
 
 data object BackupRoute
+
+data object WidgetManagementRoute
+
+data class WidgetConfigurationRoute(val appWidgetId: Int)

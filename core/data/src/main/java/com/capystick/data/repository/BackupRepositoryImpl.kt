@@ -6,6 +6,7 @@ import com.capystick.database.db.CapystickDB
 import com.capystick.database.entities.NoteCollectionCrossRef
 import com.capystick.database.entities.toDomain
 import com.capystick.database.entities.toEntity
+import com.capystick.data.widget.WidgetRefreshRequester
 import androidx.room.withTransaction
 import com.capystick.domain.repository.BackupRepository
 import com.capystick.model.BackupData
@@ -18,6 +19,7 @@ class BackupRepositoryImpl @Inject constructor(
     private val db: CapystickDB,
     private val noteDao: NoteDao,
     private val collectionDao: CollectionDao,
+    private val widgetRefreshRequester: WidgetRefreshRequester,
 ) : BackupRepository {
 
     override suspend fun exportBackup(): BackupData = withContext(Dispatchers.IO) {
@@ -56,6 +58,7 @@ class BackupRepositoryImpl @Inject constructor(
                 )
             }
         }
+        widgetRefreshRequester.requestRefresh()
     }
 
     override suspend fun hasActiveNotes(): Boolean = withContext(Dispatchers.IO) {

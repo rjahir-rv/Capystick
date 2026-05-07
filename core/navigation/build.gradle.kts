@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":feature:notepad"))
     implementation(project(":feature:collections"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:widget"))
     implementation(project(":feature:backup"))
     implementation(project(":feature:scan"))
     implementation(project(":core:designsystem"))

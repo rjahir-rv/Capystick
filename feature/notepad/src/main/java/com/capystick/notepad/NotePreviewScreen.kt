@@ -51,12 +51,19 @@ fun NotePreviewScreen(
     onEditNote: (Int) -> Unit = {},
     viewModel: NotePreviewViewModel = hiltViewModel()
 ) {
-    val note by viewModel.note.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val note = uiState.note
 
     LaunchedEffect(noteId) {
         viewModel.loadNote(noteId)
+    }
+
+    LaunchedEffect(uiState.noteMissing) {
+        if (uiState.noteMissing) {
+            onBack()
+        }
     }
 
     Scaffold(
@@ -123,7 +130,7 @@ fun NotePreviewScreen(
                 }
             )
         }
-        if (note == null) {
+        if (uiState.isLoading) {
             Box(modifier = Modifier
                 .fillMaxSize()
                 .padding(scaffoldPadding), contentAlignment = Alignment.Center) {

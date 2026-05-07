@@ -60,10 +60,16 @@ fun NotepadScreen(
         }
     }
 
-    val note by viewModel.note.collectAsStateWithLifecycle()
+    val editorUiState by viewModel.editorState.collectAsStateWithLifecycle()
+    val note = editorUiState.note
     LaunchedEffect(note) {
         if (noteId != null) {
             note?.let(editorState::load)
+        }
+    }
+    LaunchedEffect(editorUiState.noteMissing) {
+        if (editorUiState.noteMissing) {
+            onNoteSaved()
         }
     }
 
