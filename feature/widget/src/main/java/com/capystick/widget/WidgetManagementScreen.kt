@@ -125,7 +125,7 @@ private fun WidgetManagementItem(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_collection),
+                    painter = painterResource(id = R.drawable.ic_widget_dou),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )

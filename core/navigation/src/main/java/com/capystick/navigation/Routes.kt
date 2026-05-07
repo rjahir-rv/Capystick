@@ -33,6 +33,8 @@ data class CollectionNotesRoute(
     val collectionName: String
 )
 
+data object FavoriteNotesRoute
+
 data class CreateCollectionNoteRoute(val collectionId: Int)
 
 data object TrashRoute

@@ -27,8 +27,15 @@ class NotesViewModel @Inject constructor(
 
     private val _collectionId = MutableStateFlow<Int?>(null)
     private val _collectionName = MutableStateFlow<String?>(null)
+    private val _favoriteOnly = MutableStateFlow(false)
 
-    val title: StateFlow<String> = _collectionName.map { it ?: "Todas las notas" }
+    val title: StateFlow<String> = combine(_collectionName, _favoriteOnly) { collectionName, favoriteOnly ->
+        when {
+            favoriteOnly -> "Favoritas"
+            collectionName != null -> collectionName
+            else -> "Todas las notas"
+        }
+    }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed( stopTimeoutMillis = 5000), "Todas las notas")
 
     private val _searchQuery = MutableStateFlow("")
@@ -50,16 +57,18 @@ class NotesViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val notes: StateFlow<List<Note>> = _collectionId.flatMapLatest { colId ->
-        val sourceFlow = notesSourceFor(colId)
+        _favoriteOnly.flatMapLatest { favoriteOnly ->
+            val sourceFlow = notesSourceFor(colId, favoriteOnly)
 
-        combine(
-            flow = sourceFlow,
-            flow2 = _searchQuery,
-            flow3 = _sortOrder
-        ) { notesList, query, order ->
-            notesList
-                .filterByQuery(query)
-                .sortBy(order)
+            combine(
+                flow = sourceFlow,
+                flow2 = _searchQuery,
+                flow3 = _sortOrder
+            ) { notesList, query, order ->
+                notesList
+                    .filterByQuery(query)
+                    .sortBy(order)
+            }
         }
     }.stateIn(
         scope = viewModelScope,
@@ -67,9 +76,10 @@ class NotesViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    fun initialize(id: Int?, name: String?) {
+    fun initialize(id: Int?, name: String?, favoriteOnly: Boolean = false) {
         _collectionId.value = id
         _collectionName.value = name
+        _favoriteOnly.value = favoriteOnly
     }
 
     fun onSearchQueryChange(query: String) {
@@ -111,7 +121,9 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch {
             val colId = _collectionId.value
             val selectedIds = _selectedNoteIds.value
-            if (colId != null) {
+            if (_favoriteOnly.value) {
+                removeSelectedNotesFromFavorites(selectedIds)
+            } else if (colId != null) {
                 removeSelectedNotesFromCollection(selectedIds, colId)
             } else {
                 softDeleteSelectedNotes(selectedIds)
@@ -135,10 +147,10 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun notesSourceFor(collectionId: Int?) = if (collectionId != null) {
-        collectionRepository.getNotesInCollection(collectionId = collectionId)
-    } else {
-        noteRepository.getAllNotes()
+    private fun notesSourceFor(collectionId: Int?, favoriteOnly: Boolean) = when {
+        favoriteOnly -> noteRepository.getFavoriteNotes()
+        collectionId != null -> collectionRepository.getNotesInCollection(collectionId = collectionId)
+        else -> noteRepository.getAllNotes()
     }
 
     private fun List<Note>.filterByQuery(query: String): List<Note> {
@@ -167,6 +179,12 @@ class NotesViewModel @Inject constructor(
     ) {
         selectedIds.forEach { noteId ->
             collectionRepository.removeNoteFromCollection(noteId, collectionId = collectionId)
+        }
+    }
+
+    private suspend fun removeSelectedNotesFromFavorites(selectedIds: Set<Int>) {
+        selectedIds.forEach { noteId ->
+            noteRepository.updateFavoriteStatus(noteId, isFavorite = false)
         }
     }
 

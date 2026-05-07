@@ -36,6 +36,9 @@ fun CollectionsScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val isSearchActive by viewModel.isSearchActive.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
+    val favoriteNoteCount by viewModel.favoriteNoteCount.collectAsStateWithLifecycle()
+    val showFavoritesCollection = searchQuery.isBlank() ||
+        "Favoritas".contains(searchQuery, ignoreCase = true)
 
     var collectionToRename by remember { mutableStateOf<Collection?>(null) }
     var collectionToDelete by remember { mutableStateOf<Collection?>(null) }
@@ -60,7 +63,7 @@ fun CollectionsScreen(
                 .fillMaxSize()
                 .padding(scaffoldPadding)
         ) {
-            if (collections.isEmpty()) {
+            if (collections.isEmpty() && !showFavoritesCollection) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -85,6 +88,14 @@ fun CollectionsScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    if (showFavoritesCollection) {
+                        item {
+                            FavoriteCollectionItem(
+                                noteCount = favoriteNoteCount,
+                                onClick = { onCollectionClick(FAVORITES_COLLECTION_ID, "Favoritas") }
+                            )
+                        }
+                    }
                     items(collections) { collection ->
                         CollectionItem(
                             collection = collection,
@@ -158,6 +169,8 @@ fun CollectionsScreen(
         }
     }
 }
+
+const val FAVORITES_COLLECTION_ID = -1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -340,6 +353,56 @@ fun CollectionItem(
                         modifier = Modifier.size(18.dp)
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun FavoriteCollectionItem(
+    noteCount: Int,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1.1f),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_favorite),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(32.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Favoritas",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "$noteCount NOTES",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 1.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
         }
     }

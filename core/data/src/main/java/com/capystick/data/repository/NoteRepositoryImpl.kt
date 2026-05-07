@@ -25,6 +25,16 @@ class NoteRepositoryImpl @Inject constructor(
         return noteDao.getNoteById(id).map { it?.toDomain() }
     }
 
+    override fun getFavoriteNotes(): Flow<List<Note>> {
+        return noteDao.getFavoriteNotes().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override fun getFavoriteNoteCount(): Flow<Int> {
+        return noteDao.getFavoriteNoteCount()
+    }
+
     override suspend fun saveNote(note: Note): Long {
         return noteDao.insertNote(note.toEntity()).also {
             widgetRefreshRequester.requestRefresh()
@@ -61,6 +71,11 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun permanentlyDeleteNote(note: Note) {
         noteDao.deleteNote(note.toEntity())
+        widgetRefreshRequester.requestRefresh()
+    }
+
+    override suspend fun updateFavoriteStatus(noteId: Int, isFavorite: Boolean) {
+        noteDao.updateFavoriteStatus(noteId, isFavorite)
         widgetRefreshRequester.requestRefresh()
     }
 

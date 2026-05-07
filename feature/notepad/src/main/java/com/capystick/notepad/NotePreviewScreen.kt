@@ -82,6 +82,32 @@ fun NotePreviewScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        enabled = note != null,
+                        onClick = {
+                            note?.let(viewModel::toggleFavorite)
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (note?.isFavorite == true) {
+                                    R.drawable.ic_favorite_filled
+                                } else {
+                                    R.drawable.ic_favorite
+                                }
+                            ),
+                            contentDescription = if (note?.isFavorite == true) {
+                                "Quitar de favoritas"
+                            } else {
+                                "Agregar a favoritas"
+                            },
+                            tint = if (note?.isFavorite == true) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_delete),

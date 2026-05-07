@@ -15,6 +15,8 @@ data class NoteEntity(
     val colorHex: Long,
     @ColumnInfo(defaultValue = "0")
     val isDeleted: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val isFavorite: Boolean = false,
 )
 
 fun NoteEntity.toDomain(): Note = Note(
@@ -24,6 +26,7 @@ fun NoteEntity.toDomain(): Note = Note(
     timestamp = timestamp,
     colorHex = colorHex,
     isDeleted = isDeleted,
+    isFavorite = isFavorite,
 )
 
 fun Note.toEntity(): NoteEntity = NoteEntity(
@@ -33,4 +36,5 @@ fun Note.toEntity(): NoteEntity = NoteEntity(
     timestamp = timestamp,
     colorHex = colorHex,
     isDeleted = isDeleted,
+    isFavorite = isFavorite,
 )

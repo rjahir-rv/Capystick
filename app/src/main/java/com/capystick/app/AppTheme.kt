@@ -10,25 +10,28 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.designsystem.theme.CapystickTheme
-import com.capystick.designsystem.theme.ColorPaletteOption
 import com.capystick.designsystem.theme.ThemeOption
 import com.capystick.designsystem.theme.ThemePreferences
+import com.capystick.designsystem.theme.ThemeSettings
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun ComponentActivity.CapystickAppThemeContent(content: @Composable () -> Unit) {
     val themePreferences = remember { ThemePreferences(applicationContext) }
-    val themeOption by themePreferences.themeOption.collectAsStateWithLifecycle(
-        initialValue = ThemeOption.SYSTEM,
+    val themeSettingsFlow =
+        remember(themePreferences) {
+            themePreferences.themeSettings.map<ThemeSettings, ThemeSettings?> { it }
+        }
+    val themeSettings by themeSettingsFlow.collectAsStateWithLifecycle(
+        initialValue = null,
     )
-    val paletteOption by themePreferences.paletteOption.collectAsStateWithLifecycle(
-        initialValue = ColorPaletteOption.DEFAULT,
-    )
+    val settings = themeSettings ?: return
 
     CapystickTheme(
-        themeOption = themeOption,
-        paletteOption = paletteOption,
+        themeOption = settings.themeOption,
+        paletteOption = settings.paletteOption,
     ) {
-        SyncSystemBarIconAppearance(themeOption = themeOption)
+        SyncSystemBarIconAppearance(themeOption = settings.themeOption)
         content()
     }
 }

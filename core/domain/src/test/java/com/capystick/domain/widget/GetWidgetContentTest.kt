@@ -194,8 +194,11 @@ private class FakeNoteRepository(
 ) : NoteRepository {
     override fun getAllNotes(): Flow<List<Note>> = flowOf(notes)
     override fun getNoteById(id: Int): Flow<Note?> = flowOf(notes.firstOrNull { it.id == id })
+    override fun getFavoriteNotes(): Flow<List<Note>> = flowOf(notes.filter { it.isFavorite })
+    override fun getFavoriteNoteCount(): Flow<Int> = flowOf(notes.count { it.isFavorite })
     override suspend fun saveNote(note: Note): Long = note.id.toLong()
     override suspend fun deleteNote(note: Note) = Unit
+    override suspend fun updateFavoriteStatus(noteId: Int, isFavorite: Boolean) = Unit
     override fun getDeletedNotes(): Flow<List<Note>> = flowOf(emptyList())
     override suspend fun softDeleteNote(noteId: Int) = Unit
     override suspend fun restoreNote(noteId: Int) = Unit

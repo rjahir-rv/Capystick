@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.capystick.collections.CollectionsScreen
+import com.capystick.collections.FAVORITES_COLLECTION_ID
 import com.capystick.notepad.NotePreviewScreen
 import com.capystick.notepad.NotepadScreen
 import com.capystick.notepad.NotesScreen
@@ -188,7 +189,11 @@ fun AppNavigation(
                                 scope.launch { drawerState.open() }
                             },
                             onCollectionClick = { id, name ->
-                                topLevelBackStack.addRoute(CollectionNotesRoute(id, name))
+                                if (id == FAVORITES_COLLECTION_ID) {
+                                    topLevelBackStack.addRoute(FavoriteNotesRoute)
+                                } else {
+                                    topLevelBackStack.addRoute(CollectionNotesRoute(id, name))
+                                }
                             }
                         )
                     }
@@ -231,6 +236,21 @@ fun AppNavigation(
                             },
                             onAddNoteClick = {
                                 topLevelBackStack.addRoute(CreateCollectionNoteRoute(args.collectionId))
+                            }
+                        )
+                    }
+                    entry<FavoriteNotesRoute> {
+                        NotesScreen(
+                            innerPadding = innerPadding,
+                            favoriteOnly = true,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onNoteClick = { noteId ->
+                                topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                            },
+                            onAddNoteClick = {
+                                topLevelBackStack.addTopLevel(NotepadRoute)
                             }
                         )
                     }

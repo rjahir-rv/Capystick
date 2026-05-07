@@ -7,4 +7,5 @@ data class Note(
     val timestamp: Long,
     val colorHex: Long,
     val isDeleted: Boolean = false,
+    val isFavorite: Boolean = false,
 )

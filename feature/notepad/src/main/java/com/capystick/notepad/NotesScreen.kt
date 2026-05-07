@@ -49,13 +49,14 @@ fun NotesScreen(
     modifier: Modifier = Modifier,
     collectionId: Int? = null,
     collectionName: String? = null,
+    favoriteOnly: Boolean = false,
     onMenuClick: () -> Unit = {},
     onNoteClick: (Int) -> Unit = {},
     onAddNoteClick: () -> Unit = {},
     viewModel: NotesViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(collectionId, collectionName) {
-        viewModel.initialize(collectionId, collectionName)
+    LaunchedEffect(collectionId, collectionName, favoriteOnly) {
+        viewModel.initialize(collectionId, collectionName, favoriteOnly)
     }
 
     val notes by viewModel.notes.collectAsStateWithLifecycle()
@@ -81,7 +82,7 @@ fun NotesScreen(
             if (isSelectionMode) {
                 SelectionTopBar(
                     selectedCount = selectedNoteIds.size,
-                    isInCollection = collectionId != null,
+                    isInCollection = collectionId != null || favoriteOnly,
                     onCloseClick = { viewModel.clearSelection() },
                     onDeleteClick = { showDeleteDialog = true },
                     onShareClick = {
@@ -156,6 +157,7 @@ fun NotesScreen(
             DeleteNotesDialog(
                 selectedCount = selectedNoteIds.size,
                 isRemovingFromCollection = collectionId != null,
+                isRemovingFromFavorites = favoriteOnly,
                 onDismiss = { showDeleteDialog = false },
                 onConfirmDelete = {
                     viewModel.deleteSelectedNotes()
@@ -192,29 +194,35 @@ private fun shareSelectedNotes(
 fun DeleteNotesDialog(
     selectedCount: Int,
     isRemovingFromCollection: Boolean,
+    isRemovingFromFavorites: Boolean,
     onDismiss: () -> Unit,
     onConfirmDelete: () -> Unit,
 ) {
+    val isRemovingFromList = isRemovingFromCollection || isRemovingFromFavorites
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = if (isRemovingFromCollection) "Quitar de la colección" else "Eliminar notas",
+                text = when {
+                    isRemovingFromFavorites -> "Quitar de favoritas"
+                    isRemovingFromCollection -> "Quitar de la colección"
+                    else -> "Eliminar notas"
+                },
             )
         },
         text = {
             Text(
-                text = if (isRemovingFromCollection) {
-                    "¿Estás seguro de que deseas quitar las $selectedCount notas de esta colección? Seguirán estando disponibles en 'Todas las notas'."
-                } else {
-                    "¿Estás seguro de que deseas eliminar las $selectedCount notas seleccionadas?"
+                text = when {
+                    isRemovingFromFavorites -> "¿Deseas quitar las $selectedCount notas de favoritas? Seguirán estando disponibles en 'Todas las notas'."
+                    isRemovingFromCollection -> "¿Estás seguro de que deseas quitar las $selectedCount notas de esta colección? Seguirán estando disponibles en 'Todas las notas'."
+                    else -> "¿Estás seguro de que deseas eliminar las $selectedCount notas seleccionadas?"
                 },
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirmDelete) {
                 Text(
-                    text = if (isRemovingFromCollection) "Quitar" else "Eliminar",
+                    text = if (isRemovingFromList) "Quitar" else "Eliminar",
                     color = MaterialTheme.colorScheme.error,
                 )
             }

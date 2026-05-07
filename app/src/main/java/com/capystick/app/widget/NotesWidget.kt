@@ -4,10 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,13 +42,18 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.capystick.app.widget.WidgetNavigationIntents
 import com.capystick.core.designsystem.R
+import com.capystick.designsystem.theme.ColorPaletteOption
+import com.capystick.designsystem.theme.ThemeOption
+import com.capystick.designsystem.theme.ThemePreferences
+import com.capystick.designsystem.theme.ThemeSettings
+import com.capystick.designsystem.theme.resolvePaletteColorScheme
 import com.capystick.model.WidgetContentState
 import com.capystick.model.WidgetMode
 import com.capystick.model.WidgetNoteSummary
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
@@ -73,6 +76,12 @@ class NotesWidget : GlanceAppWidget() {
                 entryPoint.getWidgetContentUseCase().invoke(appWidgetId)
             }
         val widgetContentFlow = entryPoint.getWidgetContentUseCase().observe(appWidgetId)
+        val themePreferences = ThemePreferences(context.applicationContext)
+        val initialThemeSettings =
+            withContext(Dispatchers.IO) {
+                runCatching { themePreferences.themeSettings.first() }
+                    .getOrDefault(ThemeSettings())
+            }
 
         provideContent {
             val currentWidgetState by widgetContentFlow.collectAsState(initial = widgetState)
@@ -80,6 +89,8 @@ class NotesWidget : GlanceAppWidget() {
             WidgetScaffold(
                 context = context,
                 widgetState = currentWidgetState,
+                themeOption = initialThemeSettings.themeOption,
+                paletteOption = initialThemeSettings.paletteOption,
             )
         }
     }
@@ -89,8 +100,15 @@ class NotesWidget : GlanceAppWidget() {
 private fun WidgetScaffold(
     context: Context,
     widgetState: WidgetContentState,
+    themeOption: ThemeOption,
+    paletteOption: ColorPaletteOption,
 ) {
-    val palette = rememberWidgetPalette(context)
+    val palette =
+        rememberWidgetPalette(
+            context = context,
+            themeOption = themeOption,
+            paletteOption = paletteOption,
+        )
 
     Column(
         modifier =
@@ -386,26 +404,50 @@ private fun footerIntentFor(
     }
 
 @Composable
-private fun rememberWidgetPalette(context: Context): WidgetPalette {
+private fun rememberWidgetPalette(
+    context: Context,
+    themeOption: ThemeOption,
+    paletteOption: ColorPaletteOption,
+): WidgetPalette {
+    val useDynamicColors =
+        themeOption == ThemeOption.DYNAMIC &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
     val lightScheme: ColorScheme
     val darkScheme: ColorScheme
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    if (useDynamicColors) {
         lightScheme = dynamicLightColorScheme(context)
         darkScheme = dynamicDarkColorScheme(context)
     } else {
-        lightScheme = lightColorScheme()
-        darkScheme = darkColorScheme()
+        lightScheme = resolvePaletteColorScheme(paletteOption, isDark = false)
+        darkScheme = resolvePaletteColorScheme(paletteOption, isDark = true)
     }
 
-    return WidgetPalette(
-        surfaceContainer = DayNightColorProvider(lightScheme.surfaceContainer, darkScheme.surfaceContainer),
-        onSurface = DayNightColorProvider(lightScheme.onSurface, darkScheme.onSurface),
-        onSurfaceVariant = DayNightColorProvider(lightScheme.onSurfaceVariant, darkScheme.onSurfaceVariant),
-        primary = DayNightColorProvider(lightScheme.primary, darkScheme.primary),
-        onPrimary = DayNightColorProvider(lightScheme.onPrimary, darkScheme.onPrimary),
-    )
+    return when (themeOption) {
+        ThemeOption.LIGHT -> lightScheme.toWidgetPalette()
+        ThemeOption.DARK -> darkScheme.toWidgetPalette()
+        ThemeOption.SYSTEM,
+        ThemeOption.DYNAMIC,
+        ->
+            WidgetPalette(
+                surfaceContainer = DayNightColorProvider(lightScheme.surface, darkScheme.surface),
+                onSurface = DayNightColorProvider(lightScheme.onSurface, darkScheme.onSurface),
+                onSurfaceVariant = DayNightColorProvider(lightScheme.onSurfaceVariant, darkScheme.onSurfaceVariant),
+                primary = DayNightColorProvider(lightScheme.primary, darkScheme.primary),
+                onPrimary = DayNightColorProvider(lightScheme.surface, darkScheme.surface),
+            )
+    }
 }
+
+private fun ColorScheme.toWidgetPalette(): WidgetPalette =
+    WidgetPalette(
+        surfaceContainer = DayNightColorProvider(surface, surface),
+        onSurface = DayNightColorProvider(onSurface, onSurface),
+        onSurfaceVariant = DayNightColorProvider(onSurfaceVariant, onSurfaceVariant),
+        primary = DayNightColorProvider(primary, primary),
+        onPrimary = DayNightColorProvider(surface, surface),
+    )
 
 private data class WidgetPalette(
     val surfaceContainer: ColorProvider,

@@ -17,6 +17,9 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE isDeleted = 1 ORDER BY timestamp DESC")
     fun getDeletedNotes(): Flow<List<NoteEntity>>
 
+    @Query("SELECT * FROM notes WHERE isDeleted = 0 AND isFavorite = 1 ORDER BY timestamp DESC")
+    fun getFavoriteNotes(): Flow<List<NoteEntity>>
+
     @Query("SELECT * FROM notes WHERE id = :id AND isDeleted = 0")
     fun getNoteById(id: Int): Flow<NoteEntity?>
 
@@ -31,6 +34,12 @@ interface NoteDao {
 
     @Query("UPDATE notes SET isDeleted = 1 WHERE id = :id")
     suspend fun softDeleteNote(id: Int)
+
+    @Query("UPDATE notes SET isFavorite = :isFavorite WHERE id = :id")
+    suspend fun updateFavoriteStatus(id: Int, isFavorite: Boolean)
+
+    @Query("SELECT COUNT(*) FROM notes WHERE isDeleted = 0 AND isFavorite = 1")
+    fun getFavoriteNoteCount(): Flow<Int>
 
     @Query("UPDATE notes SET isDeleted = 0 WHERE id = :id")
     suspend fun restoreNote(id: Int)

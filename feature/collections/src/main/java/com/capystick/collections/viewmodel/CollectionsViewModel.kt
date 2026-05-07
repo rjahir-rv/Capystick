@@ -3,6 +3,7 @@ package com.capystick.collections.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capystick.domain.repository.CollectionRepository
+import com.capystick.domain.repository.NoteRepository
 import com.capystick.model.Collection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,8 @@ enum class CollectionSortOrder {
 
 @HiltViewModel
 class CollectionsViewModel @Inject constructor(
-    private val repository: CollectionRepository
+    private val repository: CollectionRepository,
+    noteRepository: NoteRepository,
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -34,6 +36,13 @@ class CollectionsViewModel @Inject constructor(
 
     private val _sortOrder = MutableStateFlow(CollectionSortOrder.NAME_ASC)
     val sortOrder: StateFlow<CollectionSortOrder> = _sortOrder.asStateFlow()
+
+    val favoriteNoteCount: StateFlow<Int> = noteRepository.getFavoriteNoteCount()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            initialValue = 0
+        )
 
     val collections: StateFlow<List<Collection>> = combine(
         repository.getAllCollections(),

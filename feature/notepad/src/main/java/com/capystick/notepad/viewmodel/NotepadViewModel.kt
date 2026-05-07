@@ -50,7 +50,8 @@ class NotepadViewModel @Inject constructor(
                 title = title.ifBlank { "Sin título" },
                 content = content,
                 timestamp = System.currentTimeMillis(), // Updating timestamp on edit
-                colorHex = 0xFFFFFFFF // TODO: Add color selection support
+                colorHex = 0xFFFFFFFF, // TODO: Add color selection support
+                isFavorite = _editorState.value.note?.isFavorite ?: false,
             )
             val noteId = repository.saveNote(note).toInt()
             

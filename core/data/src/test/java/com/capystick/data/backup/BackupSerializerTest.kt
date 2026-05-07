@@ -13,7 +13,7 @@ class BackupSerializerTest {
     fun `toJson and fromJson should preserve data integrity`() {
         // Arrange
         val notes = listOf(
-            Note(id = 1, title = "Note 1", content = "Content 1", timestamp = 123L, colorHex = 0xFFFFFFFFL, isDeleted = false),
+            Note(id = 1, title = "Note 1", content = "Content 1", timestamp = 123L, colorHex = 0xFFFFFFFFL, isDeleted = false, isFavorite = true),
             Note(id = 2, title = "Note 2", content = "Content 2", timestamp = 456L, colorHex = 0x00000000L, isDeleted = true)
         )
         val collections = listOf(
@@ -44,6 +44,7 @@ class BackupSerializerTest {
         assertEquals(originalData.noteCollectionRefs.size, restoredData.noteCollectionRefs.size)
 
         assertEquals(originalData.notes[0].title, restoredData.notes[0].title)
+        assertEquals(originalData.notes[0].isFavorite, restoredData.notes[0].isFavorite)
         assertEquals(originalData.notes[1].isDeleted, restoredData.notes[1].isDeleted)
         assertEquals(originalData.collections[0].name, restoredData.collections[0].name)
         assertEquals(originalData.noteCollectionRefs[0].noteId, restoredData.noteCollectionRefs[0].noteId)

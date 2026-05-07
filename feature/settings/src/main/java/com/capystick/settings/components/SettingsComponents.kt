@@ -193,7 +193,7 @@ private fun ThemeOptionRow(
             )
             if (option == ThemeOption.DYNAMIC) {
                 Text(
-                    text = "Colores extraidos del fondo de pantalla",
+                    text = "Colores del dispositivo",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

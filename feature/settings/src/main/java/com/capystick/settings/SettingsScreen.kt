@@ -120,7 +120,7 @@ fun SettingsScreen(
                     onClick = onBackupClick,
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_collection),
+                    icon = painterResource(id = R.drawable.ic_widget_dou),
                     title = "Widgets",
                     subtitle = "Configura widgets de notas recientes o por coleccion",
                     onClick = onWidgetsClick,
