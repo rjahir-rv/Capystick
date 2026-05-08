@@ -22,7 +22,7 @@ fun rememberNotepadEditorState(): NotepadEditorState {
 class NotepadEditorState(
     val richTextState: RichTextState,
 ) {
-    var title by mutableStateOf("Nueva nota")
+    var title by mutableStateOf("")
     var showStyleMenu by mutableStateOf(false)
     val undoManager = TextUndoManager(richTextState)
 
@@ -30,7 +30,7 @@ class NotepadEditorState(
         get() = richTextState.annotatedString.text.isEmpty()
 
     fun reset() {
-        title = "Nueva nota"
+        title = ""
         showStyleMenu = false
         richTextState.setHtml("")
         undoManager.clear()

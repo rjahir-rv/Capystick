@@ -1,6 +1,7 @@
 package com.capystick.notepad
 
 import android.content.ClipData
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,7 @@ fun NotepadScreen(
     viewModel: NotepadViewModel = hiltViewModel(),
 ) {
     val clipboardManager = LocalClipboard.current
+    val context = LocalContext.current
     val editorState = rememberNotepadEditorState()
     val scope = rememberCoroutineScope()
     val authenticator = rememberBiometricAuthenticator()
@@ -114,6 +117,12 @@ fun NotepadScreen(
                         editorState.richTextState.toHtml(),
                         collectionId,
                     ) {
+                        val message = if (collectionId != null && noteId == null) {
+                            "Nota guardada y añadida a la coleccion"
+                        } else {
+                            "Nota guardada"
+                        }
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         editorState.reset()
                         onNoteSaved()
                     }

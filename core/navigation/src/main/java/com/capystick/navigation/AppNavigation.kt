@@ -66,6 +66,9 @@ fun AppNavigation(
             externalNavigationCommand?.let(::applyExternalNavigationCommand)
         }
     }
+    var recentlyDeletedNoteIds by remember {
+        mutableStateOf<Set<Int>>(emptySet())
+    }
     var skipInitialExternalNavigationHandling by remember {
         mutableStateOf(externalNavigationCommand != null)
     }
@@ -200,6 +203,10 @@ fun AppNavigation(
                     entry<NotesRoute> {
                         NotesScreen(
                             innerPadding = innerPadding,
+                            recentlyDeletedNoteIds = recentlyDeletedNoteIds,
+                            onRecentlyDeletedHandled = {
+                                recentlyDeletedNoteIds = emptySet()
+                            },
                             onMenuClick = {
                                 scope.launch { drawerState.open() }
                             },
@@ -315,6 +322,10 @@ fun AppNavigation(
                             innerPadding = innerPadding,
                             isUnlockedInitially = args.isUnlocked,
                             onBack = { topLevelBackStack.removeLast() },
+                            onDeleteComplete = { topLevelBackStack.addTopLevel(NotesRoute) },
+                            onNoteMovedToTrash = { deletedNoteId ->
+                                recentlyDeletedNoteIds = setOf(deletedNoteId)
+                            },
                             onEditNote = { noteId, isUnlocked ->
                                 topLevelBackStack.addRoute(EditNoteRoute(noteId, isUnlocked))
                             }

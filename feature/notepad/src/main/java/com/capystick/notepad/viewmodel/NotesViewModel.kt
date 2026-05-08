@@ -117,7 +117,7 @@ class NotesViewModel @Inject constructor(
         _selectedNoteIds.value = emptySet()
     }
 
-    fun deleteSelectedNotes() {
+    fun deleteSelectedNotes(onNotesSoftDeleted: (Set<Int>) -> Unit = {}) {
         viewModelScope.launch {
             val colId = _collectionId.value
             val selectedIds = _selectedNoteIds.value
@@ -127,8 +127,18 @@ class NotesViewModel @Inject constructor(
                 removeSelectedNotesFromCollection(selectedIds, colId)
             } else {
                 softDeleteSelectedNotes(selectedIds)
+                onNotesSoftDeleted(selectedIds)
             }
             clearSelection()
+        }
+    }
+
+    fun restoreNotes(noteIds: Set<Int>, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            noteIds.forEach { noteId ->
+                noteRepository.restoreNote(noteId)
+            }
+            onComplete()
         }
     }
 

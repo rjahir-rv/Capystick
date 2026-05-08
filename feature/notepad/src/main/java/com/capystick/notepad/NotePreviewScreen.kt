@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.core.designsystem.R
+import com.capystick.notepad.components.CollectionSheet
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
 import com.capystick.notepad.util.noteContentToPlainText
 import com.capystick.notepad.viewmodel.NotePreviewViewModel
@@ -54,23 +55,28 @@ fun NotePreviewScreen(
     innerPadding: PaddingValues,
     isUnlockedInitially: Boolean = false,
     onBack: () -> Unit,
+    onDeleteComplete: () -> Unit = onBack,
+    onNoteMovedToTrash: (Int) -> Unit = {},
     onEditNote: (Int, Boolean) -> Unit = { _, _ -> },
     viewModel: NotePreviewViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
+    var isNavigatingAfterDelete by rememberSaveable(noteId) { mutableStateOf(false) }
     val context = LocalContext.current
     val note = uiState.note
     val authenticator = rememberBiometricAuthenticator()
     var isUnlocked by rememberSaveable(noteId) { mutableStateOf(isUnlockedInitially) }
+    val collections by viewModel.collections.collectAsStateWithLifecycle()
+    var showCollectionSheet by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(noteId) {
         viewModel.loadNote(noteId)
     }
 
     LaunchedEffect(uiState.noteMissing) {
-        if (uiState.noteMissing) {
+        if (uiState.noteMissing && !isNavigatingAfterDelete) {
             onBack()
         }
     }
@@ -95,7 +101,21 @@ fun NotePreviewScreen(
                 },
                 actions = {
                     if (note != null) {
-                        IconButton(onClick = { viewModel.toggleFavorite(note) }) {
+                        IconButton(
+                            onClick = {
+                                viewModel.toggleFavorite(note) { isFavorite ->
+                                    Toast.makeText(
+                                        context,
+                                        if (isFavorite) {
+                                            "Nota añadida a favoritas"
+                                        } else {
+                                            "Nota quitada de favoritas"
+                                        },
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
+                            },
+                        ) {
                             Icon(
                                 painter = painterResource(
                                     id = if (note.isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite,
@@ -125,7 +145,19 @@ fun NotePreviewScreen(
                                         } else {
                                             "Autenticate para bloquear esta nota"
                                         },
-                                        onSuccess = { viewModel.toggleSecure(note) },
+                                        onSuccess = {
+                                            viewModel.toggleSecure(note) { isSecure ->
+                                                Toast.makeText(
+                                                    context,
+                                                    if (isSecure) {
+                                                        "Nota bloqueada"
+                                                    } else {
+                                                        "Bloqueo quitado"
+                                                    },
+                                                    Toast.LENGTH_SHORT,
+                                                ).show()
+                                            }
+                                        },
                                         onError = { /* Toast is handled by the authenticator when needed. */ },
                                     )
                                 }
@@ -155,6 +187,19 @@ fun NotePreviewScreen(
                                 expanded = showMenu,
                                 onDismissRequest = { showMenu = false },
                             ) {
+                                DropdownMenuItem(
+                                    text = { Text("Añadir a colección") },
+                                    leadingIcon = {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_add_collection),
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    onClick = {
+                                        showMenu = false
+                                        showCollectionSheet = true
+                                    },
+                                )
                                 DropdownMenuItem(
                                     text = { Text("Compartir") },
                                     leadingIcon = {
@@ -216,7 +261,9 @@ fun NotePreviewScreen(
                             note?.let {
                                 viewModel.deleteNote(it) {
                                     showDeleteDialog = false
-                                    onBack()
+                                    isNavigatingAfterDelete = true
+                                    onNoteMovedToTrash(it.id)
+                                    onDeleteComplete()
                                 }
                             }
                         },
@@ -252,7 +299,9 @@ fun NotePreviewScreen(
                         message = "El bloqueo del telefono esta desactivado",
                         actionLabel = "Quitar bloqueo y abrir",
                         onUnlock = {
-                            viewModel.toggleSecure(note)
+                            viewModel.toggleSecure(note) {
+                                Toast.makeText(context, "Bloqueo quitado", Toast.LENGTH_SHORT).show()
+                            }
                             isUnlocked = true
                         },
                         modifier = Modifier
@@ -313,6 +362,31 @@ fun NotePreviewScreen(
                 }
             }
         }
+
+        if (showCollectionSheet && note != null) {
+            CollectionSheet(
+                collections = collections,
+                onDismiss = { showCollectionSheet = false },
+                onCollectionSelected = { collectionId ->
+                    viewModel.addNoteToCollection(note.id, collectionId) {
+                        Toast.makeText(
+                            context,
+                            "Nota añadida a la coleccion",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                },
+                onCreateCollection = { name ->
+                    viewModel.createCollectionAndAddNote(note.id, name) {
+                        Toast.makeText(
+                            context,
+                            "Nota añadida a la nueva coleccion",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                },
+            )
+        }
     }
 }
 
@@ -345,5 +419,3 @@ private fun LockedNotePrompt(
         }
     }
 }
-
-
