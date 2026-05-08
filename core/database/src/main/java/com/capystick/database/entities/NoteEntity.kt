@@ -17,6 +17,8 @@ data class NoteEntity(
     val isDeleted: Boolean = false,
     @ColumnInfo(defaultValue = "0")
     val isFavorite: Boolean = false,
+    @ColumnInfo(defaultValue = "0")
+    val isSecure: Boolean = false,
 )
 
 fun NoteEntity.toDomain(): Note = Note(
@@ -27,6 +29,7 @@ fun NoteEntity.toDomain(): Note = Note(
     colorHex = colorHex,
     isDeleted = isDeleted,
     isFavorite = isFavorite,
+    isSecure = isSecure,
 )
 
 fun Note.toEntity(): NoteEntity = NoteEntity(
@@ -37,4 +40,5 @@ fun Note.toEntity(): NoteEntity = NoteEntity(
     colorHex = colorHex,
     isDeleted = isDeleted,
     isFavorite = isFavorite,
+    isSecure = isSecure,
 )

@@ -56,6 +56,28 @@ class GetWidgetContentTest {
     }
 
     @Test
+    fun `recent widget excludes secure notes`() = runBlocking {
+        val useCase = getWidgetContent(
+            widgetRepository = FakeWidgetRepository(
+                WidgetConfiguration(appWidgetId = 7, mode = WidgetMode.RECENT_NOTES),
+            ),
+            noteRepository = FakeNoteRepository(
+                notes = listOf(
+                    note(id = 1, timestamp = 100L, isSecure = true),
+                    note(id = 2, timestamp = 300L),
+                    note(id = 3, timestamp = 200L, isSecure = true),
+                ),
+            ),
+            collectionRepository = FakeCollectionRepository(),
+        )
+
+        val result = useCase(appWidgetId = 7)
+
+        val content = result as WidgetContentState.Content
+        assertEquals(listOf(2), content.notes.map { it.noteId })
+    }
+
+    @Test
     fun `collection widget without collections returns no collections state`() = runBlocking {
         val useCase = getWidgetContent(
             widgetRepository = FakeWidgetRepository(
@@ -152,15 +174,46 @@ class GetWidgetContentTest {
         assertEquals(listOf(11, 10), content.notes.map { it.noteId })
     }
 
+    @Test
+    fun `collection widget excludes secure notes`() = runBlocking {
+        val useCase = getWidgetContent(
+            widgetRepository = FakeWidgetRepository(
+                WidgetConfiguration(
+                    appWidgetId = 8,
+                    mode = WidgetMode.SELECTED_COLLECTION,
+                    collectionId = 4,
+                    collectionName = "Trabajo",
+                ),
+            ),
+            noteRepository = FakeNoteRepository(),
+            collectionRepository = FakeCollectionRepository(
+                collections = listOf(Collection(id = 4, name = "Trabajo")),
+                notesByCollection = mapOf(
+                    4 to listOf(
+                        note(id = 10, timestamp = 1L, isSecure = true),
+                        note(id = 11, timestamp = 5L),
+                    ),
+                ),
+            ),
+        )
+
+        val result = useCase(appWidgetId = 8)
+
+        val content = result as WidgetContentState.Content
+        assertEquals(listOf(11), content.notes.map { it.noteId })
+    }
+
     private fun note(
         id: Int,
         timestamp: Long,
+        isSecure: Boolean = false,
     ) = Note(
         id = id,
         title = "Nota $id",
         content = "",
         timestamp = timestamp,
         colorHex = 0L,
+        isSecure = isSecure,
     )
 }
 
@@ -199,6 +252,7 @@ private class FakeNoteRepository(
     override suspend fun saveNote(note: Note): Long = note.id.toLong()
     override suspend fun deleteNote(note: Note) = Unit
     override suspend fun updateFavoriteStatus(noteId: Int, isFavorite: Boolean) = Unit
+    override suspend fun updateSecureStatus(noteId: Int, isSecure: Boolean) = Unit
     override fun getDeletedNotes(): Flow<List<Note>> = flowOf(emptyList())
     override suspend fun softDeleteNote(noteId: Int) = Unit
     override suspend fun restoreNote(noteId: Int) = Unit

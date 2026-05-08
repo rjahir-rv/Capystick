@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.capystick.designsystem.components.CapyNoteCard
+import com.capystick.designsystem.components.rememberBiometricAuthenticator
 import com.capystick.model.Note
 import com.capystick.notepad.util.formatNoteDate
 import com.capystick.notepad.util.noteContentToPlainText
@@ -55,7 +56,7 @@ private fun EmptyNotesState(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = if (isCollectionNotes) "Aun no hay notas en esta coleccion" else "No hay notas aún",
+            text = if (isCollectionNotes) "Aun no hay notas en esta coleccion" else "No hay notas aun",
         )
     }
 }
@@ -82,15 +83,28 @@ internal fun NotesList(
                 formatNoteDate(note.timestamp)
             }
             val isSelected = selectedNoteIds.contains(note.id)
+            val authenticator = rememberBiometricAuthenticator()
 
             CapyNoteCard(
                 title = note.title,
                 dateString = dateString,
                 plainText = plainText,
                 isSelected = isSelected,
+                isSecure = note.isSecure,
                 onClick = {
                     if (isSelectionMode) {
                         onNoteLongClick(note.id)
+                    } else if (note.isSecure) {
+                        if (authenticator.isDeviceSecure()) {
+                            authenticator.authenticate(
+                                title = "Nota segura",
+                                subtitle = "Autenticate para ver el contenido",
+                                onSuccess = { onNoteClick(note.id) },
+                                onError = { /* Optional error surface. */ },
+                            )
+                        } else {
+                            onNoteClick(note.id)
+                        }
                     } else {
                         onNoteClick(note.id)
                     }

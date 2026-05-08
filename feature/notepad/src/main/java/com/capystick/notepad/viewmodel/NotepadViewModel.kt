@@ -52,6 +52,7 @@ class NotepadViewModel @Inject constructor(
                 timestamp = System.currentTimeMillis(), // Updating timestamp on edit
                 colorHex = 0xFFFFFFFF, // TODO: Add color selection support
                 isFavorite = _editorState.value.note?.isFavorite ?: false,
+                isSecure = _editorState.value.note?.isSecure ?: false,
             )
             val noteId = repository.saveNote(note).toInt()
             
@@ -60,6 +61,15 @@ class NotepadViewModel @Inject constructor(
             }
             
             onComplete()
+        }
+    }
+
+    fun updateSecureStatus(noteId: Int, isSecure: Boolean) {
+        viewModelScope.launch {
+            repository.updateSecureStatus(noteId, isSecure)
+            _editorState.update { state ->
+                state.copy(note = state.note?.copy(isSecure = isSecure))
+            }
         }
     }
 }

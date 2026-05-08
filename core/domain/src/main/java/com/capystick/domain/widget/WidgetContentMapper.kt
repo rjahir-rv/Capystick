@@ -31,7 +31,8 @@ class WidgetContentMapper @Inject constructor(
         )
 
     private fun List<Note>.toWidgetNotes(): List<WidgetNoteSummary> =
-        sortedByDescending(Note::timestamp)
+        filterNot(Note::isSecure)
+            .sortedByDescending(Note::timestamp)
             .take(MAX_WIDGET_NOTES)
             .map { it.toWidgetSummary() }
 

@@ -204,7 +204,7 @@ fun AppNavigation(
                                 scope.launch { drawerState.open() }
                             },
                             onNoteClick = { noteId ->
-                                topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                                topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
                             onAddNoteClick = {
                                 topLevelBackStack.addTopLevel(NotepadRoute)
@@ -232,7 +232,7 @@ fun AppNavigation(
                                 scope.launch { drawerState.open() }
                             },
                             onNoteClick = { noteId ->
-                                topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                                topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
                             onAddNoteClick = {
                                 topLevelBackStack.addRoute(CreateCollectionNoteRoute(args.collectionId))
@@ -247,7 +247,7 @@ fun AppNavigation(
                                 scope.launch { drawerState.open() }
                             },
                             onNoteClick = { noteId ->
-                                topLevelBackStack.addRoute(NotePreviewRoute(noteId))
+                                topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
                             onAddNoteClick = {
                                 topLevelBackStack.addTopLevel(NotepadRoute)
@@ -313,9 +313,10 @@ fun AppNavigation(
                        NotePreviewScreen(
                             noteId = args.noteId,
                             innerPadding = innerPadding,
+                            isUnlockedInitially = args.isUnlocked,
                             onBack = { topLevelBackStack.removeLast() },
-                            onEditNote = { noteId ->
-                                topLevelBackStack.addRoute(EditNoteRoute(noteId))
+                            onEditNote = { noteId, isUnlocked ->
+                                topLevelBackStack.addRoute(EditNoteRoute(noteId, isUnlocked))
                             }
                         )
                     }
@@ -323,6 +324,7 @@ fun AppNavigation(
                         NotepadScreen(
                             noteId = args.noteId,
                             innerPadding = innerPadding,
+                            isUnlockedInitially = args.isUnlocked,
                             onMenuClick = {
                                 scope.launch { drawerState.open() }
                             },

@@ -38,6 +38,9 @@ interface NoteDao {
     @Query("UPDATE notes SET isFavorite = :isFavorite WHERE id = :id")
     suspend fun updateFavoriteStatus(id: Int, isFavorite: Boolean)
 
+    @Query("UPDATE notes SET isSecure = :isSecure WHERE id = :id")
+    suspend fun updateSecureStatus(id: Int, isSecure: Boolean)
+
     @Query("SELECT COUNT(*) FROM notes WHERE isDeleted = 0 AND isFavorite = 1")
     fun getFavoriteNoteCount(): Flow<Int>
 

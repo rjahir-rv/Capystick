@@ -24,9 +24,9 @@ data object ScanRoute : TopLevelRoute {
     override val title = "Escanear nota"
 }
 
-data class NotePreviewRoute(val noteId: Int)
+data class NotePreviewRoute(val noteId: Int, val isUnlocked: Boolean = false)
 
-data class EditNoteRoute(val noteId: Int)
+data class EditNoteRoute(val noteId: Int, val isUnlocked: Boolean = false)
 
 data class CollectionNotesRoute(
     val collectionId: Int,

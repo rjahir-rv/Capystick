@@ -29,7 +29,7 @@ enum class ColorPaletteOption(
 
     YELLOW(displayName = "Desierto"),
 
-    ROSE(displayName = "Lavanda"),
+    ROSE(displayName = "Coral"),
 
-    RED(displayName = "Fuego"),
+    RED(displayName = "Lava"),
 }

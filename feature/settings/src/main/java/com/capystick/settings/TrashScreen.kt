@@ -111,9 +111,13 @@ fun TrashScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(items = deletedNotes, key = { it.id }) { note ->
-                        val plainText = remember(note.content) {
-                            Html.fromHtml(note.content, Html.FROM_HTML_MODE_COMPACT)
-                                .toString().trim()
+                        val plainText = remember(note.content, note.isSecure) {
+                            if (note.isSecure) {
+                                ""
+                            } else {
+                                Html.fromHtml(note.content, Html.FROM_HTML_MODE_COMPACT)
+                                    .toString().trim()
+                            }
                         }
                         val dateString = remember(note.timestamp) {
                             SimpleDateFormat("MMM dd", Locale.getDefault())
@@ -269,6 +273,7 @@ private fun TrashNoteCard(
         title = note.title,
         dateString = dateString,
         plainText = plainText,
+        isSecure = note.isSecure,
         onClick = {},
         modifier = modifier,
         trailingActions = {

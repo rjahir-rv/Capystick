@@ -79,6 +79,11 @@ class NoteRepositoryImpl @Inject constructor(
         widgetRefreshRequester.requestRefresh()
     }
 
+    override suspend fun updateSecureStatus(noteId: Int, isSecure: Boolean) {
+        noteDao.updateSecureStatus(noteId, isSecure)
+        widgetRefreshRequester.requestRefresh()
+    }
+
     override suspend fun permanentlyDeleteAllTrashed() {
         noteDao.permanentlyDeleteAllTrashed()
         widgetRefreshRequester.requestRefresh()

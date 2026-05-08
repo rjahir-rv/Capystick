@@ -11,6 +11,7 @@ interface NoteRepository {
     suspend fun saveNote(note: Note): Long
     suspend fun deleteNote(note: Note)
     suspend fun updateFavoriteStatus(noteId: Int, isFavorite: Boolean)
+    suspend fun updateSecureStatus(noteId: Int, isSecure: Boolean)
 
 
     fun getDeletedNotes(): Flow<List<Note>>

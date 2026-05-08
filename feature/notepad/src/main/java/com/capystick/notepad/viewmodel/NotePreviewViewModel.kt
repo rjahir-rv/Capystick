@@ -52,6 +52,12 @@ class NotePreviewViewModel @Inject constructor(
             repository.updateFavoriteStatus(note.id, !note.isFavorite)
         }
     }
+
+    fun toggleSecure(note: Note) {
+        viewModelScope.launch {
+            repository.updateSecureStatus(note.id, !note.isSecure)
+        }
+    }
 }
 
 data class NotePreviewUiState(

@@ -15,7 +15,7 @@ import kotlinx.coroutines.Dispatchers
         CollectionEntity::class,
         NoteCollectionCrossRef::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class CapystickDB : RoomDatabase() {

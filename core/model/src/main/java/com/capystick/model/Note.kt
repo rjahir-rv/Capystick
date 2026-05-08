@@ -8,4 +8,5 @@ data class Note(
     val colorHex: Long,
     val isDeleted: Boolean = false,
     val isFavorite: Boolean = false,
+    val isSecure: Boolean = false,
 )

@@ -38,6 +38,7 @@ object BackupSerializer {
                     put("colorHex", note.colorHex)
                     put("isDeleted", note.isDeleted)
                     put("isFavorite", note.isFavorite)
+                    put("isSecure", note.isSecure)
                 },
             )
         }
@@ -102,6 +103,7 @@ object BackupSerializer {
                 colorHex = obj.getLong("colorHex"),
                 isDeleted = obj.optBoolean("isDeleted", false),
                 isFavorite = obj.optBoolean("isFavorite", false),
+                isSecure = obj.optBoolean("isSecure", false),
             )
         }
         return notes
