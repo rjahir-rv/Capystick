@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.capystick.model.Note
+import com.capystick.model.NoteType
 
 @Entity(tableName = "notes")
 data class NoteEntity(
@@ -13,6 +14,8 @@ data class NoteEntity(
     val content: String,
     val timestamp: Long,
     val colorHex: Long,
+    @ColumnInfo(defaultValue = "'TEXT'")
+    val type: String = NoteType.TEXT.name,
     @ColumnInfo(defaultValue = "0")
     val isDeleted: Boolean = false,
     @ColumnInfo(defaultValue = "0")
@@ -27,6 +30,7 @@ fun NoteEntity.toDomain(): Note = Note(
     content = content,
     timestamp = timestamp,
     colorHex = colorHex,
+    type = runCatching { NoteType.valueOf(type) }.getOrDefault(NoteType.TEXT),
     isDeleted = isDeleted,
     isFavorite = isFavorite,
     isSecure = isSecure,
@@ -38,6 +42,7 @@ fun Note.toEntity(): NoteEntity = NoteEntity(
     content = content,
     timestamp = timestamp,
     colorHex = colorHex,
+    type = type.name,
     isDeleted = isDeleted,
     isFavorite = isFavorite,
     isSecure = isSecure,

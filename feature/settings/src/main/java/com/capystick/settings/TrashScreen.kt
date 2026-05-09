@@ -41,7 +41,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.core.designsystem.R
 import com.capystick.designsystem.components.CapyNoteCard
+import com.capystick.model.ChecklistFormatter
 import com.capystick.model.Note
+import com.capystick.model.NoteType
 import com.capystick.settings.viewmodel.TrashViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -111,12 +113,11 @@ fun TrashScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(items = deletedNotes, key = { it.id }) { note ->
-                        val plainText = remember(note.content, note.isSecure) {
+                        val plainText = remember(note.content, note.type, note.isSecure) {
                             if (note.isSecure) {
                                 ""
                             } else {
-                                Html.fromHtml(note.content, Html.FROM_HTML_MODE_COMPACT)
-                                    .toString().trim()
+                                note.toTrashPreviewText()
                             }
                         }
                         val dateString = remember(note.timestamp) {
@@ -204,6 +205,16 @@ fun TrashScreen(
                 }
             },
         )
+    }
+}
+
+private fun Note.toTrashPreviewText(): String {
+    return when (type) {
+        NoteType.TEXT -> Html.fromHtml(content, Html.FROM_HTML_MODE_COMPACT)
+            .toString()
+            .trim()
+
+        NoteType.CHECKLIST -> ChecklistFormatter.plainTextFromJson(content)
     }
 }
 

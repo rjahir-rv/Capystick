@@ -13,5 +13,6 @@ kotlin {
 }
 
 dependencies {
+    implementation(libs.json)
     testImplementation(libs.junit)
 }

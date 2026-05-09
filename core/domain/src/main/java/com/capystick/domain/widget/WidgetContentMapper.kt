@@ -59,7 +59,7 @@ class WidgetContentMapper @Inject constructor(
         WidgetNoteSummary(
             noteId = id,
             title = title,
-            preview = notePreviewFormatter.format(content),
+            preview = notePreviewFormatter.format(this),
             timestamp = timestamp,
         )
 

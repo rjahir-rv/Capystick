@@ -10,6 +10,7 @@ android {
 dependencies {
     // modules
     implementation(project(":feature:notepad"))
+    implementation(project(":feature:checklist"))
     implementation(project(":feature:collections"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:widget"))

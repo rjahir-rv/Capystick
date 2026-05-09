@@ -4,6 +4,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +46,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.core.designsystem.R
 import com.capystick.notepad.components.CollectionSheet
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
+import com.capystick.model.ChecklistContentSerializer
+import com.capystick.model.ChecklistItem
+import com.capystick.model.Note
+import com.capystick.model.NoteType
 import com.capystick.notepad.util.noteContentToPlainText
 import com.capystick.notepad.viewmodel.NotePreviewViewModel
 
@@ -58,6 +64,7 @@ fun NotePreviewScreen(
     onDeleteComplete: () -> Unit = onBack,
     onNoteMovedToTrash: (Int) -> Unit = {},
     onEditNote: (Int, Boolean) -> Unit = { _, _ -> },
+    onEditChecklist: (Int, Boolean) -> Unit = { _, _ -> },
     viewModel: NotePreviewViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -223,7 +230,7 @@ fun NotePreviewScreen(
                                             type = "text/plain"
                                             putExtra(
                                                 Intent.EXTRA_TEXT,
-                                                "${note.title}\n\n${noteContentToPlainText(note.content)}",
+                                                "${note.title}\n\n${noteContentToPlainText(note)}",
                                             )
                                         }
                                         context.startActivity(Intent.createChooser(shareIntent, "Compartir nota"))
@@ -338,24 +345,20 @@ fun NotePreviewScreen(
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Card(
-                            onClick = { onEditNote(noteId, isUnlocked) },
+                            onClick = {
+                                if (note.type == NoteType.CHECKLIST) {
+                                    onEditChecklist(noteId, isUnlocked)
+                                } else {
+                                    onEditNote(noteId, isUnlocked)
+                                }
+                            },
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             ),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            val plainText = remember(note.content) {
-                                noteContentToPlainText(note.content)
-                            }
-                            Text(
-                                text = plainText,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            NotePreviewContent(note = note)
                         }
                         Spacer(modifier = Modifier.height(32.dp))
                     }
@@ -386,6 +389,76 @@ fun NotePreviewScreen(
                     }
                 },
             )
+        }
+    }
+}
+
+@Composable
+private fun NotePreviewContent(
+    note: Note,
+    modifier: Modifier = Modifier,
+) {
+    when (note.type) {
+        NoteType.TEXT -> {
+            val plainText = remember(note.content) {
+                noteContentToPlainText(note.content)
+            }
+            Text(
+                text = plainText,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        NoteType.CHECKLIST -> {
+            val items = remember(note.content) {
+                ChecklistContentSerializer.fromJson(note.content).items
+            }
+            ChecklistPreviewItems(
+                items = items,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChecklistPreviewItems(
+    items: List<ChecklistItem>,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+    ) {
+        if (items.isEmpty()) {
+            Text(
+                text = "Checklist vacia",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            items.forEach { item ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = item.checked,
+                        onCheckedChange = null,
+                    )
+                    Text(
+                        text = item.text.ifBlank { "Item sin texto" },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }

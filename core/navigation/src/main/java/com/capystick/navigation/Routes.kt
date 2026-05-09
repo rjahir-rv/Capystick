@@ -8,6 +8,10 @@ data object NotepadRoute : TopLevelRoute {
     override val title = "Crear nota"
 }
 
+data class ChecklistRoute(val initialTitle: String = "") : TopLevelRoute {
+    override val title = "Crear checklist"
+}
+
 data object CollectionsRoute : TopLevelRoute {
     override val title = "Colecciones"
 }
@@ -28,6 +32,8 @@ data class NotePreviewRoute(val noteId: Int, val isUnlocked: Boolean = false)
 
 data class EditNoteRoute(val noteId: Int, val isUnlocked: Boolean = false)
 
+data class EditChecklistRoute(val noteId: Int, val isUnlocked: Boolean = false)
+
 data class CollectionNotesRoute(
     val collectionId: Int,
     val collectionName: String
@@ -36,6 +42,11 @@ data class CollectionNotesRoute(
 data object FavoriteNotesRoute
 
 data class CreateCollectionNoteRoute(val collectionId: Int)
+
+data class CreateCollectionChecklistRoute(
+    val collectionId: Int,
+    val initialTitle: String = "",
+)
 
 data object TrashRoute
 

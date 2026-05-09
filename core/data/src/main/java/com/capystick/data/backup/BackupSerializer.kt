@@ -4,6 +4,7 @@ import com.capystick.model.BackupData
 import com.capystick.model.Collection
 import com.capystick.model.Note
 import com.capystick.model.NoteCollectionRef
+import com.capystick.model.NoteType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -36,6 +37,7 @@ object BackupSerializer {
                     put("content", note.content)
                     put("timestamp", note.timestamp)
                     put("colorHex", note.colorHex)
+                    put("type", note.type.name)
                     put("isDeleted", note.isDeleted)
                     put("isFavorite", note.isFavorite)
                     put("isSecure", note.isSecure)
@@ -101,6 +103,9 @@ object BackupSerializer {
                 content = obj.getString("content"),
                 timestamp = obj.getLong("timestamp"),
                 colorHex = obj.getLong("colorHex"),
+                type = runCatching {
+                    NoteType.valueOf(obj.optString("type", NoteType.TEXT.name))
+                }.getOrDefault(NoteType.TEXT),
                 isDeleted = obj.optBoolean("isDeleted", false),
                 isFavorite = obj.optBoolean("isFavorite", false),
                 isSecure = obj.optBoolean("isSecure", false),

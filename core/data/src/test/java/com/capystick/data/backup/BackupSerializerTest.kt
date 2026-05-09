@@ -4,6 +4,7 @@ import com.capystick.model.BackupData
 import com.capystick.model.Collection
 import com.capystick.model.Note
 import com.capystick.model.NoteCollectionRef
+import com.capystick.model.NoteType
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -29,6 +30,7 @@ class BackupSerializerTest {
                 content = "Content 2",
                 timestamp = 456L,
                 colorHex = 0x00000000L,
+                type = NoteType.CHECKLIST,
                 isDeleted = true,
             ),
         )
@@ -62,8 +64,35 @@ class BackupSerializerTest {
         assertEquals(originalData.notes[0].title, restoredData.notes[0].title)
         assertEquals(originalData.notes[0].isFavorite, restoredData.notes[0].isFavorite)
         assertEquals(originalData.notes[0].isSecure, restoredData.notes[0].isSecure)
+        assertEquals(NoteType.TEXT, restoredData.notes[0].type)
+        assertEquals(NoteType.CHECKLIST, restoredData.notes[1].type)
         assertEquals(originalData.notes[1].isDeleted, restoredData.notes[1].isDeleted)
         assertEquals(originalData.collections[0].name, restoredData.collections[0].name)
         assertEquals(originalData.noteCollectionRefs[0].noteId, restoredData.noteCollectionRefs[0].noteId)
+    }
+
+    @Test
+    fun `fromJson should default old backups to text notes`() {
+        val restoredData = BackupSerializer.fromJson(
+            """
+            {
+              "version": 1,
+              "createdAt": 999,
+              "notes": [
+                {
+                  "id": 1,
+                  "title": "Legacy",
+                  "content": "Content",
+                  "timestamp": 123,
+                  "colorHex": 4294967295
+                }
+              ],
+              "collections": [],
+              "noteCollectionRefs": []
+            }
+            """.trimIndent(),
+        )
+
+        assertEquals(NoteType.TEXT, restoredData.notes.single().type)
     }
 }

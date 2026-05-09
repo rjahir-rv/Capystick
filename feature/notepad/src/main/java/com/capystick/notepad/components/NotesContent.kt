@@ -16,7 +16,7 @@ import com.capystick.designsystem.components.CapyNoteCard
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
 import com.capystick.model.Note
 import com.capystick.notepad.util.formatNoteDate
-import com.capystick.notepad.util.noteContentToPlainText
+import com.capystick.notepad.util.noteSupportingText
 
 @Composable
 internal fun NotesContent(
@@ -76,8 +76,8 @@ internal fun NotesList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(notes) { note ->
-            val plainText = remember(note.content) {
-                noteContentToPlainText(note.content)
+            val plainText = remember(note.content, note.type) {
+                noteSupportingText(note)
             }
             val dateString = remember(note.timestamp) {
                 formatNoteDate(note.timestamp)

@@ -1,8 +1,20 @@
 package com.capystick.domain.widget
 
+import com.capystick.model.ChecklistFormatter
+import com.capystick.model.Note
+import com.capystick.model.NoteType
 import javax.inject.Inject
 
 class WidgetNotePreviewFormatter @Inject constructor() {
+    fun format(note: Note): String? {
+        val plainText = when (note.type) {
+            NoteType.TEXT -> format(note.content)
+            NoteType.CHECKLIST -> ChecklistFormatter.plainTextFromJson(note.content).takeIf { it.isNotBlank() }
+        }
+
+        return plainText?.take(MAX_PREVIEW_LENGTH)
+    }
+
     fun format(html: String): String? {
         val plainText = html
             .replace(HTML_TAG_REGEX, " ")

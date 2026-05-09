@@ -6,7 +6,9 @@ import com.capystick.database.entities.toDomain
 import com.capystick.domain.repository.NoteTextExport
 import com.capystick.domain.repository.NotesExportRepository
 import com.capystick.domain.repository.NotesExportResult
+import com.capystick.model.ChecklistFormatter
 import com.capystick.model.Note
+import com.capystick.model.NoteType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -56,7 +58,7 @@ class NotesExportRepositoryImpl @Inject constructor(
         val visibleTitle = note.title.trim().ifBlank { "Sin titulo" }
         val dateString = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
             .format(Date(note.timestamp))
-        val plainText = htmlToPlainText(note.content)
+        val plainText = note.toPlainText()
             .replace("\r\n", "\n")
             .replace("\r", "\n")
 
@@ -68,6 +70,13 @@ class NotesExportRepositoryImpl @Inject constructor(
             append(dateString)
             append("\n\n")
             append(plainText)
+        }
+    }
+
+    private fun Note.toPlainText(): String {
+        return when (type) {
+            NoteType.TEXT -> htmlToPlainText(content)
+            NoteType.CHECKLIST -> ChecklistFormatter.plainTextFromJson(content)
         }
     }
 }

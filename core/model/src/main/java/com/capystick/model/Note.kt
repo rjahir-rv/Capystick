@@ -6,7 +6,13 @@ data class Note(
     val content: String,
     val timestamp: Long,
     val colorHex: Long,
+    val type: NoteType = NoteType.TEXT,
     val isDeleted: Boolean = false,
     val isFavorite: Boolean = false,
     val isSecure: Boolean = false,
 )
+
+enum class NoteType {
+    TEXT,
+    CHECKLIST,
+}

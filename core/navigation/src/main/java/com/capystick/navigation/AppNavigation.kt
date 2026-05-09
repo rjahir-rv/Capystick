@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.capystick.checklist.ChecklistScreen
 import com.capystick.collections.CollectionsScreen
 import com.capystick.collections.FAVORITES_COLLECTION_ID
 import com.capystick.notepad.NotePreviewScreen
@@ -116,7 +117,9 @@ fun AppNavigation(
                                 Icon(painter = iconRes!!, contentDescription = item.title)
                             },
                             colors = NavigationDrawerItemDefaults.colors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
+                                selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer
                             ),
                             modifier = Modifier.padding(paddingValues = NavigationDrawerItemDefaults.ItemPadding)
                         )
@@ -129,7 +132,7 @@ fun AppNavigation(
         Scaffold(
             topBar = {
                 val currentRoute = topLevelBackStack.backStack.lastOrNull()
-                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute && currentRoute != ScanRoute) {
+                if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute !is ChecklistRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute && currentRoute != ScanRoute) {
                     CapyTopAppBar(
                         title = currentRoute.title,
                         onMenuClick = {
@@ -185,6 +188,18 @@ fun AppNavigation(
                             }
                         )
                     }
+                    entry<ChecklistRoute> { args ->
+                        ChecklistScreen(
+                            innerPadding = innerPadding,
+                            initialTitle = args.initialTitle,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onChecklistSaved = {
+                                topLevelBackStack.addTopLevel(NotesRoute)
+                            },
+                        )
+                    }
                     entry<CollectionsRoute> {
                         CollectionsScreen(
                             innerPadding = innerPadding,
@@ -213,8 +228,11 @@ fun AppNavigation(
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
-                            onAddNoteClick = {
+                            onAddTextNoteClick = {
                                 topLevelBackStack.addTopLevel(NotepadRoute)
+                            },
+                            onAddChecklistClick = { title ->
+                                topLevelBackStack.addTopLevel(ChecklistRoute(initialTitle = title))
                             }
                         )
 
@@ -241,8 +259,16 @@ fun AppNavigation(
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
-                            onAddNoteClick = {
+                            onAddTextNoteClick = {
                                 topLevelBackStack.addRoute(CreateCollectionNoteRoute(args.collectionId))
+                            },
+                            onAddChecklistClick = { title ->
+                                topLevelBackStack.addRoute(
+                                    CreateCollectionChecklistRoute(
+                                        collectionId = args.collectionId,
+                                        initialTitle = title,
+                                    ),
+                                )
                             }
                         )
                     }
@@ -256,8 +282,11 @@ fun AppNavigation(
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
-                            onAddNoteClick = {
+                            onAddTextNoteClick = {
                                 topLevelBackStack.addTopLevel(NotepadRoute)
+                            },
+                            onAddChecklistClick = { title ->
+                                topLevelBackStack.addTopLevel(ChecklistRoute(initialTitle = title))
                             }
                         )
                     }
@@ -272,6 +301,20 @@ fun AppNavigation(
                             onNoteSaved = {
                                 topLevelBackStack.removeLast()
                             }
+                        )
+                    }
+                    entry<CreateCollectionChecklistRoute> { args ->
+                        ChecklistScreen(
+                            noteId = null,
+                            collectionId = args.collectionId,
+                            innerPadding = innerPadding,
+                            initialTitle = args.initialTitle,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onChecklistSaved = {
+                                topLevelBackStack.removeLast()
+                            },
                         )
                     }
                     entry<SettingsRoute> {
@@ -328,6 +371,9 @@ fun AppNavigation(
                             },
                             onEditNote = { noteId, isUnlocked ->
                                 topLevelBackStack.addRoute(EditNoteRoute(noteId, isUnlocked))
+                            },
+                            onEditChecklist = { noteId, isUnlocked ->
+                                topLevelBackStack.addRoute(EditChecklistRoute(noteId, isUnlocked))
                             }
                         )
                     }
@@ -342,6 +388,19 @@ fun AppNavigation(
                             onNoteSaved = {
                                 topLevelBackStack.removeLast()
                             }
+                        )
+                    }
+                    entry<EditChecklistRoute> { args ->
+                        ChecklistScreen(
+                            noteId = args.noteId,
+                            innerPadding = innerPadding,
+                            isUnlockedInitially = args.isUnlocked,
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            },
+                            onChecklistSaved = {
+                                topLevelBackStack.removeLast()
+                            },
                         )
                     }
                 }
