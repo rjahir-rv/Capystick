@@ -49,8 +49,21 @@ class GetWidgetContent @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeCollectionState(
         configuration: WidgetConfiguration,
-    ): Flow<WidgetContentState> =
-        collectionRepository.getAllCollections().flatMapLatest { collections ->
+    ): Flow<WidgetContentState> {
+        if (configuration.collectionId == -1) {
+            val resolvedConfiguration = configuration.copy(
+                collectionId = -1,
+                collectionName = "Favoritas",
+            )
+            return noteRepository.getFavoriteNotes().map { notes ->
+                widgetContentMapper.collectionNotes(
+                    configuration = resolvedConfiguration,
+                    collectionName = "Favoritas",
+                    notes = notes,
+                )
+            }
+        }
+        return collectionRepository.getAllCollections().flatMapLatest { collections ->
             if (collections.isEmpty()) {
                 return@flatMapLatest flowOf(
                     WidgetContentState.EmptyNoCollections(configuration = configuration),
@@ -77,4 +90,5 @@ class GetWidgetContent @Inject constructor(
                 )
             }
         }
+    }
 }

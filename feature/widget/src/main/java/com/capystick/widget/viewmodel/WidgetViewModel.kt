@@ -3,6 +3,7 @@ package com.capystick.widget.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capystick.domain.repository.CollectionRepository
+import com.capystick.domain.repository.NoteRepository
 import com.capystick.domain.repository.WidgetRepository
 import com.capystick.model.Collection
 import com.capystick.model.WidgetConfiguration
@@ -21,8 +22,9 @@ import javax.inject.Inject
 class WidgetSettingsViewModel @Inject constructor(
     private val widgetRepository: WidgetRepository,
     collectionRepository: CollectionRepository,
+    noteRepository: NoteRepository,
 ) : ViewModel() {
-    private val collections = collectionRepository.getAllCollections()
+    private val baseCollections = collectionRepository.getAllCollections()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
@@ -38,11 +40,31 @@ class WidgetSettingsViewModel @Inject constructor(
     private val _currentAppWidgetId = MutableStateFlow<Int?>(null)
     private val _isInitialized = MutableStateFlow(false)
 
-    val availableCollections: StateFlow<List<Collection>> = collections
+    private val favoriteNoteCount = noteRepository.getFavoriteNoteCount()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+            initialValue = 0,
+        )
+
+    val availableCollections: StateFlow<List<Collection>> = combine(
+        baseCollections,
+        favoriteNoteCount,
+    ) { cols, favCount ->
+        if (favCount > 0) {
+            listOf(Collection(id = -1, name = "Favoritas", noteCount = favCount)) + cols
+        } else {
+            cols
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+        initialValue = emptyList(),
+    )
 
     val widgetItems: StateFlow<List<WidgetListItemUiState>> = combine(
         widgetRepository.getWidgetConfigurations(),
-        collections,
+        availableCollections,
     ) { configurations, availableCollections ->
         configurations.map { configuration ->
             val collection = availableCollections.firstOrNull { it.id == configuration.collectionId }
@@ -99,7 +121,7 @@ class WidgetSettingsViewModel @Inject constructor(
     fun saveConfiguration(onSaved: () -> Unit) {
         val appWidgetId = _currentAppWidgetId.value ?: return
         viewModelScope.launch {
-            val collection = collections.value.firstOrNull { it.id == _selectedCollectionId.value }
+            val collection = availableCollections.value.firstOrNull { it.id == _selectedCollectionId.value }
             widgetRepository.saveWidgetConfiguration(
                 WidgetConfiguration(
                     appWidgetId = appWidgetId,

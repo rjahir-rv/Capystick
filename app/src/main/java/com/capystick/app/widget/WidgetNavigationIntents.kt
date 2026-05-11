@@ -90,9 +90,9 @@ object WidgetNavigationIntents {
             DESTINATION_CREATE_NOTE -> ExternalNavigationCommand.OpenCreateNote
             DESTINATION_COLLECTIONS -> ExternalNavigationCommand.OpenCollections
             DESTINATION_COLLECTION -> {
-                val collectionId = intent.getIntExtra(EXTRA_COLLECTION_ID, -1)
+                val collectionId = intent.getIntExtra(EXTRA_COLLECTION_ID, -2)
                 val collectionName = intent.getStringExtra(EXTRA_COLLECTION_NAME)
-                if (collectionId == -1 || collectionName.isNullOrBlank()) {
+                if (collectionId == -2 || collectionName.isNullOrBlank()) {
                     null
                 } else {
                     ExternalNavigationCommand.OpenCollection(collectionId, collectionName)
@@ -106,9 +106,9 @@ object WidgetNavigationIntents {
 
             DESTINATION_EDIT_COLLECTION_NOTE -> {
                 val noteId = intent.getIntExtra(EXTRA_NOTE_ID, -1)
-                val collectionId = intent.getIntExtra(EXTRA_COLLECTION_ID, -1)
+                val collectionId = intent.getIntExtra(EXTRA_COLLECTION_ID, -2)
                 val collectionName = intent.getStringExtra(EXTRA_COLLECTION_NAME)
-                if (noteId == -1 || collectionId == -1 || collectionName.isNullOrBlank()) {
+                if (noteId == -1 || collectionId == -2 || collectionName.isNullOrBlank()) {
                     null
                 } else {
                     ExternalNavigationCommand.OpenEditCollectionNote(

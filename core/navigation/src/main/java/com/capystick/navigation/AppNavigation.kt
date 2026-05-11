@@ -427,28 +427,36 @@ private fun TopLevelBackStack<TopLevelRoute>.applyExternalNavigationCommand(
 
         is ExternalNavigationCommand.OpenCollection -> {
             addTopLevel(CollectionsRoute)
-            addRoute(
-                CollectionNotesRoute(
-                    collectionId = command.collectionId,
-                    collectionName = command.collectionName,
-                ),
-            )
+            if (command.collectionId == FAVORITES_COLLECTION_ID) {
+                addRoute(FavoriteNotesRoute)
+            } else {
+                addRoute(
+                    CollectionNotesRoute(
+                        collectionId = command.collectionId,
+                        collectionName = command.collectionName,
+                    ),
+                )
+            }
         }
 
         is ExternalNavigationCommand.OpenEditRecentNote -> {
             addTopLevel(NotesRoute)
-            addRoute(EditNoteRoute(command.noteId))
+            addRoute(NotePreviewRoute(command.noteId, isUnlocked = true))
         }
 
         is ExternalNavigationCommand.OpenEditCollectionNote -> {
             addTopLevel(CollectionsRoute)
-            addRoute(
-                CollectionNotesRoute(
-                    collectionId = command.collectionId,
-                    collectionName = command.collectionName,
-                ),
-            )
-            addRoute(EditNoteRoute(command.noteId))
+            if (command.collectionId == FAVORITES_COLLECTION_ID) {
+                addRoute(FavoriteNotesRoute)
+            } else {
+                addRoute(
+                    CollectionNotesRoute(
+                        collectionId = command.collectionId,
+                        collectionName = command.collectionName,
+                    ),
+                )
+            }
+            addRoute(NotePreviewRoute(command.noteId, isUnlocked = true))
         }
 
         is ExternalNavigationCommand.OpenWidgetManagement -> {

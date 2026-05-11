@@ -1,3 +1,5 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package com.capystick.checklist
 
 import android.widget.Toast
