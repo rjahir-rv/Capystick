@@ -65,7 +65,7 @@ class NotesWidget : GlanceAppWidget() {
         context: Context,
         id: GlanceId,
     ) {
-        val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
+        val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(glanceId = id)
         val entryPoint =
             EntryPointAccessors.fromApplication(
                 context.applicationContext,
@@ -114,7 +114,7 @@ private fun WidgetScaffold(
         modifier =
             GlanceModifier
                 .fillMaxSize()
-                .background(palette.surfaceContainer)
+                .background(colorProvider = palette.surfaceContainer)
                 .cornerRadius(24.dp)
                 .appWidgetBackground(), // ensures proper clipping and background bounds on Android 12+
     ) {
@@ -221,7 +221,7 @@ private fun WidgetHeader(
         modifier =
             GlanceModifier
                 .fillMaxWidth()
-                .background(palette.primary),
+                .background(colorProvider = palette.primary),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
@@ -238,7 +238,7 @@ private fun WidgetHeader(
                     TextStyle(
                         color = palette.onPrimary,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                     ),
                 maxLines = 1,
             )

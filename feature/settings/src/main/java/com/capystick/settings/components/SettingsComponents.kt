@@ -65,7 +65,7 @@ internal fun SettingsItem(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+                        color = MaterialTheme.colorScheme.onSurface,
                         shape = CircleShape,
                     ),
                 contentAlignment = Alignment.Center,
