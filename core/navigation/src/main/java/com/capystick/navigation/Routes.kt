@@ -1,31 +1,34 @@
 package com.capystick.navigation
 
+import androidx.annotation.StringRes
+
 sealed interface TopLevelRoute {
-    val title: String
+    @get:StringRes
+    val titleRes: Int
 }
 
 data object NotepadRoute : TopLevelRoute {
-    override val title = "Crear nota"
+    override val titleRes = R.string.route_create_note
 }
 
 data class ChecklistRoute(val initialTitle: String = "") : TopLevelRoute {
-    override val title = "Crear checklist"
+    override val titleRes = R.string.route_create_checklist
 }
 
 data object CollectionsRoute : TopLevelRoute {
-    override val title = "Colecciones"
+    override val titleRes = R.string.route_collections
 }
 
 data object SettingsRoute : TopLevelRoute {
-    override val title = "Ajustes"
+    override val titleRes = R.string.route_settings
 }
 
 data object NotesRoute : TopLevelRoute {
-    override val title = "Todas las notas"
+    override val titleRes = R.string.route_all_notes
 }
 
 data object ScanRoute : TopLevelRoute {
-    override val title = "Escanear nota"
+    override val titleRes = R.string.route_scan_note
 }
 
 data class NotePreviewRoute(val noteId: Int, val isUnlocked: Boolean = false)

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,13 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,25 +25,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capystick.core.designsystem.R
 import com.capystick.notepad.components.CollectionSheet
+import com.capystick.notepad.components.NotePreviewTopBar
+import com.capystick.notepad.components.LockedNotePrompt
+import com.capystick.notepad.components.NotePreviewContent
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
-import com.capystick.model.ChecklistContentSerializer
-import com.capystick.model.ChecklistItem
-import com.capystick.model.Note
 import com.capystick.model.NoteType
 import com.capystick.notepad.util.noteContentToPlainText
+import com.capystick.notepad.util.rememberNotePreviewStrings
 import com.capystick.notepad.viewmodel.NotePreviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +60,6 @@ fun NotePreviewScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-    var showMenu by remember { mutableStateOf(false) }
     var isNavigatingAfterDelete by rememberSaveable(noteId) { mutableStateOf(false) }
     val context = LocalContext.current
     val note = uiState.note
@@ -77,6 +67,7 @@ fun NotePreviewScreen(
     var isUnlocked by rememberSaveable(noteId) { mutableStateOf(isUnlockedInitially) }
     val collections by viewModel.collections.collectAsStateWithLifecycle()
     var showCollectionSheet by rememberSaveable { mutableStateOf(false) }
+    val strings = rememberNotePreviewStrings()
 
     LaunchedEffect(noteId) {
         viewModel.loadNote(noteId)
@@ -91,177 +82,72 @@ fun NotePreviewScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = note?.title ?: "Cargando...",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Volver",
-                        )
-                    }
-                },
-                actions = {
+            NotePreviewTopBar(
+                title = note?.title ?: stringResource(R.string.loading),
+                isFavorite = note?.isFavorite == true,
+                isSecure = note?.isSecure == true,
+                onBack = onBack,
+                onToggleFavoriteClick = {
                     if (note != null) {
-                        IconButton(
-                            onClick = {
-                                viewModel.toggleFavorite(note) { isFavorite ->
-                                    Toast.makeText(
-                                        context,
-                                        if (isFavorite) {
-                                            "Nota añadida a favoritas"
-                                        } else {
-                                            "Nota quitada de favoritas"
-                                        },
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                }
-                            },
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (note.isFavorite) R.drawable.ic_favorite_filled else R.drawable.ic_favorite,
-                                ),
-                                contentDescription = if (note.isFavorite) "Quitar de favoritas" else "Agregar a favoritas",
-                                tint = if (note.isFavorite) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                            )
-                        }
-
-                        IconButton(
-                            onClick = {
-                                if (note.isSecure && !authenticator.isDeviceSecure()) {
-                                    Toast.makeText(
-                                        context,
-                                        "El telefono ya no tiene bloqueo configurado",
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                } else {
-                                    authenticator.authenticate(
-                                        title = if (note.isSecure) "Desbloquear nota" else "Bloquear nota",
-                                        subtitle = if (note.isSecure) {
-                                            "Autenticate para quitar el bloqueo"
-                                        } else {
-                                            "Autenticate para bloquear esta nota"
-                                        },
-                                        onSuccess = {
-                                            viewModel.toggleSecure(note) { isSecure ->
-                                                Toast.makeText(
-                                                    context,
-                                                    if (isSecure) {
-                                                        "Nota bloqueada"
-                                                    } else {
-                                                        "Bloqueo quitado"
-                                                    },
-                                                    Toast.LENGTH_SHORT,
-                                                ).show()
-                                            }
-                                        },
-                                        onError = { /* Toast is handled by the authenticator when needed. */ },
-                                    )
-                                }
-                            },
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (note.isSecure) R.drawable.ic_lock else R.drawable.ic_lock_open,
-                                ),
-                                contentDescription = if (note.isSecure) "Quitar proteccion" else "Proteger nota",
-                                tint = if (note.isSecure) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                            )
-                        }
-
-                        Box {
-                            IconButton(onClick = { showMenu = true }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_more_vert),
-                                    contentDescription = "Mas opciones",
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false },
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Añadir a colección") },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_add_collection),
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        showCollectionSheet = true
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Compartir") },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_share),
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        if (note.isSecure && !isUnlocked) {
-                                            Toast.makeText(
-                                                context,
-                                                "Desbloquea la nota para compartirla",
-                                                Toast.LENGTH_SHORT,
-                                            ).show()
-                                            return@DropdownMenuItem
-                                        }
-
-                                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                            type = "text/plain"
-                                            putExtra(
-                                                Intent.EXTRA_TEXT,
-                                                "${note.title}\n\n${noteContentToPlainText(note)}",
-                                            )
-                                        }
-                                        context.startActivity(Intent.createChooser(shareIntent, "Compartir nota"))
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Eliminar", color = MaterialTheme.colorScheme.error) },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_delete),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.error,
-                                        )
-                                    },
-                                    onClick = {
-                                        showMenu = false
-                                        showDeleteDialog = true
-                                    },
-                                )
-                            }
+                        viewModel.toggleFavorite(note) { isFavorite ->
+                            Toast.makeText(
+                                context,
+                                if (isFavorite) strings.noteAddedToFavorites else strings.noteRemovedFromFavorites,
+                                Toast.LENGTH_SHORT,
+                            ).show()
                         }
                     }
                 },
+                onToggleSecureClick = {
+                    if (note != null) {
+                        if (note.isSecure && !authenticator.isDeviceSecure()) {
+                            Toast.makeText(context, strings.phoneLockNotConfigured, Toast.LENGTH_SHORT).show()
+                        } else {
+                            authenticator.authenticate(
+                                title = if (note.isSecure) strings.unlockNoteTitle else strings.lockNoteTitle,
+                                subtitle = if (note.isSecure) strings.authenticateToRemoveLockSubtitle else strings.authenticateToLockNoteSubtitle,
+                                onSuccess = {
+                                    viewModel.toggleSecure(note) { isSecure ->
+                                        Toast.makeText(
+                                            context,
+                                            if (isSecure) strings.noteLocked else strings.lockRemoved,
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    }
+                                },
+                                onError = {
+                                    Toast.makeText(context, strings.authenticationFailed, Toast.LENGTH_SHORT).show()
+                                },
+                            )
+                        }
+                    }
+                },
+                onAddToCollectionClick = { showCollectionSheet = true },
+                onShareClick = {
+                    if (note != null) {
+                        if (note.isSecure && !isUnlocked) {
+                            Toast.makeText(context, strings.unlockToShare, Toast.LENGTH_SHORT).show()
+                        } else {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "${note.title}\n\n${noteContentToPlainText(note)}",
+                                )
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, strings.shareNoteTitle))
+                        }
+                    }
+                },
+                onDeleteClick = { showDeleteDialog = true },
             )
         },
     ) { scaffoldPadding ->
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Eliminar nota") },
-                text = { Text("Estas seguro de enviar a la papelera esta nota?") },
+                title = { Text(stringResource(R.string.delete_note_title)) },
+                text = { Text(stringResource(R.string.delete_note_message)) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -275,12 +161,12 @@ fun NotePreviewScreen(
                             }
                         },
                     ) {
-                        Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("Cancelar")
+                        Text(stringResource(R.string.cancel))
                     }
                 },
             )
@@ -293,7 +179,7 @@ fun NotePreviewScreen(
                     .padding(scaffoldPadding),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Cargando nota...")
+                Text(stringResource(R.string.loading_note))
             }
         } else if (note != null) {
             val deviceSecure = authenticator.isDeviceSecure()
@@ -303,11 +189,11 @@ fun NotePreviewScreen(
             when {
                 needsRecovery -> {
                     LockedNotePrompt(
-                        message = "El bloqueo del telefono esta desactivado",
-                        actionLabel = "Quitar bloqueo y abrir",
+                        message = stringResource(R.string.phone_lock_disabled),
+                        actionLabel = stringResource(R.string.remove_lock_and_open),
                         onUnlock = {
                             viewModel.toggleSecure(note) {
-                                Toast.makeText(context, "Bloqueo quitado", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, strings.lockRemoved, Toast.LENGTH_SHORT).show()
                             }
                             isUnlocked = true
                         },
@@ -319,14 +205,16 @@ fun NotePreviewScreen(
 
                 needsUnlock -> {
                     LockedNotePrompt(
-                        message = "Esta nota esta protegida",
-                        actionLabel = "Desbloquear",
+                        message = stringResource(R.string.locked_note_message),
+                        actionLabel = stringResource(R.string.unlock),
                         onUnlock = {
                             authenticator.authenticate(
-                                title = "Desbloquear nota",
-                                subtitle = "Autenticate para ver el contenido",
+                                title = strings.unlockNoteTitle,
+                                subtitle = strings.authenticateToViewContentSubtitle,
                                 onSuccess = { isUnlocked = true },
-                                onError = { /* Toast */ },
+                                onError = {
+                                    Toast.makeText(context, strings.authenticationFailed, Toast.LENGTH_SHORT).show()
+                                },
                             )
                         },
                         modifier = Modifier
@@ -374,7 +262,7 @@ fun NotePreviewScreen(
                     viewModel.addNoteToCollection(note.id, collectionId) {
                         Toast.makeText(
                             context,
-                            "Nota añadida a la coleccion",
+                            strings.noteAddedToCollection,
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
@@ -383,112 +271,12 @@ fun NotePreviewScreen(
                     viewModel.createCollectionAndAddNote(note.id, name) {
                         Toast.makeText(
                             context,
-                            "Nota añadida a la nueva coleccion",
+                            strings.noteAddedToNewCollection,
                             Toast.LENGTH_SHORT,
                         ).show()
                     }
                 },
             )
-        }
-    }
-}
-
-@Composable
-private fun NotePreviewContent(
-    note: Note,
-    modifier: Modifier = Modifier,
-) {
-    when (note.type) {
-        NoteType.TEXT -> {
-            val plainText = remember(note.content) {
-                noteContentToPlainText(note.content)
-            }
-            Text(
-                text = plainText,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        NoteType.CHECKLIST -> {
-            val items = remember(note.content) {
-                ChecklistContentSerializer.fromJson(note.content).items
-            }
-            ChecklistPreviewItems(
-                items = items,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun ChecklistPreviewItems(
-    items: List<ChecklistItem>,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-    ) {
-        if (items.isEmpty()) {
-            Text(
-                text = "Checklist vacia",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        } else {
-            items.forEach { item ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(
-                        checked = item.checked,
-                        onCheckedChange = null,
-                    )
-                    Text(
-                        text = item.text.ifBlank { "Item sin texto" },
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LockedNotePrompt(
-    message: String,
-    actionLabel: String,
-    onUnlock: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_lock),
-                contentDescription = null,
-                modifier = Modifier.padding(16.dp),
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = message,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TextButton(onClick = onUnlock) {
-                Text(actionLabel)
-            }
         }
     }
 }

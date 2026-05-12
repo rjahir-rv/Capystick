@@ -22,10 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.capystick.scan.R
 import java.util.concurrent.Executors
 
 @Composable
@@ -103,7 +105,7 @@ fun CameraPreview(onPhotoCaptured: (Bitmap) -> Unit) {
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 32.dp),
         ) {
-            Text("Tomar foto")
+            Text(stringResource(R.string.take_photo))
         }
     }
 }

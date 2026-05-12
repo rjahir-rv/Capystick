@@ -24,9 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.capystick.core.designsystem.R
+import com.capystick.notepad.R
 import com.capystick.notepad.viewmodel.NoteSortOrder
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +52,7 @@ internal fun NotesTopBar(
                         value = searchQuery,
                         onValueChange = onSearchQueryChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Buscar...") },
+                        placeholder = { Text(stringResource(R.string.search_placeholder)) },
                         singleLine = true,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -64,8 +66,8 @@ internal fun NotesTopBar(
                 navigationIcon = {
                     IconButton(onClick = { onSearchActiveChange(false) }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Cerrar búsqueda",
+                            painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.close_search_content_description),
                             modifier = Modifier.size(28.dp),
                         )
                     }
@@ -82,8 +84,8 @@ internal fun NotesTopBar(
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_menu),
-                            contentDescription = "Menu",
+                            painter = painterResource(id = DesignR.drawable.ic_menu),
+                            contentDescription = stringResource(R.string.menu_content_description),
                             modifier = Modifier.size(28.dp),
                         )
                     }
@@ -91,16 +93,16 @@ internal fun NotesTopBar(
                 actions = {
                     IconButton(onClick = { onSearchActiveChange(true) }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_search),
-                            contentDescription = "Buscar",
+                            painter = painterResource(id = DesignR.drawable.ic_search),
+                            contentDescription = stringResource(R.string.search_content_description),
                             modifier = Modifier.size(28.dp),
                         )
                     }
                     Box {
                         IconButton(onClick = { expandedFilter = true }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_filter_list),
-                                contentDescription = "Filtrar",
+                                painter = painterResource(id = DesignR.drawable.ic_filter_list),
+                                contentDescription = stringResource(R.string.filter_content_description),
                                 modifier = Modifier.size(28.dp),
                             )
                         }
@@ -108,19 +110,19 @@ internal fun NotesTopBar(
                             expanded = expandedFilter,
                             onDismissRequest = { expandedFilter = false },
                         ) {
-                            SortMenuItem("Recientes") {
+                            SortMenuItem(stringResource(R.string.sort_recent)) {
                                 onSortOrderChange(NoteSortOrder.DATE_DESC)
                                 expandedFilter = false
                             }
-                            SortMenuItem("Antiguos") {
+                            SortMenuItem(stringResource(R.string.sort_oldest)) {
                                 onSortOrderChange(NoteSortOrder.DATE_ASC)
                                 expandedFilter = false
                             }
-                            SortMenuItem("A-Z") {
+                            SortMenuItem(stringResource(R.string.sort_name_asc)) {
                                 onSortOrderChange(NoteSortOrder.TITLE_ASC)
                                 expandedFilter = false
                             }
-                            SortMenuItem("Z-A") {
+                            SortMenuItem(stringResource(R.string.sort_name_desc)) {
                                 onSortOrderChange(NoteSortOrder.TITLE_DESC)
                                 expandedFilter = false
                             }
@@ -156,15 +158,15 @@ internal fun SelectionTopBar(
     TopAppBar(
         title = {
             Text(
-                text = "$selectedCount seleccionadas",
+                text = stringResource(R.string.selected_count, selectedCount),
                 style = MaterialTheme.typography.titleLarge,
             )
         },
         navigationIcon = {
             IconButton(onClick = onCloseClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_back),
-                    contentDescription = "Cancelar selección",
+                    painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                    contentDescription = stringResource(R.string.cancel_selection_content_description),
                     modifier = Modifier.size(28.dp),
                 )
             }
@@ -172,22 +174,26 @@ internal fun SelectionTopBar(
         actions = {
             IconButton(onClick = onShareClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_share),
-                    contentDescription = "Compartir",
+                    painter = painterResource(id = DesignR.drawable.ic_share),
+                    contentDescription = stringResource(R.string.share_content_description),
                     modifier = Modifier.size(24.dp),
                 )
             }
             IconButton(onClick = onAddToCollectionClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_add_collection),
-                    contentDescription = "Añadir a colección",
+                    painter = painterResource(id = DesignR.drawable.ic_add_collection),
+                    contentDescription = stringResource(R.string.add_to_collection_content_description),
                     modifier = Modifier.size(24.dp),
                 )
             }
             IconButton(onClick = onDeleteClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_delete),
-                    contentDescription = if (isInCollection) "Quitar de la colección" else "Eliminar",
+                    painter = painterResource(id = DesignR.drawable.ic_delete),
+                    contentDescription = if (isInCollection) {
+                        stringResource(R.string.remove_from_collection_content_description)
+                    } else {
+                        stringResource(R.string.delete_content_description)
+                    },
                     modifier = Modifier.size(24.dp),
                 )
             }

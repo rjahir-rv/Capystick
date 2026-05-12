@@ -1,0 +1,22 @@
+<resources>
+    <string name="checklist_saved_to_collection">Checklist guardada y añadida a la colección</string>
+    <string name="checklist_saved">Checklist guardada</string>
+    <string name="checklist_default_title">Checklist</string>
+    <string name="back_content_description">Volver</string>
+    <string name="save_checklist_content_description">Guardar checklist</string>
+    <string name="add_item_content_description">Agregar item</string>
+    <string name="phone_lock_disabled">El bloqueo del teléfono está desactivado</string>
+    <string name="remove_lock_and_edit">Quitar bloqueo y editar</string>
+    <string name="locked_checklist_message">Esta checklist está bloqueada</string>
+    <string name="unlock">Desbloquear</string>
+    <string name="unlock_checklist_title">Desbloquear checklist</string>
+    <string name="unlock_checklist_subtitle">Autentícate para editar el contenido</string>
+    <string name="completed_item_content_description">Item completado</string>
+    <string name="pending_item_content_description">Item pendiente</string>
+    <string name="new_item_placeholder">Nuevo item</string>
+    <string name="delete_item_content_description">Eliminar item</string>
+    <string name="discard_changes_title">Salir sin guardar</string>
+    <string name="discard_changes_message">Tienes cambios sin guardar. Si sales ahora, se perderá lo que escribiste.</string>
+    <string name="save">Guardar</string>
+    <string name="discard">Descartar</string>
+</resources>

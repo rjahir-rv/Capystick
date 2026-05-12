@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.PaddingValues
 import com.capystick.app.CapystickAppThemeContent
+import com.capystick.app.R
 import com.capystick.widget.WidgetConfigurationScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,7 +33,7 @@ class WidgetConfigurationActivity : ComponentActivity() {
             CapystickAppThemeContent {
                 WidgetConfigurationScreen(
                     appWidgetId = appWidgetId,
-                    title = "Nuevo widget",
+                    title = getString(R.string.widget_configuration_title),
                     innerPadding = PaddingValues(),
                     onBack = ::finish,
                     onSaved = {

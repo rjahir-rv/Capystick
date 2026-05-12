@@ -23,8 +23,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.capystick.core.designsystem.R
+import com.capystick.notepad.R
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,16 +51,16 @@ internal fun NotepadTopBar(
             if (noteId == null) {
                 IconButton(onClick = onOpenMenu) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_menu),
-                        contentDescription = "Menu",
+                        painter = painterResource(id = DesignR.drawable.ic_menu),
+                        contentDescription = stringResource(R.string.menu_content_description),
                         modifier = Modifier.size(28.dp),
                     )
                 }
             } else {
                 IconButton(onClick = onNavigateBack) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                        contentDescription = "Back",
+                        painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                        contentDescription = stringResource(R.string.back_content_description),
                         modifier = Modifier.size(28.dp),
                     )
                 }
@@ -70,15 +72,15 @@ internal fun NotepadTopBar(
                 enabled = canCopy,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_copy),
-                    contentDescription = "Copiar todo",
+                    painter = painterResource(id = DesignR.drawable.ic_copy),
+                    contentDescription = stringResource(R.string.copy_all_content_description),
                     tint = MaterialTheme.colorScheme.secondary,
                 )
             }
             IconButton(onClick = onSaveClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_saved),
-                    contentDescription = "Guardar nota",
+                    painter = painterResource(id = DesignR.drawable.ic_saved),
+                    contentDescription = stringResource(R.string.save_note_content_description),
                     tint = MaterialTheme.colorScheme.secondary,
                 )
             }
@@ -114,7 +116,7 @@ internal fun NoteTitleField(
             decorationBox = { innerTextField ->
                 if (title.isBlank() && !isFocused) {
                     Text(
-                        text = "Nueva nota",
+                        text = stringResource(R.string.new_note_placeholder),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     )

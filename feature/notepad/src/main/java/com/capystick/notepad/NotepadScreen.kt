@@ -33,10 +33,10 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capystick.core.designsystem.R
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
 import com.capystick.notepad.components.FormattingToolbar
 import com.capystick.notepad.components.NotepadTopBar
@@ -45,6 +45,7 @@ import com.capystick.notepad.util.rememberNotepadEditorState
 import com.capystick.notepad.viewmodel.NotepadViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +65,11 @@ fun NotepadScreen(
     val scope = rememberCoroutineScope()
     val authenticator = rememberBiometricAuthenticator()
     var isUnlocked by rememberSaveable(noteId) { mutableStateOf(isUnlockedInitially) }
+    val copyNoteClipLabel = stringResource(R.string.copy_note_clip_label)
+    val noteSavedMessage = stringResource(R.string.note_saved)
+    val noteSavedToCollectionMessage = stringResource(R.string.note_saved_to_collection)
+    val unlockNoteTitle = stringResource(R.string.unlock_note_title)
+    val unlockNoteEditSubtitle = stringResource(R.string.unlock_note_edit_subtitle)
 
     LaunchedEffect(editorState.richTextState.annotatedString) {
         delay(500)
@@ -106,7 +112,7 @@ fun NotepadScreen(
                 onOpenMenu = onMenuClick,
                 onCopyClick = {
                     val copyText = editorState.richTextState.toText()
-                    val clipData = ClipData.newPlainText("Copy note", copyText)
+                    val clipData = ClipData.newPlainText(copyNoteClipLabel, copyText)
                     scope.launch {
                         clipboardManager.setClipEntry(ClipEntry(clipData))
                     }
@@ -118,9 +124,9 @@ fun NotepadScreen(
                         collectionId,
                     ) {
                         val message = if (collectionId != null && noteId == null) {
-                            "Nota guardada y añadida a la coleccion"
+                            noteSavedToCollectionMessage
                         } else {
-                            "Nota guardada"
+                            noteSavedMessage
                         }
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         editorState.reset()
@@ -136,8 +142,8 @@ fun NotepadScreen(
 
         if (needsRecovery) {
             LockedEditorPrompt(
-                message = "El bloqueo del telefono esta desactivado",
-                actionLabel = "Quitar bloqueo y editar",
+                message = stringResource(R.string.phone_lock_disabled),
+                actionLabel = stringResource(R.string.remove_lock_and_edit),
                 onClick = {
                     viewModel.updateSecureStatus(note.id, isSecure = false)
                     isUnlocked = true
@@ -148,12 +154,12 @@ fun NotepadScreen(
             )
         } else if (needsUnlock) {
             LockedEditorPrompt(
-                message = "Esta nota esta bloqueada",
-                actionLabel = "Desbloquear",
+                message = stringResource(R.string.locked_note_message),
+                actionLabel = stringResource(R.string.unlock),
                 onClick = {
                     authenticator.authenticate(
-                        title = "Desbloquear nota",
-                        subtitle = "Autenticate para editar el contenido",
+                        title = unlockNoteTitle,
+                        subtitle = unlockNoteEditSubtitle,
                         onSuccess = { isUnlocked = true },
                         onError = { /* Toast is handled by the authenticator when needed. */ },
                     )
@@ -207,7 +213,7 @@ private fun LockedEditorPrompt(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_lock),
+                painter = painterResource(id = DesignR.drawable.ic_lock),
                 contentDescription = null,
                 modifier = Modifier.padding(16.dp),
                 tint = MaterialTheme.colorScheme.primary,

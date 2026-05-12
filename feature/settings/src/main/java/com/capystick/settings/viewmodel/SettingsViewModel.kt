@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capystick.settings.R
 import com.capystick.designsystem.theme.ColorPaletteOption
 import com.capystick.designsystem.theme.ThemeOption
 import com.capystick.designsystem.theme.ThemePreferences
@@ -81,16 +82,20 @@ class SettingsViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isExporting = false,
-                            errorMessage = "Error al exportar notas. Intenta de nuevo.",
+                            errorMessage = context.getString(R.string.export_notes_error),
                         )
                     }
                     return@launch
                 }
 
                 val message = if (writeResult.skippedCount == 0) {
-                    "Se exportaron ${writeResult.exportedCount} notas correctamente"
+                    context.getString(R.string.export_notes_success, writeResult.exportedCount)
                 } else {
-                    "Se exportaron ${writeResult.exportedCount} notas. ${writeResult.skippedCount} archivos no pudieron guardarse"
+                    context.getString(
+                        R.string.export_notes_partial_success,
+                        writeResult.exportedCount,
+                        writeResult.skippedCount,
+                    )
                 }
                 _uiState.update {
                     it.copy(
@@ -102,7 +107,7 @@ class SettingsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isExporting = false,
-                        errorMessage = "Error al exportar notas. Intenta de nuevo.",
+                        errorMessage = context.getString(R.string.export_notes_error),
                     )
                 }
             }
@@ -120,17 +125,17 @@ class SettingsViewModel @Inject constructor(
         notes: List<com.capystick.domain.repository.NoteTextExport>,
     ): ExportWriteResult = withContext(Dispatchers.IO) {
         val root = DocumentFile.fromTreeUri(context, directoryUri)
-            ?: throw IllegalStateException("No se pudo abrir la carpeta seleccionada")
+            ?: throw IllegalStateException(context.getString(R.string.open_selected_folder_error))
 
         var exportedCount = 0
         var skippedCount = 0
         notes.forEach { noteExport ->
             try {
                 val file = root.createFile("text/plain", noteExport.fileName.removeSuffix(".txt"))
-                val fileUri = file?.uri ?: throw IllegalStateException("No se pudo crear el archivo")
+                val fileUri = file?.uri ?: throw IllegalStateException(context.getString(R.string.create_file_error))
                 context.contentResolver.openOutputStream(fileUri)?.use { output ->
                     output.write(noteExport.content.toByteArray(StandardCharsets.UTF_8))
-                } ?: throw IllegalStateException("No se pudo abrir el stream de salida")
+                } ?: throw IllegalStateException(context.getString(R.string.open_output_stream_error))
                 exportedCount++
             } catch (_: Exception) {
                 skippedCount++

@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.capystick.designsystem.components.CapyNoteCard
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
 import com.capystick.model.Note
+import com.capystick.notepad.R
 import com.capystick.notepad.util.formatNoteDate
 import com.capystick.notepad.util.noteSupportingText
 
@@ -56,7 +58,11 @@ private fun EmptyNotesState(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = if (isCollectionNotes) "Aun no hay notas en esta coleccion" else "No hay notas aun",
+            text = if (isCollectionNotes) {
+                stringResource(R.string.no_notes_in_collection)
+            } else {
+                stringResource(R.string.no_notes_yet)
+            },
         )
     }
 }
@@ -70,6 +76,11 @@ internal fun NotesList(
     onNoteLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val authenticator = rememberBiometricAuthenticator()
+    val secureNoteTitle = stringResource(R.string.unlock_note_title)
+    val authenticateToViewContentSubtitle = stringResource(R.string.authenticate_to_view_content)
+    val noteNoTitle = stringResource(R.string.note_no_title)
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -83,10 +94,9 @@ internal fun NotesList(
                 formatNoteDate(note.timestamp)
             }
             val isSelected = selectedNoteIds.contains(note.id)
-            val authenticator = rememberBiometricAuthenticator()
 
             CapyNoteCard(
-                title = note.title,
+                title = note.title.ifBlank { noteNoTitle },
                 dateString = dateString,
                 plainText = plainText,
                 isSelected = isSelected,
@@ -97,8 +107,8 @@ internal fun NotesList(
                     } else if (note.isSecure) {
                         if (authenticator.isDeviceSecure()) {
                             authenticator.authenticate(
-                                title = "Nota segura",
-                                subtitle = "Autenticate para ver el contenido",
+                                title = secureNoteTitle,
+                                subtitle = authenticateToViewContentSubtitle,
                                 onSuccess = { onNoteClick(note.id) },
                                 onError = { /* Optional error surface. */ },
                             )

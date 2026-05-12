@@ -36,10 +36,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capystick.core.designsystem.R
 import com.capystick.designsystem.components.CapyNoteCard
 import com.capystick.model.ChecklistFormatter
 import com.capystick.model.Note
@@ -48,6 +48,7 @@ import com.capystick.settings.viewmodel.TrashViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,14 +88,14 @@ fun TrashScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_trash),
+                        painter = painterResource(id = DesignR.drawable.ic_trash),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                         modifier = Modifier.size(64.dp),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "La papelera está vacía",
+                        text = stringResource(R.string.trash_empty),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -141,19 +142,19 @@ fun TrashScreen(
     if (showRestoreAllDialog) {
         AlertDialog(
             onDismissRequest = { showRestoreAllDialog = false },
-            title = { Text("Restaurar todo") },
-            text = { Text("¿Deseas restaurar todas las notas de la papelera?") },
+            title = { Text(stringResource(R.string.trash_restore_all_title)) },
+            text = { Text(stringResource(R.string.trash_restore_all_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.restoreAllNotes()
                     showRestoreAllDialog = false
                 }) {
-                    Text("Restaurar")
+                    Text(stringResource(R.string.restore))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRestoreAllDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -162,19 +163,19 @@ fun TrashScreen(
     if (showDeleteAllDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteAllDialog = false },
-            title = { Text("Vaciar papelera") },
-            text = { Text("Esta acción eliminará permanentemente todas las notas de la papelera y no se podrá deshacer.") },
+            title = { Text(stringResource(R.string.trash_empty_title)) },
+            text = { Text(stringResource(R.string.trash_empty_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.permanentlyDeleteAllTrashed()
                     showDeleteAllDialog = false
                 }) {
-                    Text("Eliminar todo", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete_all), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteAllDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -184,11 +185,10 @@ fun TrashScreen(
     if (noteBeingDeleted != null) {
         AlertDialog(
             onDismissRequest = { noteToDelete = null },
-            title = { Text("Eliminar nota") },
+            title = { Text(stringResource(R.string.delete_note_title)) },
             text = {
                 Text(
-                    "¿Deseas eliminar permanentemente \"${noteBeingDeleted.title}\"? " +
-                        "Esta acción no se puede deshacer.",
+                    stringResource(R.string.delete_note_message, noteBeingDeleted.title),
                 )
             },
             confirmButton = {
@@ -196,12 +196,12 @@ fun TrashScreen(
                     viewModel.permanentlyDeleteNote(noteBeingDeleted)
                     noteToDelete = null
                 }) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { noteToDelete = null }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
         )
@@ -229,15 +229,15 @@ private fun TrashTopAppBar(
     TopAppBar(
         title = {
             Text(
-                text = "Papelera",
+                text = stringResource(R.string.settings_trash),
                 style = MaterialTheme.typography.titleLarge,
             )
         },
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_back),
-                    contentDescription = "Volver",
+                    painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                    contentDescription = stringResource(R.string.back_content_description),
                     modifier = Modifier.size(28.dp),
                 )
             }
@@ -247,16 +247,16 @@ private fun TrashTopAppBar(
                 // Restaurar todas
                 IconButton(onClick = onRestoreAll) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_restore),
-                        contentDescription = "Restaurar todo",
+                        painter = painterResource(id = DesignR.drawable.ic_restore),
+                        contentDescription = stringResource(R.string.trash_restore_all_title),
                         modifier = Modifier.size(24.dp),
                     )
                 }
                 // Eliminar todas permanentemente
                 IconButton(onClick = onDeleteAll) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_delete_forever),
-                        contentDescription = "Vaciar papelera",
+                        painter = painterResource(id = DesignR.drawable.ic_delete_forever),
+                        contentDescription = stringResource(R.string.trash_empty_title),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(24.dp),
                     )
@@ -268,8 +268,6 @@ private fun TrashTopAppBar(
         ),
     )
 }
-
-// ── Trash Note Card ───────────────────────────────────────────────────────────
 
 @Composable
 private fun TrashNoteCard(
@@ -288,20 +286,18 @@ private fun TrashNoteCard(
         onClick = {},
         modifier = modifier,
         trailingActions = {
-            // Restaurar nota individual
             IconButton(onClick = onRestore) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_restore_note),
-                    contentDescription = "Restaurar nota",
+                    painter = painterResource(id = DesignR.drawable.ic_restore_note),
+                    contentDescription = stringResource(R.string.restore_note_content_description),
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp),
                 )
             }
-            // Eliminar nota permanentemente
             IconButton(onClick = onPermanentDelete) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_close),
-                    contentDescription = "Eliminar permanentemente",
+                    painter = painterResource(id = DesignR.drawable.ic_close),
+                    contentDescription = stringResource(R.string.delete_forever_content_description),
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(22.dp),
                 )

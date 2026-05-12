@@ -27,12 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capystick.core.designsystem.R
+import com.capystick.model.WidgetMode
 import com.capystick.widget.viewmodel.WidgetSettingsViewModel
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,12 +51,12 @@ fun WidgetManagementScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Widgets") },
+                title = { Text(stringResource(R.string.widgets_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Volver",
+                            painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.back_content_description),
                         )
                     }
                 },
@@ -71,7 +73,7 @@ fun WidgetManagementScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Aun no hay widgets configurados. Agrega uno desde la pantalla principal de tu launcher.",
+                    text = stringResource(R.string.widgets_empty_message),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -87,8 +89,8 @@ fun WidgetManagementScreen(
             ) {
                 items(widgetItems) { item ->
                     WidgetManagementItem(
-                        title = item.title,
-                        subtitle = item.subtitle,
+                        title = stringResource(R.string.widget_list_item_title, item.appWidgetId),
+                        subtitle = item.subtitleText(),
                         onClick = { onEditWidget(item.appWidgetId) },
                     )
                 }
@@ -125,7 +127,7 @@ private fun WidgetManagementItem(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_widget_dou),
+                    painter = painterResource(id = DesignR.drawable.ic_widget_dou),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -149,3 +151,15 @@ private fun WidgetManagementItem(
         }
     }
 }
+
+@Composable
+private fun com.capystick.widget.viewmodel.WidgetListItemUiState.subtitleText(): String =
+    when (mode) {
+        WidgetMode.RECENT_NOTES -> stringResource(R.string.widget_recent_notes)
+        WidgetMode.SELECTED_COLLECTION -> when {
+            collectionName != null && isCollectionDeleted ->
+                stringResource(R.string.widget_deleted_collection_with_name, collectionName)
+            collectionName != null -> stringResource(R.string.widget_collection, collectionName)
+            else -> stringResource(R.string.widget_deleted_collection)
+        }
+    }

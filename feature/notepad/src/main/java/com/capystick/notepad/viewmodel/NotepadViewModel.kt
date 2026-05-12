@@ -47,10 +47,10 @@ class NotepadViewModel @Inject constructor(
         viewModelScope.launch {
             val note = Note(
                 id = currentNoteId ?: 0,
-                title = title.ifBlank { "Sin título" },
+                title = title.trim(),
                 content = content,
                 timestamp = System.currentTimeMillis(), // Updating timestamp on edit
-                colorHex = 0xFFFFFFFF, // TODO: Add color selection support
+                colorHex = 0xFFFFFFFF,
                 isFavorite = _editorState.value.note?.isFavorite ?: false,
                 isSecure = _editorState.value.note?.isSecure ?: false,
             )

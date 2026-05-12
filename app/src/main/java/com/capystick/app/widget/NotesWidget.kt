@@ -59,6 +59,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.glance.color.ColorProvider as DayNightColorProvider
+import com.capystick.app.R as AppR
 
 class NotesWidget : GlanceAppWidget() {
     override suspend fun provideGlance(
@@ -147,7 +148,7 @@ private fun WidgetScaffold(
                         item {
                             Spacer(modifier = GlanceModifier.height(8.dp))
                             WidgetFooterAction(
-                                label = footerLabelFor(widgetState),
+                                label = footerLabelFor(context, widgetState),
                                 intent = footerIntentFor(context, widgetState),
                                 palette = palette,
                             )
@@ -157,8 +158,8 @@ private fun WidgetScaffold(
 
                 is WidgetContentState.EmptyMissingCollection -> {
                     WidgetEmptyState(
-                        message = "La coleccion ya no existe.",
-                        buttonLabel = "Reconfigurar",
+                        message = context.getString(AppR.string.widget_missing_collection_message),
+                        buttonLabel = context.getString(AppR.string.widget_reconfigure_button),
                         buttonIntent =
                             WidgetNavigationIntents.openWidgetEditor(
                                 context = context,
@@ -170,8 +171,8 @@ private fun WidgetScaffold(
 
                 is WidgetContentState.EmptyNoCollections -> {
                     WidgetEmptyState(
-                        message = "No hay colecciones disponibles.",
-                        buttonLabel = "Abrir colecciones",
+                        message = context.getString(AppR.string.widget_no_collections_message),
+                        buttonLabel = context.getString(AppR.string.widget_open_collections_button),
                         buttonIntent = WidgetNavigationIntents.openCollections(context),
                         palette = palette,
                     )
@@ -181,15 +182,15 @@ private fun WidgetScaffold(
                     WidgetEmptyState(
                         message =
                             if (widgetState.isCollectionContext) {
-                                "Esta coleccion aun no tiene notas."
+                                context.getString(AppR.string.widget_empty_collection_message)
                             } else {
-                                "Aun no tienes notas."
+                                context.getString(AppR.string.widget_empty_notes_message)
                             },
                         buttonLabel =
                             if (widgetState.isCollectionContext) {
-                                "Abrir coleccion"
+                                context.getString(AppR.string.widget_open_collection_button)
                             } else {
-                                "Crear nota"
+                                context.getString(AppR.string.widget_create_note_button)
                             },
                         buttonIntent = widgetState.toActionIntent(context),
                         palette = palette,
@@ -244,7 +245,7 @@ private fun WidgetHeader(
             )
             Image(
                 provider = ImageProvider(R.drawable.ic_search),
-                contentDescription = "Buscar notas",
+                contentDescription = context.getString(AppR.string.widget_search_notes_content_description),
                 colorFilter = ColorFilter.tint(palette.onPrimary),
                 modifier =
                     GlanceModifier
@@ -382,11 +383,14 @@ private fun WidgetFooterAction(
     )
 }
 
-private fun footerLabelFor(state: WidgetContentState.Content): String =
+private fun footerLabelFor(
+    context: Context,
+    state: WidgetContentState.Content,
+): String =
     if (state.configuration.mode == WidgetMode.RECENT_NOTES) {
-        "Ver todo"
+        context.getString(AppR.string.widget_view_all_button)
     } else {
-        "Abrir coleccion"
+        context.getString(AppR.string.widget_open_collection_button)
     }
 
 private fun footerIntentFor(

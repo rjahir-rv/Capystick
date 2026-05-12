@@ -58,6 +58,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -66,10 +67,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.checklist.viewmodel.ChecklistViewModel
-import com.capystick.core.designsystem.R
 import com.capystick.designsystem.components.rememberBiometricAuthenticator
 import com.capystick.model.ChecklistItem
 import kotlinx.coroutines.delay
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,6 +91,8 @@ fun ChecklistScreen(
     var isUnlocked by rememberSaveable(noteId) { mutableStateOf(isUnlockedInitially) }
     var showDiscardDialog by rememberSaveable { mutableStateOf(false) }
     var focusedItemId by rememberSaveable { mutableStateOf<String?>(null) }
+    val checklistSavedMessage = stringResource(R.string.checklist_saved)
+    val checklistSavedToCollectionMessage = stringResource(R.string.checklist_saved_to_collection)
     fun navigateBack() {
         if (uiState.hasUnsavedChanges) {
             showDiscardDialog = true
@@ -100,9 +103,9 @@ fun ChecklistScreen(
     val saveChecklist = {
         viewModel.saveChecklist(collectionId) {
             val message = if (collectionId != null && noteId == null) {
-                "Checklist guardada y anadida a la coleccion"
+                checklistSavedToCollectionMessage
             } else {
-                "Checklist guardada"
+                checklistSavedMessage
             }
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             onChecklistSaved()
@@ -134,23 +137,23 @@ fun ChecklistScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = uiState.title.ifBlank { "Checklist" },
+                        text = uiState.title.ifBlank { stringResource(R.string.checklist_default_title) },
                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = ::navigateBack) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Volver",
+                            painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.back_content_description),
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = saveChecklist) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_save),
-                            contentDescription = "Guardar checklist",
+                            painter = painterResource(id = DesignR.drawable.ic_save),
+                            contentDescription = stringResource(R.string.save_checklist_content_description),
                         )
                     }
                 },
@@ -171,8 +174,8 @@ fun ChecklistScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = "Agregar item",
+                        painter = painterResource(id = DesignR.drawable.ic_add),
+                        contentDescription = stringResource(R.string.add_item_content_description),
                         modifier = Modifier.size(32.dp),
                     )
                 }
@@ -187,8 +190,8 @@ fun ChecklistScreen(
         when {
             needsRecovery -> {
                 LockedChecklistPrompt(
-                    message = "El bloqueo del telefono esta desactivado",
-                    actionLabel = "Quitar bloqueo y editar",
+                    message = stringResource(R.string.phone_lock_disabled),
+                    actionLabel = stringResource(R.string.remove_lock_and_edit),
                     onClick = {
                         viewModel.updateSecureStatus(note.id, isSecure = false)
                         isUnlocked = true
@@ -201,12 +204,12 @@ fun ChecklistScreen(
 
             needsUnlock -> {
                 LockedChecklistPrompt(
-                    message = "Esta checklist esta bloqueada",
-                    actionLabel = "Desbloquear",
+                    message = stringResource(R.string.locked_checklist_message),
+                    actionLabel = stringResource(R.string.unlock),
                     onClick = {
                         authenticator.authenticate(
-                            title = "Desbloquear checklist",
-                            subtitle = "Autenticate para editar el contenido",
+                            title = context.getString(R.string.unlock_checklist_title),
+                            subtitle = context.getString(R.string.unlock_checklist_subtitle),
                             onSuccess = { isUnlocked = true },
                             onError = { },
                         )
@@ -339,9 +342,13 @@ private fun ChecklistEditorRow(
         ) {
             Icon(
                 painter = painterResource(
-                    id = if (item.checked) R.drawable.ic_check_circle else R.drawable.ic_circle,
+                    id = if (item.checked) DesignR.drawable.ic_check_circle else DesignR.drawable.ic_circle,
                 ),
-                contentDescription = if (item.checked) "Item completado" else "Item pendiente",
+                contentDescription = if (item.checked) {
+                    stringResource(R.string.completed_item_content_description)
+                } else {
+                    stringResource(R.string.pending_item_content_description)
+                },
                 tint = if (item.checked) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -372,7 +379,7 @@ private fun ChecklistEditorRow(
                 decorationBox = { innerTextField ->
                     if (item.text.isBlank()) {
                         Text(
-                            text = "Nuevo item",
+                            text = stringResource(R.string.new_item_placeholder),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.outline,
                         )
@@ -382,8 +389,8 @@ private fun ChecklistEditorRow(
             )
             IconButton(onClick = onRemoveClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_close),
-                    contentDescription = "Eliminar item",
+                    painter = painterResource(id = DesignR.drawable.ic_close),
+                    contentDescription = stringResource(R.string.delete_item_content_description),
                     tint = MaterialTheme.colorScheme.outline,
                 )
             }
@@ -399,17 +406,17 @@ private fun DiscardChangesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Salir sin guardar") },
-        text = { Text("Tienes cambios sin guardar. Si sales ahora, se perdera lo que escribiste.") },
+        title = { Text(stringResource(R.string.discard_changes_title)) },
+        text = { Text(stringResource(R.string.discard_changes_message)) },
         confirmButton = {
             TextButton(onClick = onSave) {
-                Text("Guardar")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDiscard) {
                 Text(
-                    text = "Descartar",
+                    text = stringResource(R.string.discard),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -430,7 +437,7 @@ private fun LockedChecklistPrompt(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_lock),
+                painter = painterResource(id = DesignR.drawable.ic_lock),
                 contentDescription = null,
                 modifier = Modifier.padding(16.dp),
                 tint = MaterialTheme.colorScheme.primary,

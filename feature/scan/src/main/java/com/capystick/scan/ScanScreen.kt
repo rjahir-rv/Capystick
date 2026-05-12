@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -72,7 +73,7 @@ fun ScanScreen(
     Scaffold(
         topBar = {
             CapyTopAppBar(
-                title = "Escanear nota",
+                title = stringResource(R.string.scan_note_title),
                 onMenuClick = onMenuClick,
             )
         },
@@ -104,7 +105,7 @@ fun ScanScreen(
                 )
             } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Se requiere permiso de cámara")
+                    Text(stringResource(R.string.camera_permission_required))
                 }
             }
         }
@@ -155,7 +156,7 @@ private fun ScanContent(
                 Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(onClick = onRetry) {
-                    Text("Reintentar")
+                    Text(stringResource(R.string.retry))
                 }
             }
         }

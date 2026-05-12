@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Capystick</string>
+    <string name="widget_configuration_title">Nuevo widget</string>
+    <string name="widget_search_notes_content_description">Buscar notas</string>
+    <string name="widget_missing_collection_message">La colección ya no existe.</string>
+    <string name="widget_reconfigure_button">Reconfigurar</string>
+    <string name="widget_no_collections_message">No hay colecciones disponibles.</string>
+    <string name="widget_open_collections_button">Abrir colecciones</string>
+    <string name="widget_empty_collection_message">Esta colección aún no tiene notas.</string>
+    <string name="widget_empty_notes_message">Aún no tienes notas.</string>
+    <string name="widget_open_collection_button">Abrir colección</string>
+    <string name="widget_create_note_button">Crear nota</string>
+    <string name="widget_view_all_button">Ver todo</string>
 </resources>

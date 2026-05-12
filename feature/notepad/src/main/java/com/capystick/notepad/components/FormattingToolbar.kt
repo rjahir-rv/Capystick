@@ -20,14 +20,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.capystick.core.designsystem.R
+import com.capystick.notepad.R
 import com.capystick.notepad.util.TextUndoManager
 import com.mohamedrejeb.richeditor.model.RichTextState
+import com.capystick.core.designsystem.R as DesignR
 
 @Composable
 internal fun FormattingToolbar(
@@ -66,8 +68,8 @@ internal fun FormattingToolbar(
                 },
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_format_bold),
-                    contentDescription = "Bold",
+                    painter = painterResource(DesignR.drawable.ic_format_bold),
+                    contentDescription = stringResource(R.string.bold_content_description),
                     tint = if (isBold) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -78,8 +80,8 @@ internal fun FormattingToolbar(
                 },
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_format_italic),
-                    contentDescription = "Italic",
+                    painter = painterResource(DesignR.drawable.ic_format_italic),
+                    contentDescription = stringResource(R.string.italic_content_description),
                     tint = if (isItalic) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface,
                 )
             }
@@ -114,8 +116,8 @@ internal fun FormattingToolbar(
                 },
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_format_streamline),
-                    contentDescription = "icon streamline",
+                    painter = painterResource(DesignR.drawable.ic_format_streamline),
+                    contentDescription = stringResource(R.string.strikethrough_content_description),
                     modifier = Modifier.size(16.dp),
                 )
             }
@@ -124,8 +126,8 @@ internal fun FormattingToolbar(
                 enabled = undoManager.canUndo,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_undo),
-                    contentDescription = "Deshacer",
+                    painter = painterResource(id = DesignR.drawable.ic_undo),
+                    contentDescription = stringResource(R.string.undo_content_description),
                     tint = if (undoManager.canUndo) {
                         MaterialTheme.colorScheme.onSurface
                     } else {
@@ -139,8 +141,8 @@ internal fun FormattingToolbar(
                 enabled = undoManager.canRedo,
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_redo),
-                    contentDescription = "Rehacer",
+                    painter = painterResource(id = DesignR.drawable.ic_redo),
+                    contentDescription = stringResource(R.string.redo_content_description),
                     tint = if (undoManager.canRedo) {
                         MaterialTheme.colorScheme.onSurface
                     } else {
@@ -182,8 +184,8 @@ private fun TextStyleMenu(
     Box {
         IconButton(onClick = { onShowStyleMenuChange(true) }) {
             Icon(
-                painter = painterResource(R.drawable.ic_format_h1),
-                contentDescription = "Estilo de texto",
+                painter = painterResource(DesignR.drawable.ic_format_h1),
+                contentDescription = stringResource(R.string.text_style_content_description),
                 modifier = Modifier.background(
                     color = if (isHighlighted) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
                     shape = CircleShape,
@@ -196,21 +198,21 @@ private fun TextStyleMenu(
             modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerHigh),
         ) {
             DropdownMenuItem(
-                text = { Text("Título", style = MaterialTheme.typography.titleLarge) },
+                text = { Text(stringResource(R.string.text_style_title), style = MaterialTheme.typography.titleLarge) },
                 onClick = {
                     richTextState.toggleSpanStyle(headlineStyle)
                     onShowStyleMenuChange(false)
                 },
             )
             DropdownMenuItem(
-                text = { Text("Subtítulo", style = MaterialTheme.typography.titleMedium) },
+                text = { Text(stringResource(R.string.text_style_subtitle), style = MaterialTheme.typography.titleMedium) },
                 onClick = {
                     richTextState.toggleSpanStyle(titleStyle)
                     onShowStyleMenuChange(false)
                 },
             )
             DropdownMenuItem(
-                text = { Text("Cuerpo", style = MaterialTheme.typography.bodyLarge) },
+                text = { Text(stringResource(R.string.text_style_body), style = MaterialTheme.typography.bodyLarge) },
                 onClick = {
                     val currentStyle = richTextState.currentSpanStyle
                     if (currentStyle.fontSize == headlineStyle.fontSize) {

@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -44,7 +45,6 @@ import com.capystick.collections.FAVORITES_COLLECTION_ID
 import com.capystick.notepad.NotePreviewScreen
 import com.capystick.notepad.NotepadScreen
 import com.capystick.notepad.NotesScreen
-import com.capystick.core.designsystem.R
 import com.capystick.settings.SettingsScreen
 import com.capystick.settings.TrashScreen
 import com.capystick.widget.WidgetConfigurationScreen
@@ -52,6 +52,7 @@ import com.capystick.widget.WidgetManagementScreen
 import com.capystick.backup.BackupScreen
 import com.capystick.scan.ScanScreen
 import kotlinx.coroutines.launch
+import com.capystick.core.designsystem.R as DesignR
 
 @Composable
 fun AppNavigation(
@@ -85,8 +86,8 @@ fun AppNavigation(
                 ) {
                     Spacer(modifier.height(12.dp))
                     Image(
-                        painter = painterResource(id = R.drawable.capystick_logo),
-                        contentDescription = "Capystick logo",
+                        painter = painterResource(id = DesignR.drawable.capystick_logo),
+                        contentDescription = stringResource(R.string.capystick_logo_content_description),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -98,23 +99,24 @@ fun AppNavigation(
 
                     levelRoutes.forEach { item ->
                         val isSelected = item == topLevelBackStack.topLevelKey
+                        val title = stringResource(item.titleRes)
                         NavigationDrawerItem(
-                            label = { Text(item.title) },
+                            label = { Text(title) },
                             selected = isSelected,
                             onClick = {
                                 scope.launch { drawerState.close() }
                                 topLevelBackStack.addTopLevel(item)
                             },
                             icon = {
-                                val iconRes = when (item.title) {
-                                    "Crear nota" -> painterResource(id = R.drawable.ic_new_note)
-                                    "Todas las notas" -> painterResource(id = R.drawable.ic_all_notes)
-                                    "Colecciones" -> painterResource(id = R.drawable.ic_collection)
-                                    "Ajustes" -> painterResource(id = R.drawable.ic_settings)
-                                    "Escanear nota" -> painterResource(id = R.drawable.ic_document_scann)
+                                val iconRes = when (item) {
+                                    NotepadRoute -> painterResource(id = DesignR.drawable.ic_new_note)
+                                    NotesRoute -> painterResource(id = DesignR.drawable.ic_all_notes)
+                                    CollectionsRoute -> painterResource(id = DesignR.drawable.ic_collection)
+                                    SettingsRoute -> painterResource(id = DesignR.drawable.ic_settings)
+                                    ScanRoute -> painterResource(id = DesignR.drawable.ic_document_scann)
                                     else -> null
                                 }
-                                Icon(painter = iconRes!!, contentDescription = item.title)
+                                Icon(painter = iconRes!!, contentDescription = title)
                             },
                             colors = NavigationDrawerItemDefaults.colors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
@@ -134,7 +136,7 @@ fun AppNavigation(
                 val currentRoute = topLevelBackStack.backStack.lastOrNull()
                 if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute !is ChecklistRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute && currentRoute != ScanRoute) {
                     CapyTopAppBar(
-                        title = currentRoute.title,
+                        title = stringResource(currentRoute.titleRes),
                         onMenuClick = {
                             scope.launch { drawerState.open() }
                         }

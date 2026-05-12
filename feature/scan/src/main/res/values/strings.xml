@@ -1,0 +1,13 @@
+<resources>
+    <string name="scan_note_title" translatable="false">Escanear nota</string>
+    <string name="camera_permission_required" translatable="false">Se requiere permiso de cámara</string>
+    <string name="retry" translatable="false">Reintentar</string>
+    <string name="scan">Escanear</string>
+    <string name="captured_photo_content_description">Foto capturada</string>
+    <string name="scanned_note_default_title">Nota escaneada</string>
+    <string name="title_label">Título</string>
+    <string name="content_label">Contenido</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Guardar</string>
+    <string name="take_photo">Tomar foto</string>
+</resources>

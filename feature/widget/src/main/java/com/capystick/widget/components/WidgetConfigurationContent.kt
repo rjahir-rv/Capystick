@@ -32,11 +32,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.capystick.core.designsystem.R
+import com.capystick.widget.R
 import com.capystick.model.Collection
 import com.capystick.model.WidgetMode
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +63,8 @@ fun WidgetConfigurationContent(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Volver",
+                            painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.back_content_description),
                         )
                     }
                 },
@@ -79,26 +81,26 @@ fun WidgetConfigurationContent(
         ) {
             item {
                 Text(
-                    text = "Elige que quieres mostrar en este widget.",
+                    text = stringResource(R.string.widget_configuration_intro),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             item {
                 WidgetModeOption(
-                    title = "Notas recientes",
-                    subtitle = "Muestra las notas activas mas nuevas",
+                    title = stringResource(R.string.widget_recent_notes),
+                    subtitle = stringResource(R.string.widget_recent_notes_subtitle),
                     selected = selectedMode == WidgetMode.RECENT_NOTES,
                     onClick = { onModeSelected(WidgetMode.RECENT_NOTES) },
                 )
             }
             item {
                 WidgetModeOption(
-                    title = "Seleccionar coleccion",
+                    title = stringResource(R.string.widget_select_collection),
                     subtitle = if (collections.isEmpty()) {
-                        "No hay colecciones disponibles"
+                        stringResource(R.string.widget_no_collections)
                     } else {
-                        "Muestra solo notas de una coleccion"
+                        stringResource(R.string.widget_collection_mode_subtitle)
                     },
                     selected = selectedMode == WidgetMode.SELECTED_COLLECTION,
                     onClick = { onModeSelected(WidgetMode.SELECTED_COLLECTION) },
@@ -112,7 +114,7 @@ fun WidgetConfigurationContent(
                 } else {
                     item {
                         Text(
-                            text = "Colecciones disponibles",
+                            text = stringResource(R.string.widget_available_collections),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                         )
@@ -133,7 +135,7 @@ fun WidgetConfigurationContent(
                     enabled = canSave,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Guardar configuracion")
+                    Text(stringResource(R.string.widget_save_configuration))
                 }
             }
         }
@@ -191,12 +193,12 @@ private fun EmptyCollectionsCard() {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "No hay colecciones disponibles",
+                text = stringResource(R.string.widget_no_collections),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = "Crea una coleccion desde la app y luego vuelve para usar este modo.",
+                text = stringResource(R.string.widget_empty_collections_help),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp),
@@ -242,7 +244,7 @@ private fun CollectionChoiceRow(
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = "${collection.noteCount} notas",
+                    text = stringResource(R.string.widget_collection_note_count, collection.noteCount),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

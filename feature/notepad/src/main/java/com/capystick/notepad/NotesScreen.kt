@@ -45,12 +45,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.activity.compose.BackHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capystick.core.designsystem.R
 import com.capystick.model.Note
 import com.capystick.notepad.components.CollectionSheet
 import com.capystick.notepad.components.NotesContent
@@ -59,6 +59,7 @@ import com.capystick.notepad.components.SelectionTopBar
 import com.capystick.notepad.util.buildShareNotesText
 import com.capystick.notepad.viewmodel.NotesViewModel
 import kotlinx.coroutines.launch
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +93,17 @@ fun NotesScreen(
     var showChecklistNameDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val noteMovedToTrashMessage = stringResource(R.string.note_moved_to_trash)
+    val notesMovedToTrashMessage = stringResource(R.string.notes_moved_to_trash)
+    val undoLabel = stringResource(R.string.undo)
+    val noteRestoredMessage = stringResource(R.string.note_restored)
+    val notesRestoredMessage = stringResource(R.string.notes_restored)
+    val lockedNotesCannotBeSharedMessage = stringResource(R.string.locked_notes_cannot_be_shared)
+    val shareNotesChooserTitle = stringResource(R.string.share_notes_chooser_title)
+    
+    val getLockedNotesSkippedMessage: (Int) -> String = { count ->
+        context.resources.getString(R.string.locked_notes_skipped, count)
+    }
 
     LaunchedEffect(collectionId, collectionName, favoriteOnly) {
         viewModel.initialize(collectionId, collectionName, favoriteOnly)
@@ -102,11 +114,11 @@ fun NotesScreen(
 
         val result = snackbarHostState.showSnackbar(
             message = if (recentlyDeletedNoteIds.size == 1) {
-                "Nota enviada a la papelera"
+                noteMovedToTrashMessage
             } else {
-                "Notas enviadas a la papelera"
+                notesMovedToTrashMessage
             },
-            actionLabel = "Deshacer",
+            actionLabel = undoLabel,
             duration = SnackbarDuration.Long,
         )
 
@@ -115,9 +127,9 @@ fun NotesScreen(
                 Toast.makeText(
                     context,
                     if (recentlyDeletedNoteIds.size == 1) {
-                        "Nota restaurada"
+                        noteRestoredMessage
                     } else {
-                        "Notas restauradas"
+                        notesRestoredMessage
                     },
                     Toast.LENGTH_SHORT,
                 ).show()
@@ -147,6 +159,9 @@ fun NotesScreen(
                         shareSelectedNotes(
                             context = context,
                             selectedNotes = selectedNotes,
+                            lockedNotesCannotBeSharedMessage = lockedNotesCannotBeSharedMessage,
+                            getLockedNotesSkippedMessage = getLockedNotesSkippedMessage,
+                            shareNotesChooserTitle = shareNotesChooserTitle
                         )
                         viewModel.clearSelection()
                     },
@@ -154,7 +169,7 @@ fun NotesScreen(
                 )
             } else {
                 NotesTopBar(
-                    title = title,
+                    title = title.asString(),
                     isSearchActive = isSearchActive,
                     searchQuery = searchQuery,
                     sortOrder = sortOrder,
@@ -201,16 +216,16 @@ fun NotesScreen(
                         shape = RoundedCornerShape(24.dp)
                     ) {
                         CreateNoteMenuItem(
-                            text = "Nota",
-                            iconRes = R.drawable.ic_new_note,
+                            text = stringResource(R.string.note_type_text),
+                            iconRes = DesignR.drawable.ic_new_note,
                             onClick = {
                                 showCreateMenu = false
                                 onAddTextNoteClick()
                             },
                         )
                         CreateNoteMenuItem(
-                            text = "Checklist",
-                            iconRes = R.drawable.ic_checklist,
+                            text = stringResource(R.string.note_type_checklist),
+                            iconRes = DesignR.drawable.ic_checklist,
                             onClick = {
                                 showCreateMenu = false
                                 showChecklistNameDialog = true
@@ -222,8 +237,8 @@ fun NotesScreen(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_add),
-                            contentDescription = "Crear nota",
+                            painter = painterResource(id = DesignR.drawable.ic_add),
+                            contentDescription = stringResource(R.string.create_note_content_description),
                         )
                     }
                 }
@@ -260,11 +275,11 @@ fun NotesScreen(
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
                                 message = if (deletedIds.size == 1) {
-                                    "Nota enviada a la papelera"
+                                    noteMovedToTrashMessage
                                 } else {
-                                    "Notas enviadas a la papelera"
+                                    notesMovedToTrashMessage
                                 },
-                                actionLabel = "Deshacer",
+                                actionLabel = undoLabel,
                                 duration = SnackbarDuration.Long,
                             )
 
@@ -273,9 +288,9 @@ fun NotesScreen(
                                     Toast.makeText(
                                         context,
                                         if (deletedIds.size == 1) {
-                                            "Nota restaurada"
+                                            noteRestoredMessage
                                         } else {
-                                            "Notas restauradas"
+                                            notesRestoredMessage
                                         },
                                         Toast.LENGTH_SHORT,
                                     ).show()
@@ -335,12 +350,12 @@ private fun CreateChecklistDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Nueva checklist") },
+        title = { Text(stringResource(R.string.new_checklist_title)) },
         text = {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Nombre de la lista") },
+                label = { Text(stringResource(R.string.checklist_name_label)) },
                 singleLine = true,
             )
         },
@@ -349,12 +364,12 @@ private fun CreateChecklistDialog(
                 enabled = title.isNotBlank(),
                 onClick = { onConfirm(title.trim()) },
             ) {
-                Text("Crear")
+                Text(stringResource(R.string.create))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancel))
             }
         },
     )
@@ -373,6 +388,9 @@ private fun rememberSelectedNotes(
 private fun shareSelectedNotes(
     context: Context,
     selectedNotes: List<Note>,
+    lockedNotesCannotBeSharedMessage: String,
+    getLockedNotesSkippedMessage: (Int) -> String,
+    shareNotesChooserTitle: String
 ) {
     val shareableNotes = selectedNotes.filterNot(Note::isSecure)
     val skippedCount = selectedNotes.size - shareableNotes.size
@@ -380,7 +398,7 @@ private fun shareSelectedNotes(
     if (shareableNotes.isEmpty()) {
         Toast.makeText(
             context,
-            "Las notas bloqueadas no se pueden compartir en seleccion multiple",
+            lockedNotesCannotBeSharedMessage,
             Toast.LENGTH_SHORT,
         ).show()
         return
@@ -389,7 +407,7 @@ private fun shareSelectedNotes(
     if (skippedCount > 0) {
         Toast.makeText(
             context,
-            "Se omitieron $skippedCount notas bloqueadas",
+            getLockedNotesSkippedMessage(skippedCount),
             Toast.LENGTH_SHORT,
         ).show()
     }
@@ -398,7 +416,7 @@ private fun shareSelectedNotes(
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, buildShareNotesText(shareableNotes))
     }
-    context.startActivity(Intent.createChooser(intent, "Compartir notas"))
+    context.startActivity(Intent.createChooser(intent, shareNotesChooserTitle))
 }
 
 
@@ -416,32 +434,36 @@ fun DeleteNotesDialog(
         title = {
             Text(
                 text = when {
-                    isRemovingFromFavorites -> "Quitar de favoritas"
-                    isRemovingFromCollection -> "Quitar de la colección"
-                    else -> "Eliminar notas"
+                    isRemovingFromFavorites -> stringResource(R.string.remove_from_favorites_title)
+                    isRemovingFromCollection -> stringResource(R.string.remove_from_collection_title)
+                    else -> stringResource(R.string.delete_notes_title)
                 },
             )
         },
         text = {
             Text(
                 text = when {
-                    isRemovingFromFavorites -> "¿Deseas quitar las $selectedCount notas de favoritas? Seguirán estando disponibles en 'Todas las notas'."
-                    isRemovingFromCollection -> "¿Estás seguro de que deseas quitar las $selectedCount notas de esta colección? Seguirán estando disponibles en 'Todas las notas'."
-                    else -> "¿Estás seguro de que deseas eliminar las $selectedCount notas seleccionadas?"
+                    isRemovingFromFavorites -> stringResource(R.string.remove_from_favorites_message, selectedCount)
+                    isRemovingFromCollection -> stringResource(R.string.remove_from_collection_message, selectedCount)
+                    else -> stringResource(R.string.delete_notes_message, selectedCount)
                 },
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirmDelete) {
                 Text(
-                    text = if (isRemovingFromList) "Quitar" else "Eliminar",
+                    text = if (isRemovingFromList) {
+                        stringResource(R.string.remove)
+                    } else {
+                        stringResource(R.string.delete)
+                    },
                     color = MaterialTheme.colorScheme.error,
                 )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = "Cancelar")
+                Text(text = stringResource(R.string.cancel))
             }
         },
     )

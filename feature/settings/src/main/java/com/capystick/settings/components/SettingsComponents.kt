@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.capystick.core.designsystem.R
@@ -50,9 +51,9 @@ internal fun SettingsItem(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerLowest,
-        shadowElevation = 1.dp,
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceBright,
+        shadowElevation = 2.dp,
         onClick = onClick,
     ) {
         Row(
@@ -65,7 +66,7 @@ internal fun SettingsItem(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
                         shape = CircleShape,
                     ),
                 contentAlignment = Alignment.Center,
@@ -73,7 +74,7 @@ internal fun SettingsItem(
                 Icon(
                     painter = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp),
                 )
             }
@@ -124,7 +125,7 @@ internal fun ThemeSelectionDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Seleccionar tema",
+                text = stringResource(com.capystick.settings.R.string.select_theme_title),
                 style = MaterialTheme.typography.titleLarge,
             )
         },
@@ -141,7 +142,7 @@ internal fun ThemeSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(com.capystick.settings.R.string.cancel))
             }
         },
         shape = RoundedCornerShape(24.dp),
@@ -193,7 +194,7 @@ private fun ThemeOptionRow(
             )
             if (option == ThemeOption.DYNAMIC) {
                 Text(
-                    text = "Colores del dispositivo",
+                    text = stringResource(com.capystick.settings.R.string.dynamic_colors_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -215,7 +216,7 @@ internal fun PaletteSelectionDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Seleccionar paleta",
+                text = stringResource(com.capystick.settings.R.string.select_palette_title),
                 style = MaterialTheme.typography.titleLarge,
             )
         },
@@ -223,7 +224,7 @@ internal fun PaletteSelectionDialog(
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (currentTheme == ThemeOption.DYNAMIC) {
                     Text(
-                        text = "La paleta guardada se aplicara al usar el modo claro, oscuro o predeterminado.",
+                        text = stringResource(com.capystick.settings.R.string.dynamic_palette_help),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -241,7 +242,7 @@ internal fun PaletteSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(com.capystick.settings.R.string.cancel))
             }
         },
         shape = RoundedCornerShape(24.dp),
@@ -324,11 +325,12 @@ private fun ColorCircle(
     )
 }
 
+@Composable
 internal fun ThemeOption.label(): String = when (this) {
-    ThemeOption.SYSTEM -> "Predeterminado del sistema"
-    ThemeOption.LIGHT -> "Claro"
-    ThemeOption.DARK -> "Oscuro"
-    ThemeOption.DYNAMIC -> "Tema dinamico"
+    ThemeOption.SYSTEM -> stringResource(com.capystick.settings.R.string.theme_system)
+    ThemeOption.LIGHT -> stringResource(com.capystick.settings.R.string.theme_light)
+    ThemeOption.DARK -> stringResource(com.capystick.settings.R.string.theme_dark)
+    ThemeOption.DYNAMIC -> stringResource(com.capystick.settings.R.string.theme_dynamic)
 }
 
 internal fun ColorPaletteOption.label(): String = displayName

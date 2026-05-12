@@ -37,6 +37,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -76,13 +77,13 @@ fun PhotoCropScreen(
                 onClick = onRetry,
                 modifier = Modifier.weight(1f),
             ) {
-                Text("Reintentar")
+                Text(stringResource(R.string.retry))
             }
             Button(
                 onClick = { onScanPhoto(bitmap.cropTo(cropRect)) },
                 modifier = Modifier.weight(1f),
             ) {
-                Text("Escanear")
+                Text(stringResource(R.string.scan))
             }
         }
     }
@@ -113,7 +114,7 @@ private fun CropImagePreview(
     ) {
         Image(
             bitmap = bitmap.asImageBitmap(),
-            contentDescription = "Foto capturada",
+            contentDescription = stringResource(R.string.captured_photo_content_description),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
         )

@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -80,7 +81,7 @@ fun CapyNoteCard(
                 if (isSecure) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_lock),
-                        contentDescription = "Nota segura",
+                        contentDescription = stringResource(R.string.secure_note_content_description),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -106,7 +107,7 @@ fun CapyNoteCard(
             if (isSecure || plainText.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = if (isSecure) "Esta nota está bloqueada" else plainText,
+                    text = if (isSecure) stringResource(R.string.secure_note_locked) else plainText,
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontStyle = if (isSecure) androidx.compose.ui.text.font.FontStyle.Italic else androidx.compose.ui.text.font.FontStyle.Normal
                     ),

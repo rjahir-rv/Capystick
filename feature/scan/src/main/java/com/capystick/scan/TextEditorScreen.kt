@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -26,21 +27,22 @@ fun TextEditorScreen(
     onSave: (String, String) -> Unit,
     onCancel: () -> Unit,
 ) {
-    var title by remember { mutableStateOf("Nota escaneada") }
+    val defaultTitle = stringResource(R.string.scanned_note_default_title)
+    var title by remember(defaultTitle) { mutableStateOf(defaultTitle) }
     var content by remember { mutableStateOf(initialText) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Título") },
+            label = { Text(stringResource(R.string.title_label)) },
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = content,
             onValueChange = { content = it },
-            label = { Text("Contenido") },
+            label = { Text(stringResource(R.string.content_label)) },
             modifier = Modifier.weight(1f).fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -48,8 +50,10 @@ fun TextEditorScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            OutlinedButton(onClick = onCancel) { Text("Cancelar") }
-            Button(onClick = { onSave(title, content) }) { Text("Guardar") }
+            OutlinedButton(onClick = onCancel) { Text(stringResource(R.string.cancel)) }
+            Button(onClick = { onSave(title.ifBlank { defaultTitle }, content) }) {
+                Text(stringResource(R.string.save))
+            }
         }
     }
 }

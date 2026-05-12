@@ -1,0 +1,27 @@
+<resources>
+    <string name="favorites_collection_name">Favoritas</string>
+    <string name="collections_empty_search">No se encontró una colección relacionada con tu búsqueda</string>
+    <string name="collections_empty">No hay colecciones aún</string>
+    <string name="new_collection_content_description">Nueva colección</string>
+    <string name="new_collection_title">Nueva colección</string>
+    <string name="rename_collection_title">Renombrar colección</string>
+    <string name="delete_collection_title">Eliminar colección</string>
+    <string name="delete_collection_message">¿Estás seguro de que deseas eliminar la colección \"%1$s\"? Las notas asociadas no se eliminarán, solo se quitarán de esta colección.</string>
+    <string name="delete">Eliminar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="search_collection_placeholder">Buscar colección...</string>
+    <string name="close_search_content_description">Cerrar búsqueda</string>
+    <string name="collections_title">Colecciones</string>
+    <string name="menu_content_description">Menu</string>
+    <string name="search_content_description">Buscar</string>
+    <string name="filter_content_description">Filtrar</string>
+    <string name="sort_name_asc">A-Z</string>
+    <string name="sort_name_desc">Z-A</string>
+    <string name="sort_most_notes">Más notas</string>
+    <string name="sort_fewest_notes">Menos notas</string>
+    <string name="note_count">%1$d notas</string>
+    <string name="rename_content_description">Renombrar</string>
+    <string name="delete_content_description">Eliminar</string>
+    <string name="name_label">Nombre</string>
+    <string name="confirm">Confirmar</string>
+</resources>

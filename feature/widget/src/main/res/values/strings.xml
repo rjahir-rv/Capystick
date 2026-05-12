@@ -1,0 +1,19 @@
+<resources>
+    <string name="widgets_title">Widgets</string>
+    <string name="back_content_description">Volver</string>
+    <string name="widgets_empty_message">Aún no hay widgets configurados. Agrega uno desde la pantalla principal de tu launcher.</string>
+    <string name="widget_list_item_title">Widget #%1$d</string>
+    <string name="widget_recent_notes">Notas recientes</string>
+    <string name="widget_collection">Colección: %1$s</string>
+    <string name="widget_deleted_collection">Colección eliminada</string>
+    <string name="widget_deleted_collection_with_name">Colección eliminada: %1$s</string>
+    <string name="widget_configuration_intro">Elige qué quieres mostrar en este widget.</string>
+    <string name="widget_recent_notes_subtitle">Muestra las notas activas más nuevas</string>
+    <string name="widget_select_collection">Seleccionar colección</string>
+    <string name="widget_no_collections">No hay colecciones disponibles</string>
+    <string name="widget_collection_mode_subtitle">Muestra solo notas de una colección</string>
+    <string name="widget_available_collections">Colecciones disponibles</string>
+    <string name="widget_save_configuration">Guardar configuración</string>
+    <string name="widget_empty_collections_help">Crea una colección desde la app y luego vuelve para usar este modo.</string>
+    <string name="widget_collection_note_count">%1$d notas</string>
+</resources>

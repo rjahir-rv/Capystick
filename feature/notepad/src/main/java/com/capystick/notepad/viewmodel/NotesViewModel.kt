@@ -6,6 +6,8 @@ import com.capystick.domain.repository.CollectionRepository
 import com.capystick.domain.repository.NoteRepository
 import com.capystick.model.Collection
 import com.capystick.model.Note
+import com.capystick.notepad.R
+import com.capystick.notepad.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,14 +31,16 @@ class NotesViewModel @Inject constructor(
     private val _collectionName = MutableStateFlow<String?>(null)
     private val _favoriteOnly = MutableStateFlow(false)
 
-    val title: StateFlow<String> = combine(_collectionName, _favoriteOnly) { collectionName, favoriteOnly ->
+    private val _uiTitle = combine(_collectionName, _favoriteOnly) { collectionName, favoriteOnly ->
         when {
-            favoriteOnly -> "Favoritas"
-            collectionName != null -> collectionName
-            else -> "Todas las notas"
+            favoriteOnly -> UiText.Resource(R.string.notes_title_favorites)
+            collectionName != null -> UiText.Dynamic(collectionName)
+            else -> UiText.Resource(R.string.notes_title_all)
         }
     }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed( stopTimeoutMillis = 5000), "Todas las notas")
+
+    val title: StateFlow<UiText> = _uiTitle
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000), UiText.Resource(R.string.notes_title_all))
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()

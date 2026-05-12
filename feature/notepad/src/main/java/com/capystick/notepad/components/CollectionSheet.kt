@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.capystick.core.designsystem.R
 import com.capystick.model.Collection
@@ -86,13 +87,13 @@ private fun CollectionAssignmentContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            text = "Añadir a colección",
+            text = stringResource(com.capystick.notepad.R.string.add_to_collection_sheet_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
         )
 
         if (collections.isEmpty()) {
-            Text(text = "No tienes colecciones. Crea una nueva:")
+            Text(text = stringResource(com.capystick.notepad.R.string.no_collections_prompt))
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -115,7 +116,7 @@ private fun CollectionAssignmentContent(
                     }
                 }
             }
-            Text(text = "O crea una nueva:")
+            Text(text = stringResource(com.capystick.notepad.R.string.or_create_new))
         }
 
         Row(
@@ -127,7 +128,7 @@ private fun CollectionAssignmentContent(
                 value = newCollectionName,
                 onValueChange = { newCollectionName = it },
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Nombre de la colección") },
+                placeholder = { Text(stringResource(com.capystick.notepad.R.string.collection_name_placeholder)) },
                 singleLine = true,
             )
             IconButton(
@@ -140,7 +141,7 @@ private fun CollectionAssignmentContent(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_save),
-                    contentDescription = "Crear",
+                    contentDescription = stringResource(com.capystick.notepad.R.string.create),
                     tint = if (newCollectionName.isNotBlank()) MaterialTheme.colorScheme.primary else Color.Gray,
                 )
             }

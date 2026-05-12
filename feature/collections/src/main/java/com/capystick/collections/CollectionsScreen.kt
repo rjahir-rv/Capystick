@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,8 +21,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.collections.viewmodel.CollectionSortOrder
 import com.capystick.collections.viewmodel.CollectionsViewModel
-import com.capystick.core.designsystem.R
 import com.capystick.model.Collection
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,8 +38,9 @@ fun CollectionsScreen(
     val isSearchActive by viewModel.isSearchActive.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
     val favoriteNoteCount by viewModel.favoriteNoteCount.collectAsStateWithLifecycle()
+    val favoritesCollectionName = stringResource(R.string.favorites_collection_name)
     val showFavoritesCollection = searchQuery.isBlank() ||
-        "Favoritas".contains(searchQuery, ignoreCase = true)
+        favoritesCollectionName.contains(searchQuery, ignoreCase = true)
 
     var collectionToRename by remember { mutableStateOf<Collection?>(null) }
     var collectionToDelete by remember { mutableStateOf<Collection?>(null) }
@@ -70,9 +72,9 @@ fun CollectionsScreen(
                 ) {
                     Text(
                         text = if (searchQuery.isNotEmpty()) {
-                            "No se encontro una coleccion relacionada con tu busqueda"
+                            stringResource(R.string.collections_empty_search)
                         } else {
-                            "No hay colecciones aún"
+                            stringResource(R.string.collections_empty)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -92,7 +94,7 @@ fun CollectionsScreen(
                         item {
                             FavoriteCollectionItem(
                                 noteCount = favoriteNoteCount,
-                                onClick = { onCollectionClick(FAVORITES_COLLECTION_ID, "Favoritas") }
+                                onClick = { onCollectionClick(FAVORITES_COLLECTION_ID, favoritesCollectionName) }
                             )
                         }
                     }
@@ -116,14 +118,14 @@ fun CollectionsScreen(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = "Nueva colección"
+                    painter = painterResource(id = DesignR.drawable.ic_add),
+                    contentDescription = stringResource(R.string.new_collection_content_description)
                 )
             }
 
             if (showCreateDialog) {
                 CollectionNameDialog(
-                    title = "Nueva colección",
+                    title = stringResource(R.string.new_collection_title),
                     onDismiss = { showCreateDialog = false },
                     onConfirm = { name ->
                         viewModel.createCollection(name)
@@ -134,7 +136,7 @@ fun CollectionsScreen(
 
             if (collectionToRename != null) {
                 CollectionNameDialog(
-                    title = "Renombrar colección",
+                    title = stringResource(R.string.rename_collection_title),
                     initialName = collectionToRename!!.name,
                     onDismiss = { collectionToRename = null },
                     onConfirm = { newName ->
@@ -147,8 +149,15 @@ fun CollectionsScreen(
             if (collectionToDelete != null) {
                 AlertDialog(
                     onDismissRequest = { collectionToDelete = null },
-                    title = { Text(text = "Eliminar colección") },
-                    text = { Text(text = "¿Estás seguro de que deseas eliminar la colección '${collectionToDelete?.name}'? Las notas asociadas no se eliminarán, solo se quitarán de esta colección.") },
+                    title = { Text(text = stringResource(R.string.delete_collection_title)) },
+                    text = {
+                        Text(
+                            text = stringResource(
+                                R.string.delete_collection_message,
+                                collectionToDelete?.name.orEmpty(),
+                            ),
+                        )
+                    },
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -156,12 +165,12 @@ fun CollectionsScreen(
                                 collectionToDelete = null
                             }
                         ) {
-                            Text(text = "Eliminar", color = MaterialTheme.colorScheme.error)
+                            Text(text = stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { collectionToDelete = null }) {
-                            Text(text = "Cancelar")
+                            Text(text = stringResource(R.string.cancel))
                         }
                     }
                 )
@@ -193,7 +202,7 @@ fun CollectionsTopAppBar(
                         value = searchQuery,
                         onValueChange = onSearchQueryChange,
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Buscar colección...") },
+                        placeholder = { Text(stringResource(R.string.search_collection_placeholder)) },
                         singleLine = true,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
@@ -207,8 +216,8 @@ fun CollectionsTopAppBar(
                 navigationIcon = {
                     IconButton(onClick = { onSearchActiveChange(false) }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Cerrar búsqueda",
+                            painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.close_search_content_description),
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -218,15 +227,15 @@ fun CollectionsTopAppBar(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Colecciones",
+                        text = stringResource(R.string.collections_title),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onMenuClick) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_menu),
-                            contentDescription = "Menu",
+                            painter = painterResource(id = DesignR.drawable.ic_menu),
+                            contentDescription = stringResource(R.string.menu_content_description),
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -234,16 +243,16 @@ fun CollectionsTopAppBar(
                 actions = {
                     IconButton(onClick = { onSearchActiveChange(true) }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_search),
-                            contentDescription = "Buscar",
+                            painter = painterResource(id = DesignR.drawable.ic_search),
+                            contentDescription = stringResource(R.string.search_content_description),
                             modifier = Modifier.size(28.dp)
                         )
                     }
                     Box {
                         IconButton(onClick = { expandedFilter = true }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_filter_list),
-                                contentDescription = "Filtrar",
+                                painter = painterResource(id = DesignR.drawable.ic_filter_list),
+                                contentDescription = stringResource(R.string.filter_content_description),
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -252,28 +261,28 @@ fun CollectionsTopAppBar(
                             onDismissRequest = { expandedFilter = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("A-Z") },
+                                text = { Text(stringResource(R.string.sort_name_asc)) },
                                 onClick = {
                                     onSortOrderChange(CollectionSortOrder.NAME_ASC)
                                     expandedFilter = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Z-A") },
+                                text = { Text(stringResource(R.string.sort_name_desc)) },
                                 onClick = {
                                     onSortOrderChange(CollectionSortOrder.NAME_DESC)
                                     expandedFilter = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Más notas") },
+                                text = { Text(stringResource(R.string.sort_most_notes)) },
                                 onClick = {
                                     onSortOrderChange(CollectionSortOrder.NOTE_COUNT_DESC)
                                     expandedFilter = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Menos notas") },
+                                text = { Text(stringResource(R.string.sort_fewest_notes)) },
                                 onClick = {
                                     onSortOrderChange(CollectionSortOrder.NOTE_COUNT_ASC)
                                     expandedFilter = false
@@ -320,7 +329,7 @@ fun CollectionItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${collection.noteCount} NOTES",
+                    text = stringResource(R.string.note_count, collection.noteCount),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.sp
@@ -338,8 +347,8 @@ fun CollectionItem(
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_edit),
-                        contentDescription = "Rename",
+                        painter = painterResource(id = DesignR.drawable.ic_edit),
+                        contentDescription = stringResource(R.string.rename_content_description),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -348,8 +357,8 @@ fun CollectionItem(
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_delete),
-                        contentDescription = "Delete",
+                        painter = painterResource(id = DesignR.drawable.ic_delete),
+                        contentDescription = stringResource(R.string.delete_content_description),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -380,14 +389,14 @@ fun FavoriteCollectionItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_favorite),
+                    painter = painterResource(id = DesignR.drawable.ic_favorite),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(32.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Favoritas",
+                    text = stringResource(R.string.favorites_collection_name),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textAlign = TextAlign.Center,
@@ -396,7 +405,7 @@ fun FavoriteCollectionItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "$noteCount NOTES",
+                    text = stringResource(R.string.note_count, noteCount),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.sp
@@ -424,7 +433,7 @@ fun CollectionNameDialog(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Nombre") },
+                label = { Text(stringResource(R.string.name_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -434,12 +443,12 @@ fun CollectionNameDialog(
                 onClick = { onConfirm(name) },
                 enabled = name.isNotBlank()
             ) {
-                Text("Confirmar")
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

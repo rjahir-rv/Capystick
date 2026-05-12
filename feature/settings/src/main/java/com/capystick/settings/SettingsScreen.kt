@@ -30,10 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.capystick.core.designsystem.R
 import com.capystick.designsystem.theme.ColorPaletteOption
 import com.capystick.designsystem.theme.ThemeOption
 import com.capystick.settings.components.PaletteSelectionDialog
@@ -41,6 +41,7 @@ import com.capystick.settings.components.SettingsItem
 import com.capystick.settings.components.ThemeSelectionDialog
 import com.capystick.settings.components.label
 import com.capystick.settings.viewmodel.SettingsViewModel
+import com.capystick.core.designsystem.R as DesignR
 
 @Composable
 fun SettingsScreen(
@@ -100,14 +101,14 @@ fun SettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_dark_mode),
-                    title = "Tema",
+                    icon = painterResource(id = DesignR.drawable.ic_dark_mode),
+                    title = stringResource(R.string.settings_theme),
                     subtitle = currentTheme.label(),
                     onClick = { showThemeDialog = true },
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_palette),
-                    title = "Paleta",
+                    icon = painterResource(id = DesignR.drawable.ic_palette),
+                    title = stringResource(R.string.settings_palette),
                     subtitle = paletteSubtitle(
                         paletteOption = currentPalette,
                         themeOption = currentTheme,
@@ -115,30 +116,30 @@ fun SettingsScreen(
                     onClick = { showPaletteDialog = true },
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_backup),
-                    title = "Copia de seguridad",
+                    icon = painterResource(id = DesignR.drawable.ic_backup),
+                    title = stringResource(R.string.settings_backup),
                     onClick = onBackupClick,
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_widget_dou),
-                    title = "Widgets",
-                    subtitle = "Configura widgets de notas recientes o por coleccion",
+                    icon = painterResource(id = DesignR.drawable.ic_widget_dou),
+                    title = stringResource(R.string.settings_widgets),
+                    subtitle = stringResource(R.string.settings_widgets_subtitle),
                     onClick = onWidgetsClick,
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_trash),
-                    title = "Papelera",
+                    icon = painterResource(id = DesignR.drawable.ic_trash),
+                    title = stringResource(R.string.settings_trash),
                     onClick = onTrashClick,
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_export_notes),
-                    title = "Exportar notas",
-                    subtitle = "Guarda todas tus notas activas como archivos .txt",
+                    icon = painterResource(id = DesignR.drawable.ic_export_notes),
+                    title = stringResource(R.string.settings_export_notes),
+                    subtitle = stringResource(R.string.settings_export_notes_subtitle),
                     onClick = { exportLauncher.launch(null) },
                 )
                 SettingsItem(
-                    icon = painterResource(id = R.drawable.ic_info),
-                    title = "Acerca de",
+                    icon = painterResource(id = DesignR.drawable.ic_info),
+                    title = stringResource(R.string.settings_about),
                     onClick = {},
                 )
             }
@@ -184,19 +185,19 @@ fun SettingsScreen(
             onDismissRequest = viewModel::dismissNoNotesWarning,
             title = {
                 Text(
-                    text = "Sin notas para exportar",
+                    text = stringResource(R.string.settings_no_notes_export_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
             },
             text = {
                 Text(
-                    text = "No tienes notas activas. Crea o restaura al menos una nota antes de exportarlas.",
+                    text = stringResource(R.string.settings_no_notes_export_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             confirmButton = {
                 TextButton(onClick = viewModel::dismissNoNotesWarning) {
-                    Text("Entendido")
+                    Text(stringResource(R.string.understood))
                 }
             },
             shape = RoundedCornerShape(24.dp),
@@ -204,13 +205,14 @@ fun SettingsScreen(
     }
 }
 
+@Composable
 private fun paletteSubtitle(
     paletteOption: ColorPaletteOption,
     themeOption: ThemeOption,
 ): String {
     val baseLabel = paletteOption.label()
     return if (themeOption == ThemeOption.DYNAMIC) {
-        "$baseLabel - Se aplica en claro/oscuro/sistema"
+        stringResource(R.string.settings_dynamic_palette_subtitle, baseLabel)
     } else {
         baseLabel
     }

@@ -45,16 +45,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.backup.viewmodel.BackupViewModel
-import com.capystick.core.designsystem.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.capystick.core.designsystem.R as DesignR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +68,8 @@ fun BackupScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val exportSuccessMessage = stringResource(R.string.backup_export_success)
+    val importSuccessMessage = stringResource(R.string.backup_import_success)
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json"),
@@ -91,7 +94,7 @@ fun BackupScreen(
     LaunchedEffect(uiState.exportSuccess) {
         if (uiState.exportSuccess) {
             snackbarHostState.showSnackbar(
-                message = "Backup exportado correctamente ✓",
+                message = exportSuccessMessage,
                 duration = SnackbarDuration.Short,
             )
             viewModel.dismissExportSuccess()
@@ -101,7 +104,7 @@ fun BackupScreen(
     LaunchedEffect(uiState.importSuccess) {
         if (uiState.importSuccess) {
             snackbarHostState.showSnackbar(
-                message = "Notas restauradas correctamente ✓",
+                message = importSuccessMessage,
                 duration = SnackbarDuration.Short,
             )
             viewModel.dismissImportSuccess()
@@ -125,15 +128,15 @@ fun BackupScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Copia de seguridad",
+                        text = stringResource(R.string.backup_title),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Volver",
+                            painter = painterResource(id = DesignR.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.back_content_description),
                             modifier = Modifier.size(28.dp),
                         )
                     }
@@ -159,8 +162,7 @@ fun BackupScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
-                    text = "Gestiona una copia de seguridad de todas tus notas " +
-                        "y colecciones en un archivo JSON.",
+                    text = stringResource(R.string.backup_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -168,10 +170,10 @@ fun BackupScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 BackupCard(
-                    iconRes = R.drawable.ic_export_notes,
-                    title = "Exportar backup",
-                    description = "Guarda todas tus notas y colecciones en un archivo JSON en tu dispositivo.",
-                    actionLabel = "Exportar",
+                    iconRes = DesignR.drawable.ic_export_notes,
+                    title = stringResource(R.string.backup_export_title),
+                    description = stringResource(R.string.backup_export_description),
+                    actionLabel = stringResource(R.string.backup_export_action),
                     onClick = {
                         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                             .format(Date())
@@ -180,10 +182,10 @@ fun BackupScreen(
                 )
 
                 BackupCard(
-                    iconRes = R.drawable.ic_backup,
-                    title = "Importar backup",
-                    description = "Restaura tus notas desde un archivo JSON. Esto reemplazará todos los datos actuales.",
-                    actionLabel = "Importar",
+                    iconRes = DesignR.drawable.ic_backup,
+                    title = stringResource(R.string.backup_import_title),
+                    description = stringResource(R.string.backup_import_description),
+                    actionLabel = stringResource(R.string.backup_import_action),
                     onClick = { importLauncher.launch(arrayOf("application/json")) },
                 )
             }
@@ -211,19 +213,19 @@ fun BackupScreen(
             onDismissRequest = viewModel::dismissNoNotesWarning,
             title = {
                 Text(
-                    text = "Sin notas para respaldar",
+                    text = stringResource(R.string.backup_no_notes_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
             },
             text = {
                 Text(
-                    text = "No tienes notas activas. Crea al menos una nota antes de exportar un backup.",
+                    text = stringResource(R.string.backup_no_notes_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             confirmButton = {
                 TextButton(onClick = viewModel::dismissNoNotesWarning) {
-                    Text("Entendido")
+                    Text(stringResource(R.string.understood))
                 }
             },
             shape = RoundedCornerShape(24.dp),
@@ -235,15 +237,13 @@ fun BackupScreen(
             onDismissRequest = viewModel::dismissImportConfirmation,
             title = {
                 Text(
-                    text = "¿Restaurar backup?",
+                    text = stringResource(R.string.backup_restore_confirmation_title),
                     style = MaterialTheme.typography.titleLarge,
                 )
             },
             text = {
                 Text(
-                    text = "Esta acción reemplazará TODAS las notas y colecciones " +
-                        "actuales con las del archivo seleccionado. " +
-                        "Esta operación no se puede deshacer.",
+                    text = stringResource(R.string.backup_restore_confirmation_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -252,14 +252,14 @@ fun BackupScreen(
                     onClick = viewModel::confirmImport,
                 ) {
                     Text(
-                        text = "Restaurar",
+                        text = stringResource(R.string.restore),
                         color = MaterialTheme.colorScheme.error,
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = viewModel::dismissImportConfirmation) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.cancel))
                 }
             },
             shape = RoundedCornerShape(24.dp),

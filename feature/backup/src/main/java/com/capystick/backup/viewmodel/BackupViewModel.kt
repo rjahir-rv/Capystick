@@ -3,6 +3,7 @@ package com.capystick.backup.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capystick.backup.R
 import com.capystick.data.backup.BackupSerializer
 import com.capystick.domain.repository.BackupRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +48,7 @@ class BackupViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, error = "Error al exportar: por favor verifica el archivo")
+                    it.copy(isLoading = false, error = context.getString(R.string.backup_export_error))
                 }
             }
         }
@@ -70,7 +71,13 @@ class BackupViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, importSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, error = "Error al importar: ${e.localizedMessage}")
+                    it.copy(
+                        isLoading = false,
+                        error = context.getString(
+                            R.string.backup_import_error,
+                            e.localizedMessage.orEmpty(),
+                        ),
+                    )
                 }
             } finally {
                 pendingInputStream = null

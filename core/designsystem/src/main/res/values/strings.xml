@@ -1,0 +1,5 @@
+<resources>
+    <string name="menu_content_description">Menu</string>
+    <string name="secure_note_content_description">Nota segura</string>
+    <string name="secure_note_locked">Esta nota está bloqueada</string>
+</resources>

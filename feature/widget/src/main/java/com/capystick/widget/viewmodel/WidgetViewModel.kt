@@ -70,15 +70,9 @@ class WidgetSettingsViewModel @Inject constructor(
             val collection = availableCollections.firstOrNull { it.id == configuration.collectionId }
             WidgetListItemUiState(
                 appWidgetId = configuration.appWidgetId,
-                title = "Widget #${configuration.appWidgetId}",
-                subtitle = when (configuration.mode) {
-                    WidgetMode.RECENT_NOTES -> "Notas recientes"
-                    WidgetMode.SELECTED_COLLECTION -> when {
-                        collection != null -> "Coleccion: ${collection.name}"
-                        configuration.collectionName != null -> "Coleccion eliminada: ${configuration.collectionName}"
-                        else -> "Coleccion eliminada"
-                    }
-                },
+                mode = configuration.mode,
+                collectionName = collection?.name ?: configuration.collectionName,
+                isCollectionDeleted = configuration.mode == WidgetMode.SELECTED_COLLECTION && collection == null,
             )
         }
     }.stateIn(
@@ -137,6 +131,7 @@ class WidgetSettingsViewModel @Inject constructor(
 
 data class WidgetListItemUiState(
     val appWidgetId: Int,
-    val title: String,
-    val subtitle: String,
+    val mode: WidgetMode,
+    val collectionName: String?,
+    val isCollectionDeleted: Boolean,
 )

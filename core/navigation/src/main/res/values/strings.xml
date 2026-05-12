@@ -1,0 +1,9 @@
+<resources>
+    <string name="route_create_note">Crear nota</string>
+    <string name="route_create_checklist">Crear checklist</string>
+    <string name="route_collections">Colecciones</string>
+    <string name="route_settings">Ajustes</string>
+    <string name="route_all_notes">Todas las notas</string>
+    <string name="route_scan_note">Escanear nota</string>
+    <string name="capystick_logo_content_description">Capystick logo</string>
+</resources>
