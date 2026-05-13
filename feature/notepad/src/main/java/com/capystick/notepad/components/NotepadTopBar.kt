@@ -12,18 +12,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.capystick.notepad.R
 import com.capystick.core.designsystem.R as DesignR
@@ -41,6 +41,12 @@ internal fun NotepadTopBar(
     onSaveClick: () -> Unit,
 ) {
     CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.secondary,
+        ),
         title = {
             NoteTitleField(
                 title = title,
@@ -53,7 +59,7 @@ internal fun NotepadTopBar(
                     Icon(
                         painter = painterResource(id = DesignR.drawable.ic_menu),
                         contentDescription = stringResource(R.string.menu_content_description),
-                        modifier = Modifier.size(28.dp),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             } else {
@@ -61,7 +67,7 @@ internal fun NotepadTopBar(
                     Icon(
                         painter = painterResource(id = DesignR.drawable.ic_arrow_back),
                         contentDescription = stringResource(R.string.back_content_description),
-                        modifier = Modifier.size(28.dp),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -74,7 +80,11 @@ internal fun NotepadTopBar(
                 Icon(
                     painter = painterResource(id = DesignR.drawable.ic_copy),
                     contentDescription = stringResource(R.string.copy_all_content_description),
-                    tint = MaterialTheme.colorScheme.secondary,
+                    tint = if (canCopy) {
+                        MaterialTheme.colorScheme.secondary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    },
                 )
             }
             IconButton(onClick = onSaveClick) {
@@ -95,30 +105,32 @@ internal fun NoteTitleField(
     modifier: Modifier = Modifier,
 ) {
     val titleScrollState = rememberScrollState()
-    val titleFocus = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
 
     Row(
-        modifier = modifier.horizontalScroll(titleScrollState, reverseScrolling = true),
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(titleScrollState, reverseScrolling = true),
     ) {
         BasicTextField(
             value = title,
             onValueChange = onTitleChange,
             textStyle = MaterialTheme.typography.titleLarge.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(titleFocus)
-                .                   onFocusChanged { isFocused = it.isFocused },
+                .onFocusChanged { isFocused = it.isFocused },
             singleLine = true,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             decorationBox = { innerTextField ->
                 if (title.isBlank() && !isFocused) {
                     Text(
                         text = stringResource(R.string.new_note_placeholder),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.62f),
                     )
                 }
                 innerTextField()

@@ -93,6 +93,9 @@ fun ChecklistScreen(
     var focusedItemId by rememberSaveable { mutableStateOf<String?>(null) }
     val checklistSavedMessage = stringResource(R.string.checklist_saved)
     val checklistSavedToCollectionMessage = stringResource(R.string.checklist_saved_to_collection)
+    val unlockChecklistMessage = stringResource(R.string.unlock_checklist_title)
+    val unlockChecklistSubtitle = stringResource(R.string.unlock_checklist_subtitle)
+
     fun navigateBack() {
         if (uiState.hasUnsavedChanges) {
             showDiscardDialog = true
@@ -208,8 +211,8 @@ fun ChecklistScreen(
                     actionLabel = stringResource(R.string.unlock),
                     onClick = {
                         authenticator.authenticate(
-                            title = context.getString(R.string.unlock_checklist_title),
-                            subtitle = context.getString(R.string.unlock_checklist_subtitle),
+                            title = unlockChecklistMessage,
+                            subtitle = unlockChecklistSubtitle,
                             onSuccess = { isUnlocked = true },
                             onError = { },
                         )

@@ -4,6 +4,7 @@
     <string name="copy_all_content_description">Copiar todo</string>
     <string name="save_note_content_description">Guardar nota</string>
     <string name="new_note_placeholder">Nueva nota</string>
+    <string name="note_body_placeholder">Empieza a escribir...</string>
     <string name="bold_content_description">Negrita</string>
     <string name="italic_content_description">Cursiva</string>
     <string name="strikethrough_content_description">Tachado</string>

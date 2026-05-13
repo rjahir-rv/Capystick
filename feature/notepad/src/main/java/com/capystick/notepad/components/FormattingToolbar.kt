@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -45,19 +46,22 @@ internal fun FormattingToolbar(
     val isBold = richTextState.currentSpanStyle.fontWeight == FontWeight.Bold
     val isItalic = richTextState.currentSpanStyle.fontStyle == FontStyle.Italic
     val isUnderline = richTextState.currentSpanStyle.textDecoration?.contains(TextDecoration.Underline) == true
+    val isStrikethrough =
+        richTextState.currentSpanStyle.textDecoration?.contains(TextDecoration.LineThrough) == true
     val isHeadline = richTextState.currentSpanStyle.fontSize == headlineStyle.fontSize
     val isTitle = richTextState.currentSpanStyle.fontSize == titleStyle.fontSize
 
     Surface(
-        shape = CircleShape,
+        shape = RoundedCornerShape(28.dp),
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shadowElevation = 8.dp,
-        modifier = modifier.fillMaxWidth(0.9f),
+        tonalElevation = 3.dp,
+        shadowElevation = 4.dp,
+        modifier = modifier.fillMaxWidth(0.88f),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 6.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -108,7 +112,8 @@ internal fun FormattingToolbar(
                 titleStyle = titleStyle,
                 onShowStyleMenuChange = onShowStyleMenuChange,
             )
-            IconButton(
+            FormatIconButton(
+                isActive = isStrikethrough,
                 onClick = {
                     richTextState.toggleSpanStyle(
                         SpanStyle(textDecoration = TextDecoration.LineThrough),
@@ -118,6 +123,11 @@ internal fun FormattingToolbar(
                 Icon(
                     painter = painterResource(DesignR.drawable.ic_format_streamline),
                     contentDescription = stringResource(R.string.strikethrough_content_description),
+                    tint = if (isStrikethrough) {
+                        MaterialTheme.colorScheme.onSecondaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
                     modifier = Modifier.size(16.dp),
                 )
             }
@@ -190,6 +200,11 @@ private fun TextStyleMenu(
                     color = if (isHighlighted) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
                     shape = CircleShape,
                 ),
+                tint = if (isHighlighted) {
+                    MaterialTheme.colorScheme.onSecondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
             )
         }
         DropdownMenu(
