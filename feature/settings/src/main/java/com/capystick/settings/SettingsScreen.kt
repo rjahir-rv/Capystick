@@ -2,6 +2,7 @@
 
 package com.capystick.settings
 
+import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -58,6 +62,7 @@ fun SettingsScreen(
     var showThemeDialog by remember { mutableStateOf(false) }
     var showPaletteDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree(),
     ) { uri ->
@@ -94,55 +99,55 @@ fun SettingsScreen(
                 .padding(scaffoldPadding)
                 .padding(innerPadding),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 8.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_dark_mode),
-                    title = stringResource(R.string.settings_theme),
-                    subtitle = currentTheme.label(),
-                    onClick = { showThemeDialog = true },
-                )
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_palette),
-                    title = stringResource(R.string.settings_palette),
-                    subtitle = paletteSubtitle(
-                        paletteOption = currentPalette,
-                        themeOption = currentTheme,
+            if (isLandscape) {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        top = 8.dp,
+                        end = 16.dp,
+                        bottom = 24.dp,
                     ),
-                    onClick = { showPaletteDialog = true },
-                )
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_backup),
-                    title = stringResource(R.string.settings_backup),
-                    onClick = onBackupClick,
-                )
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_widget_dou),
-                    title = stringResource(R.string.settings_widgets),
-                    subtitle = stringResource(R.string.settings_widgets_subtitle),
-                    onClick = onWidgetsClick,
-                )
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_trash),
-                    title = stringResource(R.string.settings_trash),
-                    onClick = onTrashClick,
-                )
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_export_notes),
-                    title = stringResource(R.string.settings_export_notes),
-                    subtitle = stringResource(R.string.settings_export_notes_subtitle),
-                    onClick = { exportLauncher.launch(null) },
-                )
-                SettingsItem(
-                    icon = painterResource(id = DesignR.drawable.ic_info),
-                    title = stringResource(R.string.settings_about),
-                    onClick = {},
-                )
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(count = SettingsItemCount) { index ->
+                        SettingsItemAt(
+                            index = index,
+                            currentTheme = currentTheme,
+                            currentPalette = currentPalette,
+                            onThemeClick = { showThemeDialog = true },
+                            onPaletteClick = { showPaletteDialog = true },
+                            onBackupClick = onBackupClick,
+                            onWidgetsClick = onWidgetsClick,
+                            onTrashClick = onTrashClick,
+                            onExportClick = { exportLauncher.launch(null) },
+                        )
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 8.dp, bottom = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    repeat(SettingsItemCount) { index ->
+                        SettingsItemAt(
+                            index = index,
+                            currentTheme = currentTheme,
+                            currentPalette = currentPalette,
+                            onThemeClick = { showThemeDialog = true },
+                            onPaletteClick = { showPaletteDialog = true },
+                            onBackupClick = onBackupClick,
+                            onWidgetsClick = onWidgetsClick,
+                            onTrashClick = onTrashClick,
+                            onExportClick = { exportLauncher.launch(null) },
+                        )
+                    }
+                }
             }
 
             if (uiState.isExporting) {
@@ -202,6 +207,72 @@ fun SettingsScreen(
                 }
             },
             shape = RoundedCornerShape(24.dp),
+        )
+    }
+}
+
+private const val SettingsItemCount = 7
+
+@Composable
+private fun SettingsItemAt(
+    index: Int,
+    currentTheme: ThemeOption,
+    currentPalette: ColorPaletteOption,
+    onThemeClick: () -> Unit,
+    onPaletteClick: () -> Unit,
+    onBackupClick: () -> Unit,
+    onWidgetsClick: () -> Unit,
+    onTrashClick: () -> Unit,
+    onExportClick: () -> Unit,
+) {
+    when (index) {
+        0 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_dark_mode),
+            title = stringResource(R.string.settings_theme),
+            subtitle = currentTheme.label(),
+            onClick = onThemeClick,
+        )
+
+        1 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_palette),
+            title = stringResource(R.string.settings_palette),
+            subtitle = paletteSubtitle(
+                paletteOption = currentPalette,
+                themeOption = currentTheme,
+            ),
+            onClick = onPaletteClick,
+        )
+
+        2 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_backup),
+            title = stringResource(R.string.settings_backup),
+            onClick = onBackupClick,
+        )
+
+        3 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_widget_dou),
+            title = stringResource(R.string.settings_widgets),
+            subtitle = stringResource(R.string.settings_widgets_subtitle),
+            onClick = onWidgetsClick,
+        )
+
+        4 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_trash),
+            title = stringResource(R.string.settings_trash),
+            onClick = onTrashClick,
+        )
+
+        5 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_export_notes),
+            title = stringResource(R.string.settings_export_notes),
+            subtitle = stringResource(R.string.settings_export_notes_subtitle),
+            onClick = onExportClick,
+        )
+
+        6 -> SettingsItem(
+            icon = painterResource(id = DesignR.drawable.ic_info),
+            title = stringResource(R.string.settings_about),
+            onClick = {},
         )
     }
 }

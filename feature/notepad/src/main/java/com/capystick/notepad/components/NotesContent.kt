@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +33,7 @@ internal fun NotesContent(
     onNoteLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(16.dp),
+    isLandscape: Boolean = false,
 ) {
     if (notes.isEmpty()) {
         EmptyNotesState(
@@ -47,6 +51,7 @@ internal fun NotesContent(
         onNoteLongClick = onNoteLongClick,
         modifier = modifier,
         contentPadding = contentPadding,
+        isLandscape = isLandscape,
     )
 }
 
@@ -78,11 +83,67 @@ internal fun NotesList(
     onNoteLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(16.dp),
+    isLandscape: Boolean = false,
 ) {
     val authenticator = rememberBiometricAuthenticator()
     val secureNoteTitle = stringResource(R.string.unlock_note_title)
     val authenticateToViewContentSubtitle = stringResource(R.string.authenticate_to_view_content)
     val noteNoTitle = stringResource(R.string.note_no_title)
+
+    @Composable
+    fun NoteItem(note: Note) {
+        val plainText = remember(note.content, note.type) {
+            noteSupportingText(note)
+        }
+        val dateString = remember(note.timestamp) {
+            formatNoteDate(note.timestamp)
+        }
+        val isSelected = selectedNoteIds.contains(note.id)
+
+        CapyNoteCard(
+            title = note.title.ifBlank { noteNoTitle },
+            dateString = dateString,
+            plainText = plainText,
+            isSelected = isSelected,
+            isSecure = note.isSecure,
+            onClick = {
+                if (isSelectionMode) {
+                    onNoteLongClick(note.id)
+                } else if (note.isSecure) {
+                    if (authenticator.isDeviceSecure()) {
+                        authenticator.authenticate(
+                            title = secureNoteTitle,
+                            subtitle = authenticateToViewContentSubtitle,
+                            onSuccess = { onNoteClick(note.id) },
+                            onError = { /* Optional error surface. */ },
+                        )
+                    } else {
+                        onNoteClick(note.id)
+                    }
+                } else {
+                    onNoteClick(note.id)
+                }
+            },
+            onLongClick = {
+                onNoteLongClick(note.id)
+            },
+        )
+    }
+
+    if (isLandscape) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 320.dp),
+            modifier = modifier.fillMaxSize(),
+            contentPadding = contentPadding,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            gridItems(notes) { note ->
+                NoteItem(note = note)
+            }
+        }
+        return
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -90,42 +151,7 @@ internal fun NotesList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(notes) { note ->
-            val plainText = remember(note.content, note.type) {
-                noteSupportingText(note)
-            }
-            val dateString = remember(note.timestamp) {
-                formatNoteDate(note.timestamp)
-            }
-            val isSelected = selectedNoteIds.contains(note.id)
-
-            CapyNoteCard(
-                title = note.title.ifBlank { noteNoTitle },
-                dateString = dateString,
-                plainText = plainText,
-                isSelected = isSelected,
-                isSecure = note.isSecure,
-                onClick = {
-                    if (isSelectionMode) {
-                        onNoteLongClick(note.id)
-                    } else if (note.isSecure) {
-                        if (authenticator.isDeviceSecure()) {
-                            authenticator.authenticate(
-                                title = secureNoteTitle,
-                                subtitle = authenticateToViewContentSubtitle,
-                                onSuccess = { onNoteClick(note.id) },
-                                onError = { /* Optional error surface. */ },
-                            )
-                        } else {
-                            onNoteClick(note.id)
-                        }
-                    } else {
-                        onNoteClick(note.id)
-                    }
-                },
-                onLongClick = {
-                    onNoteLongClick(note.id)
-                },
-            )
+            NoteItem(note = note)
         }
     }
 }

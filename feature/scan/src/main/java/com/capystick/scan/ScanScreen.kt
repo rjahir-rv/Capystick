@@ -46,6 +46,7 @@ import com.capystick.scan.viewmodel.ScanViewModel
 fun ScanScreen(
     innerPadding: PaddingValues,
     onMenuClick: () -> Unit,
+    showNavigationIcon: Boolean = true,
     onNoteSaved: (Int) -> Unit,
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
@@ -75,6 +76,7 @@ fun ScanScreen(
             CapyTopAppBar(
                 title = stringResource(R.string.scan_note_title),
                 onMenuClick = onMenuClick,
+                showNavigationIcon = showNavigationIcon,
             )
         },
     ) { paddingValues ->

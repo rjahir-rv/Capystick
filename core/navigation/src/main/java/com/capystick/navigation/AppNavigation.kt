@@ -1,6 +1,10 @@
 package com.capystick.navigation
 
+import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +14,9 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -20,9 +27,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +42,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -64,7 +76,7 @@ fun AppNavigation(
     val levelRoutes = listOf(NotepadRoute, NotesRoute, ScanRoute, CollectionsRoute, SettingsRoute)
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val topLevelBackStack = remember {
+    val topLevelBackStack = rememberSaveable(saver = TopLevelBackStack.Saver) {
         TopLevelBackStack<TopLevelRoute>(NotepadRoute).apply {
             externalNavigationCommand?.let(::applyExternalNavigationCommand)
         }
@@ -75,75 +87,186 @@ fun AppNavigation(
     var skipInitialExternalNavigationHandling by remember {
         mutableStateOf(externalNavigationCommand != null)
     }
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val openDrawer = {
+        if (!isLandscape) {
+            scope.launch { drawerState.open() }
+        }
+    }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier.height(12.dp))
-                    Image(
-                        painter = painterResource(id = DesignR.drawable.capystick_logo),
-                        contentDescription = stringResource(R.string.capystick_logo_content_description),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp),
-                        alignment = Alignment.CenterStart,
-                        contentScale = ContentScale.Fit
-                    )
+    if (isLandscape) {
+        Row(modifier = modifier.fillMaxSize()) {
+            AppNavigationRail(
+                levelRoutes = levelRoutes,
+                selectedRoute = topLevelBackStack.topLevelKey,
+                onRouteClick = topLevelBackStack::addTopLevel,
+            )
+            AppNavigationScaffold(
+                modifier = Modifier.weight(1f),
+                topLevelBackStack = topLevelBackStack,
+                externalNavigationCommand = externalNavigationCommand,
+                onExternalNavigationHandled = onExternalNavigationHandled,
+                skipInitialExternalNavigationHandling = skipInitialExternalNavigationHandling,
+                onSkipInitialExternalNavigationHandled = {
+                    skipInitialExternalNavigationHandling = false
+                },
+                recentlyDeletedNoteIds = recentlyDeletedNoteIds,
+                onRecentlyDeletedNoteIdsChange = { recentlyDeletedNoteIds = it },
+                onOpenDrawer = openDrawer,
+                showNavigationIcon = false,
+            )
+        }
+    } else {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                AppNavigationDrawer(
+                    levelRoutes = levelRoutes,
+                    selectedRoute = topLevelBackStack.topLevelKey,
+                    onRouteClick = { item ->
+                        scope.launch { drawerState.close() }
+                        topLevelBackStack.addTopLevel(item)
+                    },
+                )
+            },
+            modifier = modifier
+        ) {
+            AppNavigationScaffold(
+                modifier = modifier,
+                topLevelBackStack = topLevelBackStack,
+                externalNavigationCommand = externalNavigationCommand,
+                onExternalNavigationHandled = onExternalNavigationHandled,
+                skipInitialExternalNavigationHandling = skipInitialExternalNavigationHandling,
+                onSkipInitialExternalNavigationHandled = {
+                    skipInitialExternalNavigationHandling = false
+                },
+                recentlyDeletedNoteIds = recentlyDeletedNoteIds,
+                onRecentlyDeletedNoteIdsChange = { recentlyDeletedNoteIds = it },
+                onOpenDrawer = openDrawer,
+                showNavigationIcon = true,
+            )
+        }
+    }
+}
 
-                    Spacer(modifier.height(12.dp))
-
-                    levelRoutes.forEach { item ->
-                        val isSelected = item == topLevelBackStack.topLevelKey
-                        val title = stringResource(item.titleRes)
-                        NavigationDrawerItem(
-                            label = { Text(title) },
-                            selected = isSelected,
-                            onClick = {
-                                scope.launch { drawerState.close() }
-                                topLevelBackStack.addTopLevel(item)
-                            },
-                            icon = {
-                                val iconRes = when (item) {
-                                    NotepadRoute -> painterResource(id = DesignR.drawable.ic_new_note)
-                                    NotesRoute -> painterResource(id = DesignR.drawable.ic_all_notes)
-                                    CollectionsRoute -> painterResource(id = DesignR.drawable.ic_collection)
-                                    SettingsRoute -> painterResource(id = DesignR.drawable.ic_settings)
-                                    ScanRoute -> painterResource(id = DesignR.drawable.ic_document_scann)
-                                    else -> null
-                                }
-                                Icon(painter = iconRes!!, contentDescription = title)
-                            },
-                            colors = NavigationDrawerItemDefaults.colors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
-                                selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            ),
-                            shape = RoundedCornerShape(18.dp),
-                            modifier = Modifier.padding(paddingValues = NavigationDrawerItemDefaults.ItemPadding)
-                        )
-                    }
-                }
-            }
-        },
-        modifier = modifier
+@Composable
+private fun AppNavigationDrawer(
+    levelRoutes: List<TopLevelRoute>,
+    selectedRoute: TopLevelRoute,
+    onRouteClick: (TopLevelRoute) -> Unit,
+) {
+    ModalDrawerSheet(
+        drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
     ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(Modifier.height(12.dp))
+            Image(
+                painter = painterResource(id = DesignR.drawable.capystick_logo),
+                contentDescription = stringResource(R.string.capystick_logo_content_description),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp),
+                alignment = Alignment.CenterStart,
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            levelRoutes.forEach { item ->
+                val title = stringResource(item.titleRes)
+                NavigationDrawerItem(
+                    label = { Text(title) },
+                    selected = item == selectedRoute,
+                    onClick = { onRouteClick(item) },
+                    icon = { TopLevelRouteIcon(item = item, contentDescription = title) },
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                        selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    shape = RoundedCornerShape(18.dp),
+                    modifier = Modifier.padding(paddingValues = NavigationDrawerItemDefaults.ItemPadding)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppNavigationRail(
+    levelRoutes: List<TopLevelRoute>,
+    selectedRoute: TopLevelRoute,
+    onRouteClick: (TopLevelRoute) -> Unit,
+) {
+    NavigationRail(
+        containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            levelRoutes.forEach { item ->
+                val title = stringResource(item.titleRes)
+                NavigationRailItem(
+                    selected = item == selectedRoute,
+                    onClick = { onRouteClick(item) },
+                    icon = { TopLevelRouteIcon(item = item, contentDescription = title) },
+                    colors = NavigationRailItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
+                    ),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopLevelRouteIcon(
+    item: TopLevelRoute,
+    contentDescription: String,
+) {
+    val iconRes = when (item) {
+        NotepadRoute -> DesignR.drawable.ic_new_note
+        NotesRoute -> DesignR.drawable.ic_all_notes
+        CollectionsRoute -> DesignR.drawable.ic_collection
+        SettingsRoute -> DesignR.drawable.ic_settings
+        ScanRoute -> DesignR.drawable.ic_document_scann
+        else -> DesignR.drawable.ic_new_note
+    }
+    Icon(
+        painter = painterResource(id = iconRes),
+        contentDescription = contentDescription,
+    )
+}
+
+@Composable
+private fun AppNavigationScaffold(
+    modifier: Modifier,
+    topLevelBackStack: TopLevelBackStack<TopLevelRoute>,
+    externalNavigationCommand: ExternalNavigationCommand?,
+    onExternalNavigationHandled: () -> Unit,
+    skipInitialExternalNavigationHandling: Boolean,
+    onSkipInitialExternalNavigationHandled: () -> Unit,
+    recentlyDeletedNoteIds: Set<Int>,
+    onRecentlyDeletedNoteIdsChange: (Set<Int>) -> Unit,
+    onOpenDrawer: () -> Unit,
+    showNavigationIcon: Boolean,
+) {
         Scaffold(
+            modifier = modifier.fillMaxSize(),
             topBar = {
                 val currentRoute = topLevelBackStack.backStack.lastOrNull()
                 if (currentRoute is TopLevelRoute && currentRoute != NotepadRoute && currentRoute !is ChecklistRoute && currentRoute != NotesRoute && currentRoute != CollectionsRoute && currentRoute != ScanRoute) {
                     CapyTopAppBar(
                         title = stringResource(currentRoute.titleRes),
-                        onMenuClick = {
-                            scope.launch { drawerState.open() }
-                        }
+                        onMenuClick = onOpenDrawer,
+                        showNavigationIcon = showNavigationIcon,
                     )
                 }
             }
@@ -151,7 +274,7 @@ fun AppNavigation(
             androidx.compose.runtime.LaunchedEffect(externalNavigationCommand) {
                 val command = externalNavigationCommand ?: return@LaunchedEffect
                 if (skipInitialExternalNavigationHandling) {
-                    skipInitialExternalNavigationHandling = false
+                    onSkipInitialExternalNavigationHandled()
                     onExternalNavigationHandled()
                     return@LaunchedEffect
                 }
@@ -161,7 +284,7 @@ fun AppNavigation(
             }
 
             NavDisplay(
-                modifier = modifier,
+                modifier = Modifier.fillMaxSize(),
                 backStack = topLevelBackStack.backStack,
                 onBack = { topLevelBackStack.removeLast() },
                 transitionSpec = {
@@ -186,9 +309,8 @@ fun AppNavigation(
                     entry<NotepadRoute> {
                         NotepadScreen(
                             innerPadding = innerPadding,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteSaved = {
                                 topLevelBackStack.addTopLevel(NotesRoute)
                             }
@@ -198,9 +320,7 @@ fun AppNavigation(
                         ChecklistScreen(
                             innerPadding = innerPadding,
                             initialTitle = args.initialTitle,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
                             onChecklistSaved = {
                                 topLevelBackStack.addTopLevel(NotesRoute)
                             },
@@ -209,9 +329,8 @@ fun AppNavigation(
                     entry<CollectionsRoute> {
                         CollectionsScreen(
                             innerPadding = innerPadding,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onCollectionClick = { id, name ->
                                 if (id == FAVORITES_COLLECTION_ID) {
                                     topLevelBackStack.addRoute(FavoriteNotesRoute)
@@ -226,11 +345,10 @@ fun AppNavigation(
                             innerPadding = innerPadding,
                             recentlyDeletedNoteIds = recentlyDeletedNoteIds,
                             onRecentlyDeletedHandled = {
-                                recentlyDeletedNoteIds = emptySet()
+                                onRecentlyDeletedNoteIdsChange(emptySet())
                             },
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
@@ -246,9 +364,8 @@ fun AppNavigation(
                     entry<ScanRoute> {
                         ScanScreen(
                             innerPadding = innerPadding,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteSaved = {
                                 topLevelBackStack.addTopLevel(NotesRoute)
                             }
@@ -259,9 +376,8 @@ fun AppNavigation(
                             innerPadding = innerPadding,
                             collectionId = args.collectionId,
                             collectionName = args.collectionName,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
@@ -282,9 +398,8 @@ fun AppNavigation(
                         NotesScreen(
                             innerPadding = innerPadding,
                             favoriteOnly = true,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteClick = { noteId ->
                                 topLevelBackStack.addRoute(NotePreviewRoute(noteId, isUnlocked = true))
                             },
@@ -301,9 +416,8 @@ fun AppNavigation(
                             noteId = null,
                             collectionId = args.collectionId,
                             innerPadding = innerPadding,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteSaved = {
                                 topLevelBackStack.removeLast()
                             }
@@ -315,9 +429,7 @@ fun AppNavigation(
                             collectionId = args.collectionId,
                             innerPadding = innerPadding,
                             initialTitle = args.initialTitle,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
                             onChecklistSaved = {
                                 topLevelBackStack.removeLast()
                             },
@@ -373,7 +485,7 @@ fun AppNavigation(
                             onBack = { topLevelBackStack.removeLast() },
                             onDeleteComplete = { topLevelBackStack.addTopLevel(NotesRoute) },
                             onNoteMovedToTrash = { deletedNoteId ->
-                                recentlyDeletedNoteIds = setOf(deletedNoteId)
+                                onRecentlyDeletedNoteIdsChange(setOf(deletedNoteId))
                             },
                             onEditNote = { noteId, isUnlocked ->
                                 topLevelBackStack.addRoute(EditNoteRoute(noteId, isUnlocked))
@@ -388,9 +500,8 @@ fun AppNavigation(
                             noteId = args.noteId,
                             innerPadding = innerPadding,
                             isUnlockedInitially = args.isUnlocked,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
+                            showNavigationIcon = showNavigationIcon,
                             onNoteSaved = {
                                 topLevelBackStack.removeLast()
                             }
@@ -401,9 +512,7 @@ fun AppNavigation(
                             noteId = args.noteId,
                             innerPadding = innerPadding,
                             isUnlockedInitially = args.isUnlocked,
-                            onMenuClick = {
-                                scope.launch { drawerState.open() }
-                            },
+                            onMenuClick = onOpenDrawer,
                             onChecklistSaved = {
                                 topLevelBackStack.removeLast()
                             },
@@ -412,7 +521,6 @@ fun AppNavigation(
                 }
             )
         }
-    }
 }
 
 private fun TopLevelBackStack<TopLevelRoute>.applyExternalNavigationCommand(
@@ -543,5 +651,139 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
             }
         }
         updateBackStack()
+    }
+
+    private fun toSaveableState(): List<String> {
+        return buildList {
+            add(routeToToken(topLevelKey))
+            topLevelStacks.values.forEach { stack ->
+                add(stack.joinToString(StackRouteSeparator) { routeToToken(it) })
+            }
+        }
+    }
+
+    companion object {
+        val Saver = listSaver<TopLevelBackStack<TopLevelRoute>, String>(
+            save = { it.toSaveableState() },
+            restore = { savedState -> restoreFromSaveableState(savedState) },
+        )
+
+        private const val StackRouteSeparator = "\u001F"
+
+        private fun restoreFromSaveableState(savedState: List<String>): TopLevelBackStack<TopLevelRoute> {
+            val restoredStacks = savedState
+                .drop(1)
+                .mapNotNull { stackToken ->
+                    stackToken
+                        .split(StackRouteSeparator)
+                        .mapNotNull(::routeFromToken)
+                        .takeIf { it.firstOrNull() is TopLevelRoute }
+                }
+
+            val firstKey = restoredStacks
+                .firstOrNull()
+                ?.firstOrNull() as? TopLevelRoute ?: NotepadRoute
+            val restoredBackStack = TopLevelBackStack(firstKey)
+
+            restoredBackStack.topLevelStacks.clear()
+            restoredStacks.forEach { stack ->
+                val key = stack.first() as? TopLevelRoute ?: return@forEach
+                restoredBackStack.topLevelStacks[key] = mutableStateListOf<Any>().apply {
+                    addAll(stack)
+                }
+            }
+
+            if (restoredBackStack.topLevelStacks.isEmpty()) {
+                restoredBackStack.topLevelStacks[NotepadRoute] = mutableStateListOf(NotepadRoute)
+            }
+
+            val restoredTopLevelKey = routeFromToken(savedState.firstOrNull().orEmpty()) as? TopLevelRoute
+            restoredBackStack.topLevelKey = if (
+                restoredTopLevelKey != null &&
+                restoredBackStack.topLevelStacks.containsKey(restoredTopLevelKey)
+            ) {
+                restoredTopLevelKey
+            } else {
+                restoredBackStack.topLevelStacks.keys.last()
+            }
+            restoredBackStack.updateBackStack()
+            return restoredBackStack
+        }
+
+        private fun routeToToken(route: Any): String {
+            return when (route) {
+                NotepadRoute -> "notepad"
+                NotesRoute -> "notes"
+                ScanRoute -> "scan"
+                CollectionsRoute -> "collections"
+                SettingsRoute -> "settings"
+                is ChecklistRoute -> "checklist|${route.initialTitle.encodeRoutePart()}"
+                is NotePreviewRoute -> "notePreview|${route.noteId}|${route.isUnlocked}"
+                is EditNoteRoute -> "editNote|${route.noteId}|${route.isUnlocked}"
+                is EditChecklistRoute -> "editChecklist|${route.noteId}|${route.isUnlocked}"
+                is CollectionNotesRoute ->
+                    "collectionNotes|${route.collectionId}|${route.collectionName.encodeRoutePart()}"
+                FavoriteNotesRoute -> "favoriteNotes"
+                is CreateCollectionNoteRoute -> "createCollectionNote|${route.collectionId}"
+                is CreateCollectionChecklistRoute ->
+                    "createCollectionChecklist|${route.collectionId}|${route.initialTitle.encodeRoutePart()}"
+                TrashRoute -> "trash"
+                BackupRoute -> "backup"
+                WidgetManagementRoute -> "widgetManagement"
+                is WidgetConfigurationRoute -> "widgetConfiguration|${route.appWidgetId}"
+                else -> "notepad"
+            }
+        }
+
+        private fun routeFromToken(token: String): Any? {
+            val parts = token.split("|")
+            return when (parts.firstOrNull()) {
+                "notepad" -> NotepadRoute
+                "notes" -> NotesRoute
+                "scan" -> ScanRoute
+                "collections" -> CollectionsRoute
+                "settings" -> SettingsRoute
+                "checklist" -> ChecklistRoute(initialTitle = parts.getOrNull(1).decodeRoutePart())
+                "notePreview" -> NotePreviewRoute(
+                    noteId = parts.getIntOrNull(1) ?: return null,
+                    isUnlocked = parts.getBooleanOrFalse(2),
+                )
+                "editNote" -> EditNoteRoute(
+                    noteId = parts.getIntOrNull(1) ?: return null,
+                    isUnlocked = parts.getBooleanOrFalse(2),
+                )
+                "editChecklist" -> EditChecklistRoute(
+                    noteId = parts.getIntOrNull(1) ?: return null,
+                    isUnlocked = parts.getBooleanOrFalse(2),
+                )
+                "collectionNotes" -> CollectionNotesRoute(
+                    collectionId = parts.getIntOrNull(1) ?: return null,
+                    collectionName = parts.getOrNull(2).decodeRoutePart(),
+                )
+                "favoriteNotes" -> FavoriteNotesRoute
+                "createCollectionNote" -> CreateCollectionNoteRoute(
+                    collectionId = parts.getIntOrNull(1) ?: return null,
+                )
+                "createCollectionChecklist" -> CreateCollectionChecklistRoute(
+                    collectionId = parts.getIntOrNull(1) ?: return null,
+                    initialTitle = parts.getOrNull(2).decodeRoutePart(),
+                )
+                "trash" -> TrashRoute
+                "backup" -> BackupRoute
+                "widgetManagement" -> WidgetManagementRoute
+                "widgetConfiguration" -> WidgetConfigurationRoute(
+                    appWidgetId = parts.getIntOrNull(1) ?: return null,
+                )
+                else -> null
+            }
+        }
+
+        private fun String.encodeRoutePart(): String = Uri.encode(this)
+
+        private fun String?.decodeRoutePart(): String = this?.let(Uri::decode).orEmpty()
+
+        private fun List<String>.getIntOrNull(index: Int): Int? = getOrNull(index)?.toIntOrNull()
+
+        private fun List<String>.getBooleanOrFalse(index: Int): Boolean = getOrNull(index)?.toBoolean() ?: false
     }
 }

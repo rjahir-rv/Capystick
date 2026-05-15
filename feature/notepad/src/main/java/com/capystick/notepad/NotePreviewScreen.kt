@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -65,6 +68,7 @@ fun NotePreviewScreen(
     val context = LocalContext.current
     val note = uiState.note
     val authenticator = rememberBiometricAuthenticator()
+    val layoutDirection = LocalLayoutDirection.current
     var isUnlocked by rememberSaveable(noteId) { mutableStateOf(isUnlockedInitially) }
     val collections by viewModel.collections.collectAsStateWithLifecycle()
     var showCollectionSheet by rememberSaveable { mutableStateOf(false) }
@@ -177,7 +181,12 @@ fun NotePreviewScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(scaffoldPadding),
+                    .padding(scaffoldPadding)
+                    .padding(
+                        start = innerPadding.calculateStartPadding(layoutDirection),
+                        end = innerPadding.calculateEndPadding(layoutDirection),
+                        bottom = innerPadding.calculateBottomPadding(),
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(stringResource(R.string.loading_note))
@@ -200,7 +209,12 @@ fun NotePreviewScreen(
                         },
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(scaffoldPadding),
+                            .padding(scaffoldPadding)
+                            .padding(
+                                start = innerPadding.calculateStartPadding(layoutDirection),
+                                end = innerPadding.calculateEndPadding(layoutDirection),
+                                bottom = innerPadding.calculateBottomPadding(),
+                            ),
                     )
                 }
 
@@ -220,7 +234,12 @@ fun NotePreviewScreen(
                         },
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(scaffoldPadding),
+                            .padding(scaffoldPadding)
+                            .padding(
+                                start = innerPadding.calculateStartPadding(layoutDirection),
+                                end = innerPadding.calculateEndPadding(layoutDirection),
+                                bottom = innerPadding.calculateBottomPadding(),
+                            ),
                     )
                 }
 
@@ -229,6 +248,11 @@ fun NotePreviewScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(scaffoldPadding)
+                            .padding(
+                                start = innerPadding.calculateStartPadding(layoutDirection),
+                                end = innerPadding.calculateEndPadding(layoutDirection),
+                                bottom = innerPadding.calculateBottomPadding(),
+                            )
                             .padding(horizontal = 16.dp)
                             .verticalScroll(rememberScrollState()),
                     ) {

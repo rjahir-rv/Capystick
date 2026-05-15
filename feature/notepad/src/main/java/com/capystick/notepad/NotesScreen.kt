@@ -2,6 +2,7 @@
 
 package com.capystick.notepad
 
+import android.content.res.Configuration
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -72,6 +74,7 @@ fun NotesScreen(
     recentlyDeletedNoteIds: Set<Int> = emptySet(),
     onRecentlyDeletedHandled: () -> Unit = {},
     onMenuClick: () -> Unit = {},
+    showNavigationIcon: Boolean = true,
     onNoteClick: (Int) -> Unit = {},
     onAddTextNoteClick: () -> Unit = {},
     onAddChecklistClick: (String) -> Unit = {},
@@ -85,6 +88,7 @@ fun NotesScreen(
     val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
     val selectedNoteIds by viewModel.selectedNoteIds.collectAsStateWithLifecycle()
     val collections by viewModel.collections.collectAsStateWithLifecycle()
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val context = LocalContext.current
     val selectedNotes = rememberSelectedNotes(notes, selectedNoteIds)
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -177,6 +181,7 @@ fun NotesScreen(
                     onSearchActiveChange = viewModel::onSearchActiveChange,
                     onSortOrderChange = viewModel::onSortOrderChange,
                     onMenuClick = onMenuClick,
+                    showNavigationIcon = showNavigationIcon,
                 )
             }
         },
@@ -185,7 +190,7 @@ fun NotesScreen(
             start = 16.dp,
             top = 16.dp,
             end = 16.dp,
-            bottom = 16.dp + 56.dp + 24.dp + innerPadding.calculateBottomPadding(),
+            bottom = 16.dp + 56.dp + 24.dp,
         )
 
         Box(
@@ -207,6 +212,7 @@ fun NotesScreen(
                 onNoteLongClick = viewModel::toggleSelection,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = noteListContentPadding,
+                isLandscape = isLandscape,
             )
 
             if (!isSelectionMode) {

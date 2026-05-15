@@ -1,7 +1,9 @@
 package com.capystick.collections
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +12,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +35,7 @@ fun CollectionsScreen(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     onMenuClick: () -> Unit = {},
+    showNavigationIcon: Boolean = true,
     onCollectionClick: (Int, String) -> Unit = { _, _ -> },
     viewModel: CollectionsViewModel = hiltViewModel()
 ) {
@@ -43,6 +48,13 @@ fun CollectionsScreen(
     val showFavoritesCollection = searchQuery.isBlank() ||
         favoritesCollectionName.contains(searchQuery, ignoreCase = true)
     val showStarterEmptyState = collections.isEmpty() && searchQuery.isBlank()
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val layoutDirection = LocalLayoutDirection.current
+    val gridColumns = if (isLandscape) {
+        GridCells.Adaptive(minSize = 220.dp)
+    } else {
+        GridCells.Fixed(2)
+    }
 
     var collectionToRename by remember { mutableStateOf<Collection?>(null) }
     var collectionToDelete by remember { mutableStateOf<Collection?>(null) }
@@ -58,7 +70,8 @@ fun CollectionsScreen(
                 onSearchQueryChange = viewModel::onSearchQueryChange,
                 onSearchActiveChange = viewModel::onSearchActiveChange,
                 onSortOrderChange = viewModel::onSortOrderChange,
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
+                showNavigationIcon = showNavigationIcon
             )
         }
     ) { scaffoldPadding ->
@@ -66,6 +79,11 @@ fun CollectionsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(scaffoldPadding)
+                .padding(
+                    start = innerPadding.calculateStartPadding(layoutDirection),
+                    end = innerPadding.calculateEndPadding(layoutDirection),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
         ) {
             if (collections.isEmpty() && !showFavoritesCollection) {
                 Box(
@@ -86,7 +104,7 @@ fun CollectionsScreen(
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = gridColumns,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -97,6 +115,13 @@ fun CollectionsScreen(
                             FavoriteCollectionItem(
                                 noteCount = favoriteNoteCount,
                                 onClick = { onCollectionClick(FAVORITES_COLLECTION_ID, favoritesCollectionName) }
+                            )
+                        }
+                    }
+                    if (showStarterEmptyState && isLandscape) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            CollectionsStarterEmptyState(
+                                modifier = Modifier.padding(horizontal = 40.dp),
                             )
                         }
                     }
@@ -111,7 +136,7 @@ fun CollectionsScreen(
                 }
             }
 
-            if (showStarterEmptyState) {
+            if (showStarterEmptyState && !isLandscape) {
                 CollectionsStarterEmptyState(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -200,7 +225,8 @@ fun CollectionsTopAppBar(
     onSearchQueryChange: (String) -> Unit,
     onSearchActiveChange: (Boolean) -> Unit,
     onSortOrderChange: (CollectionSortOrder) -> Unit,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
+    showNavigationIcon: Boolean = true
 ) {
     var expandedFilter by remember { mutableStateOf(false) }
 
@@ -237,6 +263,7 @@ fun CollectionsTopAppBar(
             CapyTopAppBar(
                 title = stringResource(R.string.collections_title),
                 onMenuClick = onMenuClick,
+                showNavigationIcon = showNavigationIcon,
                 actions = {
                     IconButton(onClick = { onSearchActiveChange(true) }) {
                         Icon(

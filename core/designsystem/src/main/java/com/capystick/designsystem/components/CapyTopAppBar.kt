@@ -22,6 +22,7 @@ fun CapyTopAppBar(
     title: String,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showNavigationIcon: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
@@ -34,12 +35,14 @@ fun CapyTopAppBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_menu),
-                    contentDescription = stringResource(R.string.menu_content_description),
-                    modifier = Modifier.size(28.dp)
-                )
+            if (showNavigationIcon) {
+                IconButton(onClick = onMenuClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_menu),
+                        contentDescription = stringResource(R.string.menu_content_description),
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
         },
         actions = actions,

@@ -56,6 +56,7 @@ fun NotepadScreen(
     innerPadding: PaddingValues,
     isUnlockedInitially: Boolean = false,
     onMenuClick: () -> Unit,
+    showNavigationIcon: Boolean = true,
     onNoteSaved: () -> Unit = {},
     viewModel: NotepadViewModel = hiltViewModel(),
 ) {
@@ -110,6 +111,7 @@ fun NotepadScreen(
                 onTitleChange = { editorState.title = it },
                 onNavigateBack = onNoteSaved,
                 onOpenMenu = onMenuClick,
+                showNavigationIcon = showNavigationIcon,
                 onCopyClick = {
                     val copyText = editorState.richTextState.toText()
                     val clipData = ClipData.newPlainText(copyNoteClipLabel, copyText)

@@ -37,6 +37,7 @@ internal fun NotepadTopBar(
     onTitleChange: (String) -> Unit,
     onNavigateBack: () -> Unit,
     onOpenMenu: () -> Unit,
+    showNavigationIcon: Boolean = true,
     onCopyClick: () -> Unit,
     onSaveClick: () -> Unit,
 ) {
@@ -54,7 +55,7 @@ internal fun NotepadTopBar(
             )
         },
         navigationIcon = {
-            if (noteId == null) {
+            if (noteId == null && showNavigationIcon) {
                 IconButton(onClick = onOpenMenu) {
                     Icon(
                         painter = painterResource(id = DesignR.drawable.ic_menu),

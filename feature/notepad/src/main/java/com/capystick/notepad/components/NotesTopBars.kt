@@ -41,6 +41,7 @@ internal fun NotesTopBar(
     onSearchActiveChange: (Boolean) -> Unit,
     onSortOrderChange: (NoteSortOrder) -> Unit,
     onMenuClick: () -> Unit,
+    showNavigationIcon: Boolean = true,
 ) {
     var expandedFilter by remember { mutableStateOf(false) }
 
@@ -77,6 +78,7 @@ internal fun NotesTopBar(
             CapyTopAppBar(
                 title = title,
                 onMenuClick = onMenuClick,
+                showNavigationIcon = showNavigationIcon,
                 actions = {
                     IconButton(onClick = { onSearchActiveChange(true) }) {
                         Icon(
