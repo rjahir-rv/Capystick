@@ -29,6 +29,7 @@ internal fun NotesContent(
     onNoteClick: (Int) -> Unit,
     onNoteLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
 ) {
     if (notes.isEmpty()) {
         EmptyNotesState(
@@ -45,6 +46,7 @@ internal fun NotesContent(
         onNoteClick = onNoteClick,
         onNoteLongClick = onNoteLongClick,
         modifier = modifier,
+        contentPadding = contentPadding,
     )
 }
 
@@ -75,6 +77,7 @@ internal fun NotesList(
     onNoteClick: (Int) -> Unit,
     onNoteLongClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(16.dp),
 ) {
     val authenticator = rememberBiometricAuthenticator()
     val secureNoteTitle = stringResource(R.string.unlock_note_title)
@@ -83,7 +86,7 @@ internal fun NotesList(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(notes) { note ->

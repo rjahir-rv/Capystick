@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.capystick.designsystem.components.CapyTopAppBar
 import com.capystick.collections.viewmodel.CollectionSortOrder
 import com.capystick.collections.viewmodel.CollectionsViewModel
 import com.capystick.model.Collection
@@ -41,6 +42,7 @@ fun CollectionsScreen(
     val favoritesCollectionName = stringResource(R.string.favorites_collection_name)
     val showFavoritesCollection = searchQuery.isBlank() ||
         favoritesCollectionName.contains(searchQuery, ignoreCase = true)
+    val showStarterEmptyState = collections.isEmpty() && searchQuery.isBlank()
 
     var collectionToRename by remember { mutableStateOf<Collection?>(null) }
     var collectionToDelete by remember { mutableStateOf<Collection?>(null) }
@@ -107,6 +109,14 @@ fun CollectionsScreen(
                         )
                     }
                 }
+            }
+
+            if (showStarterEmptyState) {
+                CollectionsStarterEmptyState(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(horizontal = 40.dp),
+                )
             }
 
             FloatingActionButton(
@@ -224,22 +234,9 @@ fun CollectionsTopAppBar(
                 }
             )
         } else {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.collections_title),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(
-                            painter = painterResource(id = DesignR.drawable.ic_menu),
-                            contentDescription = stringResource(R.string.menu_content_description),
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                },
+            CapyTopAppBar(
+                title = stringResource(R.string.collections_title),
+                onMenuClick = onMenuClick,
                 actions = {
                     IconButton(onClick = { onSearchActiveChange(true) }) {
                         Icon(
@@ -293,6 +290,35 @@ fun CollectionsTopAppBar(
                 }
             )
         }
+    }
+}
+
+
+@Composable
+private fun CollectionsStarterEmptyState(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.collections_starter_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = stringResource(R.string.collections_starter_message),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

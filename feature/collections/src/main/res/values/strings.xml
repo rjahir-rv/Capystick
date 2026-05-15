@@ -2,6 +2,8 @@
     <string name="favorites_collection_name">Favoritas</string>
     <string name="collections_empty_search">No se encontró una colección relacionada con tu búsqueda</string>
     <string name="collections_empty">No hay colecciones aún</string>
+    <string name="collections_starter_title">Organiza tus notas</string>
+    <string name="collections_starter_message">Usa el botón + para crear tu primera colección.</string>
     <string name="new_collection_content_description">Nueva colección</string>
     <string name="new_collection_title">Nueva colección</string>
     <string name="rename_collection_title">Renombrar colección</string>

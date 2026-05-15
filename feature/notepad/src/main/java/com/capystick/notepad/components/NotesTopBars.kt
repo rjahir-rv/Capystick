@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.capystick.designsystem.components.CapyTopAppBar
 import com.capystick.notepad.R
 import com.capystick.notepad.viewmodel.NoteSortOrder
 import com.capystick.core.designsystem.R as DesignR
@@ -74,22 +74,9 @@ internal fun NotesTopBar(
                 },
             )
         } else {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(
-                            painter = painterResource(id = DesignR.drawable.ic_menu),
-                            contentDescription = stringResource(R.string.menu_content_description),
-                            modifier = Modifier.size(28.dp),
-                        )
-                    }
-                },
+            CapyTopAppBar(
+                title = title,
+                onMenuClick = onMenuClick,
                 actions = {
                     IconButton(onClick = { onSearchActiveChange(true) }) {
                         Icon(

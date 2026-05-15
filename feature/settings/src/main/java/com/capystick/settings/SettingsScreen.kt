@@ -91,14 +91,15 @@ fun SettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(scaffoldPadding),
+                .padding(scaffoldPadding)
+                .padding(innerPadding),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = scaffoldPadding.calculateTopPadding() + 14.dp)
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 8.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 SettingsItem(
                     icon = painterResource(id = DesignR.drawable.ic_dark_mode),

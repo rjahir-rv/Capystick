@@ -44,14 +44,18 @@ fun CapyNoteCard(
     trailingActions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     Card(
-        shape = RoundedCornerShape(size = 16.dp),
+        shape = RoundedCornerShape(size = 12.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 3.dp else 1.dp),
         border = BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.72f)
+            },
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -62,7 +66,7 @@ fun CapyNoteCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(20.dp)
                 .fillMaxWidth(),
         ) {
             Row(
@@ -72,11 +76,13 @@ fun CapyNoteCard(
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 if (isSecure) {
                     Icon(
@@ -91,13 +97,13 @@ fun CapyNoteCard(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         border = BorderStroke(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.72f)
                         ),
                     ) {
                         Text(
                             text = dateString,
                             style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
@@ -105,16 +111,16 @@ fun CapyNoteCard(
             }
 
             if (isSecure || plainText.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = if (isSecure) stringResource(R.string.secure_note_locked) else plainText,
-                    style = MaterialTheme.typography.bodyLarge.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontStyle = if (isSecure) androidx.compose.ui.text.font.FontStyle.Italic else androidx.compose.ui.text.font.FontStyle.Normal
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    lineHeight = 24.sp,
+                    lineHeight = 22.sp,
                 )
             }
 

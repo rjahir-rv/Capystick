@@ -1,5 +1,6 @@
 package com.capystick.designsystem.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.capystick.core.designsystem.R
 
@@ -19,13 +21,16 @@ import com.capystick.core.designsystem.R
 fun CapyTopAppBar(
     title: String,
     onMenuClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         },
         navigationIcon = {
@@ -37,6 +42,7 @@ fun CapyTopAppBar(
                 )
             }
         },
-        modifier = modifier
+        actions = actions,
+        modifier = modifier,
     )
 }

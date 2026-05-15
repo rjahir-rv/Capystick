@@ -28,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.capystick.core.designsystem.R as DesignR
 import com.capystick.model.ChecklistContentSerializer
 import com.capystick.model.ChecklistItem
@@ -56,7 +58,9 @@ internal fun NotePreviewTopBar(
         title = {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         },
         navigationIcon = {
@@ -178,6 +182,7 @@ internal fun NotePreviewContent(
                     .padding(24.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 26.sp,
             )
         }
 

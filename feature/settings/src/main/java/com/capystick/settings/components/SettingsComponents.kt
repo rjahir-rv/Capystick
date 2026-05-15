@@ -51,9 +51,9 @@ internal fun SettingsItem(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surfaceBright,
-        shadowElevation = 2.dp,
+        shadowElevation = 1.dp,
         onClick = onClick,
     ) {
         Row(
@@ -66,7 +66,7 @@ internal fun SettingsItem(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.035f),
                         shape = CircleShape,
                     ),
                 contentAlignment = Alignment.Center,

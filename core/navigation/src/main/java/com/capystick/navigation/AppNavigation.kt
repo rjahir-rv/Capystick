@@ -3,6 +3,7 @@ package com.capystick.navigation
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
@@ -78,7 +79,9 @@ fun AppNavigation(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerShape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -119,10 +122,11 @@ fun AppNavigation(
                                 Icon(painter = iconRes!!, contentDescription = title)
                             },
                             colors = NavigationDrawerItemDefaults.colors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
                                 selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer
                             ),
+                            shape = RoundedCornerShape(18.dp),
                             modifier = Modifier.padding(paddingValues = NavigationDrawerItemDefaults.ItemPadding)
                         )
                     }

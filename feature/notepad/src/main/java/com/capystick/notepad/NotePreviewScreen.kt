@@ -2,6 +2,7 @@ package com.capystick.notepad
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -240,9 +241,14 @@ fun NotePreviewScreen(
                                     onEditNote(noteId, isUnlocked)
                                 }
                             },
-                            shape = RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.72f),
                             ),
                             modifier = Modifier.fillMaxWidth(),
                         ) {

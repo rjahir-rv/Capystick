@@ -181,6 +181,13 @@ fun NotesScreen(
             }
         },
     ) { scaffoldPadding ->
+        val noteListContentPadding = PaddingValues(
+            start = 16.dp,
+            top = 16.dp,
+            end = 16.dp,
+            bottom = 16.dp + 56.dp + 24.dp + innerPadding.calculateBottomPadding(),
+        )
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -199,6 +206,7 @@ fun NotesScreen(
                 onNoteClick = onNoteClick,
                 onNoteLongClick = viewModel::toggleSelection,
                 modifier = Modifier.fillMaxSize(),
+                contentPadding = noteListContentPadding,
             )
 
             if (!isSelectionMode) {
@@ -213,7 +221,7 @@ fun NotesScreen(
                         modifier = Modifier
                             .width(224.dp)
                             .padding(vertical = 8.dp),
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(18.dp)
                     ) {
                         CreateNoteMenuItem(
                             text = stringResource(R.string.note_type_text),
