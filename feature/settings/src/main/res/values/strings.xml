@@ -24,6 +24,8 @@
     <string name="about_feature_customization_description">Adapta la interfaz con diferentes temas y paletas de colores, y gestiona tus copias de seguridad o exportaciones a texto plano.</string>
     <string name="about_quick_actions_title">Enlaces y Contacto</string>
     <string name="about_github_action">Ver en GitHub</string>
+    <string name="about_contact_developer_action">Contacta con el desarrollador</string>
+    <string name="about_report_issue_action">Reportar un problema</string>
     <string name="about_version_title">Versión de la app</string>
     <string name="about_version_value">Versión %1$s</string>
     <string name="settings_dynamic_palette_subtitle">%1$s - Se aplica en claro/oscuro/sistema</string>

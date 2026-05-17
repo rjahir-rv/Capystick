@@ -11,6 +11,8 @@ dependencies {
     compileOnly(libs.findLibrary("compose.compiler.gradlePlugin").get())
     compileOnly(libs.findLibrary("hilt.gradlePlugin").get())
     compileOnly(libs.findLibrary("ksp.gradlePlugin").get())
+    compileOnly(libs.findLibrary("google.services.gradlePlugin").get())
+    compileOnly(libs.findLibrary("firebase.crashlytics.gradlePlugin").get())
 }
 
 gradlePlugin {
@@ -22,6 +24,10 @@ gradlePlugin {
         register("androidHilt") {
             id = "capystick.android.hilt"
             implementationClass = "com.capystick.buildlogic.AndroidHiltConventionPlugin"
+        }
+        register("androidFirebase") {
+            id = "capystick.android.firebase"
+            implementationClass = "com.capystick.buildlogic.AndroidFirebaseConventionPlugin"
         }
     }
 }

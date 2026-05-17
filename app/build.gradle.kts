@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ktlint)
     id("capystick.android.hilt")
+    id("capystick.android.firebase")
 }
 
 android {

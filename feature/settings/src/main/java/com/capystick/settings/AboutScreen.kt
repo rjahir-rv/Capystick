@@ -1,6 +1,8 @@
 package com.capystick.settings
 
 import android.content.Context
+import android.net.Uri
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +50,9 @@ import androidx.compose.ui.unit.dp
 import com.capystick.core.designsystem.R as DesignR
 
 private const val GitHubUrl = "https://github.com/rjahir-rv/Capystick"
+private const val ContactEmail = "support.imaginarydeer@proton.me"
+private const val ContactEmailUri = "mailto:$ContactEmail"
+private const val ReportIssueSubject = "Reporte de problema - Capystick"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +65,7 @@ fun AboutScreen(
     val layoutDirection = LocalLayoutDirection.current
     val uriHandler = LocalUriHandler.current
     val versionName = remember(context) { context.appVersionName() }
+    val reportIssueUri = remember(versionName) { buildReportIssueUri(versionName) }
     val features = remember { aboutFeatures() }
 
     Scaffold(
@@ -128,6 +134,38 @@ fun AboutScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = stringResource(R.string.about_github_action))
+                }
+            }
+
+            item {
+                OutlinedButton(
+                    onClick = { uriHandler.openUri(ContactEmailUri) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(id = DesignR.drawable.ic_email),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = stringResource(R.string.about_contact_developer_action))
+                }
+            }
+
+            item {
+                OutlinedButton(
+                    onClick = { uriHandler.openUri(reportIssueUri) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(id = DesignR.drawable.ic_report_problem),
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = stringResource(R.string.about_report_issue_action))
                 }
             }
 
@@ -338,6 +376,31 @@ private data class AboutFeature(
     val titleRes: Int,
     val descriptionRes: Int,
 )
+
+private fun buildReportIssueUri(versionName: String): String {
+    val device = listOf(
+        Build.MANUFACTURER,
+        Build.MODEL,
+    ).joinToString(separator = " ").trim()
+    val body = """
+        Describe el problema:
+
+
+        Pasos para reproducirlo:
+        1.
+        2.
+        3.
+
+        Informacion del dispositivo:
+        - App: $versionName
+        - Dispositivo: $device
+        - Android: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
+    """.trimIndent()
+
+    return "mailto:$ContactEmail" +
+        "?subject=${Uri.encode(ReportIssueSubject)}" +
+        "&body=${Uri.encode(body)}"
+}
 
 @Suppress("DEPRECATION")
 private fun Context.appVersionName(): String =
