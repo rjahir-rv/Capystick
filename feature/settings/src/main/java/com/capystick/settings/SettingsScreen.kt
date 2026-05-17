@@ -54,6 +54,7 @@ fun SettingsScreen(
     onTrashClick: () -> Unit = {},
     onBackupClick: () -> Unit = {},
     onWidgetsClick: () -> Unit = {},
+    onAboutClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val currentTheme by viewModel.themeOption.collectAsStateWithLifecycle()
@@ -123,6 +124,7 @@ fun SettingsScreen(
                             onWidgetsClick = onWidgetsClick,
                             onTrashClick = onTrashClick,
                             onExportClick = { exportLauncher.launch(null) },
+                            onAboutClick = onAboutClick,
                         )
                     }
                 }
@@ -145,6 +147,7 @@ fun SettingsScreen(
                             onWidgetsClick = onWidgetsClick,
                             onTrashClick = onTrashClick,
                             onExportClick = { exportLauncher.launch(null) },
+                            onAboutClick = onAboutClick,
                         )
                     }
                 }
@@ -224,6 +227,7 @@ private fun SettingsItemAt(
     onWidgetsClick: () -> Unit,
     onTrashClick: () -> Unit,
     onExportClick: () -> Unit,
+    onAboutClick: () -> Unit,
 ) {
     when (index) {
         0 -> SettingsItem(
@@ -272,7 +276,7 @@ private fun SettingsItemAt(
         6 -> SettingsItem(
             icon = painterResource(id = DesignR.drawable.ic_info),
             title = stringResource(R.string.settings_about),
-            onClick = {},
+            onClick = onAboutClick,
         )
     }
 }

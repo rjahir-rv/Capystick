@@ -1,6 +1,8 @@
 <resources>
     <string name="scan_note_title" translatable="false">Escanear nota</string>
     <string name="camera_permission_required" translatable="false">Se requiere permiso de cámara</string>
+    <string name="allow_camera_permission" translatable="false">Permitir cámara</string>
+    <string name="open_app_settings" translatable="false">Abrir ajustes</string>
     <string name="retry" translatable="false">Reintentar</string>
     <string name="scan">Escanear</string>
     <string name="captured_photo_content_description">Foto capturada</string>

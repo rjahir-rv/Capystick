@@ -1,8 +1,14 @@
 package com.capystick.scan
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -58,11 +64,21 @@ fun ScanScreen(
                 PackageManager.PERMISSION_GRANTED,
         )
     }
+    var shouldOpenAppSettings by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         hasCameraPermission = isGranted
+        shouldOpenAppSettings = !isGranted &&
+            context.findActivity()?.shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) == false
+    }
+
+    val settingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        hasCameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED
     }
 
     LaunchedEffect(Unit) {
@@ -106,10 +122,48 @@ fun ScanScreen(
                     },
                 )
             } else {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(stringResource(R.string.camera_permission_required))
-                }
+                CameraPermissionDeniedContent(
+                    shouldOpenAppSettings = shouldOpenAppSettings,
+                    onRequestPermission = {
+                        if (shouldOpenAppSettings) {
+                            settingsLauncher.launch(context.appSettingsIntent())
+                        } else {
+                            permissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    },
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun CameraPermissionDeniedContent(
+    shouldOpenAppSettings: Boolean,
+    onRequestPermission: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = stringResource(R.string.camera_permission_required),
+            style = MaterialTheme.typography.bodyLarge,
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Button(onClick = onRequestPermission) {
+            Text(
+                text = stringResource(
+                    if (shouldOpenAppSettings) {
+                        R.string.open_app_settings
+                    } else {
+                        R.string.allow_camera_permission
+                    },
+                ),
+            )
         }
     }
 }
@@ -163,4 +217,16 @@ private fun ScanContent(
             }
         }
     }
+}
+
+private fun Context.appSettingsIntent(): Intent =
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null),
+    )
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

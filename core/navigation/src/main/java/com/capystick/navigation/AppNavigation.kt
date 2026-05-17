@@ -58,6 +58,7 @@ import com.capystick.collections.FAVORITES_COLLECTION_ID
 import com.capystick.notepad.NotePreviewScreen
 import com.capystick.notepad.NotepadScreen
 import com.capystick.notepad.NotesScreen
+import com.capystick.settings.AboutScreen
 import com.capystick.settings.SettingsScreen
 import com.capystick.settings.TrashScreen
 import com.capystick.widget.WidgetConfigurationScreen
@@ -290,13 +291,22 @@ private fun AppNavigationScaffold(
                 transitionSpec = {
                     slideInHorizontally(
                         animationSpec = tween(300),
+                        initialOffsetX = { it }
+                    ) togetherWith slideOutHorizontally(
+                        animationSpec = tween(300),
+                        targetOffsetX = { -it }
+                    )
+                },
+                popTransitionSpec = {
+                    slideInHorizontally(
+                        animationSpec = tween(300),
                         initialOffsetX = { -it }
                     ) togetherWith slideOutHorizontally(
                         animationSpec = tween(300),
                         targetOffsetX = { it }
                     )
                 },
-                popTransitionSpec = {
+                predictivePopTransitionSpec = {
                     slideInHorizontally(
                         animationSpec = tween(300),
                         initialOffsetX = { -it }
@@ -447,6 +457,15 @@ private fun AppNavigationScaffold(
                             onWidgetsClick = {
                                 topLevelBackStack.addRoute(WidgetManagementRoute)
                             },
+                            onAboutClick = {
+                                topLevelBackStack.addRoute(AboutRoute)
+                            },
+                        )
+                    }
+                    entry<AboutRoute> {
+                        AboutScreen(
+                            innerPadding = innerPadding,
+                            onBack = { topLevelBackStack.removeLast() },
                         )
                     }
                     entry<WidgetManagementRoute> {
@@ -729,6 +748,7 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
                     "createCollectionChecklist|${route.collectionId}|${route.initialTitle.encodeRoutePart()}"
                 TrashRoute -> "trash"
                 BackupRoute -> "backup"
+                AboutRoute -> "about"
                 WidgetManagementRoute -> "widgetManagement"
                 is WidgetConfigurationRoute -> "widgetConfiguration|${route.appWidgetId}"
                 else -> "notepad"
@@ -770,6 +790,7 @@ class TopLevelBackStack<T: TopLevelRoute>(startKey: T) {
                 )
                 "trash" -> TrashRoute
                 "backup" -> BackupRoute
+                "about" -> AboutRoute
                 "widgetManagement" -> WidgetManagementRoute
                 "widgetConfiguration" -> WidgetConfigurationRoute(
                     appWidgetId = parts.getIntOrNull(1) ?: return null,

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
@@ -164,39 +165,47 @@ fun BackupScreen(
                     bottom = innerPadding.calculateBottomPadding(),
                 ),
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                    .fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(
-                    text = stringResource(R.string.backup_description),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                item {
+                    Text(
+                        text = stringResource(R.string.backup_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                item {
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
 
-                BackupCard(
-                    iconRes = DesignR.drawable.ic_export_notes,
-                    title = stringResource(R.string.backup_export_title),
-                    description = stringResource(R.string.backup_export_description),
-                    actionLabel = stringResource(R.string.backup_export_action),
-                    onClick = {
-                        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                            .format(Date())
-                        exportLauncher.launch("capystick_backup_$timestamp.json")
-                    },
-                )
+                item {
+                    BackupCard(
+                        iconRes = DesignR.drawable.ic_export_notes,
+                        title = stringResource(R.string.backup_export_title),
+                        description = stringResource(R.string.backup_export_description),
+                        actionLabel = stringResource(R.string.backup_export_action),
+                        onClick = {
+                            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                                .format(Date())
+                            exportLauncher.launch("capystick_backup_$timestamp.json")
+                        },
+                    )
+                }
 
-                BackupCard(
-                    iconRes = DesignR.drawable.ic_backup,
-                    title = stringResource(R.string.backup_import_title),
-                    description = stringResource(R.string.backup_import_description),
-                    actionLabel = stringResource(R.string.backup_import_action),
-                    onClick = { importLauncher.launch(arrayOf("application/json")) },
-                )
+                item {
+                    BackupCard(
+                        iconRes = DesignR.drawable.ic_backup,
+                        title = stringResource(R.string.backup_import_title),
+                        description = stringResource(R.string.backup_import_description),
+                        actionLabel = stringResource(R.string.backup_import_action),
+                        onClick = { importLauncher.launch(arrayOf("application/json")) },
+                    )
+                }
             }
 
             AnimatedVisibility(

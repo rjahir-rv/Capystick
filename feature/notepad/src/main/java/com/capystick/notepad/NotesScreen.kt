@@ -90,6 +90,7 @@ fun NotesScreen(
     val collections by viewModel.collections.collectAsStateWithLifecycle()
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val context = LocalContext.current
+    val appContext = context.applicationContext
     val selectedNotes = rememberSelectedNotes(notes, selectedNoteIds)
     var showBottomSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -106,7 +107,9 @@ fun NotesScreen(
     val shareNotesChooserTitle = stringResource(R.string.share_notes_chooser_title)
     
     val getLockedNotesSkippedMessage: (Int) -> String = { count ->
-        context.resources.getString(R.string.locked_notes_skipped, count)
+        // Use applicationContext so we don't capture a composable Context that may
+        // leak or cause a lint warning when the lambda escapes composition.
+        appContext.getString(R.string.locked_notes_skipped, count)
     }
 
     LaunchedEffect(collectionId, collectionName, favoriteOnly) {

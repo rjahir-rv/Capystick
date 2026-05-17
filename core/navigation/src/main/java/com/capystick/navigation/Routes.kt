@@ -55,6 +55,8 @@ data object TrashRoute
 
 data object BackupRoute
 
+data object AboutRoute
+
 data object WidgetManagementRoute
 
 data class WidgetConfigurationRoute(val appWidgetId: Int)
