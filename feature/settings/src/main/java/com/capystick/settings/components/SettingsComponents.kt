@@ -333,4 +333,12 @@ internal fun ThemeOption.label(): String = when (this) {
     ThemeOption.DYNAMIC -> stringResource(com.capystick.settings.R.string.theme_dynamic)
 }
 
-internal fun ColorPaletteOption.label(): String = displayName
+@Composable
+internal fun ColorPaletteOption.label(): String = when (this) {
+    ColorPaletteOption.DEFAULT -> stringResource(com.capystick.settings.R.string.palette_default)
+    ColorPaletteOption.FOREST -> stringResource(com.capystick.settings.R.string.palette_forest)
+    ColorPaletteOption.OCEAN -> stringResource(com.capystick.settings.R.string.palette_ocean)
+    ColorPaletteOption.YELLOW -> stringResource(com.capystick.settings.R.string.palette_yellow)
+    ColorPaletteOption.ROSE -> stringResource(com.capystick.settings.R.string.palette_rose)
+    ColorPaletteOption.RED -> stringResource(com.capystick.settings.R.string.palette_red)
+}

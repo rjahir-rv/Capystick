@@ -51,6 +51,7 @@ import com.capystick.designsystem.theme.resolvePaletteColorScheme
 import com.capystick.model.WidgetContentState
 import com.capystick.model.WidgetMode
 import com.capystick.model.WidgetNoteSummary
+import com.capystick.model.WidgetTitle
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -121,7 +122,7 @@ private fun WidgetScaffold(
     ) {
         WidgetHeader(
             context = context,
-            title = widgetState.title,
+            title = widgetState.title.resolve(context),
             palette = palette,
         )
 
@@ -206,11 +207,19 @@ private fun WidgetContentState.EmptyNoNotes.toActionIntent(context: Context): In
         WidgetNavigationIntents.openCollection(
             context = context,
             collectionId = configuration.collectionId ?: 0,
-            collectionName = configuration.collectionName ?: title,
+            collectionName = configuration.collectionName ?: title.resolve(context),
         )
     } else {
         WidgetNavigationIntents.openCreateNote(context)
     }
+
+private fun WidgetTitle.resolve(context: Context): String = when (this) {
+    WidgetTitle.RecentNotes -> context.getString(AppR.string.widget_title_recent_notes)
+    WidgetTitle.Favorites -> context.getString(AppR.string.widget_title_favorites)
+    WidgetTitle.Collections -> context.getString(AppR.string.widget_title_collections)
+    WidgetTitle.CollectionFallback -> context.getString(AppR.string.widget_title_collection_fallback)
+    is WidgetTitle.Text -> value
+}
 
 @Composable
 private fun WidgetHeader(
@@ -271,7 +280,7 @@ private fun WidgetNoteRow(
                 context = context,
                 noteId = note.noteId,
                 collectionId = state.configuration.collectionId ?: 0,
-                collectionName = state.configuration.collectionName ?: state.title,
+                collectionName = state.configuration.collectionName ?: state.title.resolve(context),
             )
         }
 
@@ -403,7 +412,7 @@ private fun footerIntentFor(
         WidgetNavigationIntents.openCollection(
             context = context,
             collectionId = state.configuration.collectionId ?: 0,
-            collectionName = state.configuration.collectionName ?: state.title,
+            collectionName = state.configuration.collectionName ?: state.title.resolve(context),
         )
     }
 

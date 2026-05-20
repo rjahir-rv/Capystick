@@ -11,4 +11,8 @@
     <string name="widget_open_collection_button">Abrir colección</string>
     <string name="widget_create_note_button">Crear nota</string>
     <string name="widget_view_all_button">Ver todo</string>
+    <string name="widget_title_recent_notes">Notas recientes</string>
+    <string name="widget_title_favorites">Favoritas</string>
+    <string name="widget_title_collections">Colecciones</string>
+    <string name="widget_title_collection_fallback">Colección</string>
 </resources>

@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.capystick.core.designsystem.R
 
 class BiometricAuthenticator(
     private val activity: FragmentActivity,
@@ -28,12 +29,15 @@ class BiometricAuthenticator(
 
     @Suppress("DEPRECATION")
     fun authenticate(
-        title: String = "Autenticacion requerida",
-        subtitle: String = "Usa tu huella o PIN para continuar",
+        title: String? = null,
+        subtitle: String? = null,
         onSuccess: () -> Unit,
         onError: (String) -> Unit,
         onFailed: () -> Unit = {},
     ) {
+        val promptTitle = title ?: activity.getString(R.string.biometric_authentication_required)
+        val promptSubtitle = subtitle ?: activity.getString(R.string.biometric_authentication_subtitle)
+
         if (!isDeviceSecure()) {
             showMissingCredentialMessage(onError)
             return
@@ -52,16 +56,18 @@ class BiometricAuthenticator(
             canAuthenticate == BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE
         ) {
             val keyguardManager = activity.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-            val intent = keyguardManager.createConfirmDeviceCredentialIntent(title, subtitle)
+            val intent = keyguardManager.createConfirmDeviceCredentialIntent(promptTitle, promptSubtitle)
             if (intent != null) {
-                launchKeyguard(intent, onSuccess) { onError("Cancelado") }
+                launchKeyguard(intent, onSuccess) {
+                    onError(activity.getString(R.string.biometric_authentication_canceled))
+                }
                 return
             }
         } else if (canAuthenticate == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED) {
             showMissingCredentialMessage(onError)
             return
         } else if (canAuthenticate != BiometricManager.BIOMETRIC_SUCCESS) {
-            onError("No se pudo iniciar la autenticacion")
+            onError(activity.getString(R.string.biometric_authentication_start_error))
             return
         }
 
@@ -88,8 +94,8 @@ class BiometricAuthenticator(
         )
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(title)
-            .setSubtitle(subtitle)
+            .setTitle(promptTitle)
+            .setSubtitle(promptSubtitle)
             .setAllowedAuthenticators(authenticators)
             .build()
 
@@ -97,7 +103,7 @@ class BiometricAuthenticator(
     }
 
     private fun showMissingCredentialMessage(onError: (String) -> Unit) {
-        val message = "Configura un PIN, patron o contrasena para proteger notas"
+        val message = activity.getString(R.string.biometric_missing_credential_message)
         onError(message)
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }

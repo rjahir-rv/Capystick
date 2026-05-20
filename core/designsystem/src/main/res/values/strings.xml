@@ -2,4 +2,9 @@
     <string name="menu_content_description">Menu</string>
     <string name="secure_note_content_description">Nota segura</string>
     <string name="secure_note_locked">Esta nota está bloqueada</string>
+    <string name="biometric_authentication_required">Autenticación requerida</string>
+    <string name="biometric_authentication_subtitle">Usa tu huella o PIN para continuar</string>
+    <string name="biometric_authentication_canceled">Cancelado</string>
+    <string name="biometric_authentication_start_error">No se pudo iniciar la autenticación</string>
+    <string name="biometric_missing_credential_message">Configura un PIN, patrón o contraseña para proteger notas</string>
 </resources>

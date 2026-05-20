@@ -8,17 +8,17 @@ data class WidgetNoteSummary(
 )
 
 sealed interface WidgetContentState {
-    val title: String
+    val title: WidgetTitle
     val configuration: WidgetConfiguration
 
     data class Content(
-        override val title: String,
+        override val title: WidgetTitle,
         override val configuration: WidgetConfiguration,
         val notes: List<WidgetNoteSummary>,
     ) : WidgetContentState
 
     data class EmptyNoNotes(
-        override val title: String,
+        override val title: WidgetTitle,
         override val configuration: WidgetConfiguration,
         val isCollectionContext: Boolean,
     ) : WidgetContentState
@@ -26,11 +26,19 @@ sealed interface WidgetContentState {
     data class EmptyNoCollections(
         override val configuration: WidgetConfiguration,
     ) : WidgetContentState {
-        override val title: String = "Colecciones"
+        override val title: WidgetTitle = WidgetTitle.Collections
     }
 
     data class EmptyMissingCollection(
-        override val title: String,
+        override val title: WidgetTitle,
         override val configuration: WidgetConfiguration,
     ) : WidgetContentState
+}
+
+sealed interface WidgetTitle {
+    data object RecentNotes : WidgetTitle
+    data object Favorites : WidgetTitle
+    data object Collections : WidgetTitle
+    data object CollectionFallback : WidgetTitle
+    data class Text(val value: String) : WidgetTitle
 }

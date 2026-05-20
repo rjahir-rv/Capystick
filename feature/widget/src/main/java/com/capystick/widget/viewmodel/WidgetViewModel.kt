@@ -1,5 +1,6 @@
 package com.capystick.widget.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capystick.domain.repository.CollectionRepository
@@ -8,7 +9,9 @@ import com.capystick.domain.repository.WidgetRepository
 import com.capystick.model.Collection
 import com.capystick.model.WidgetConfiguration
 import com.capystick.model.WidgetMode
+import com.capystick.widget.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WidgetSettingsViewModel @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val widgetRepository: WidgetRepository,
     collectionRepository: CollectionRepository,
     noteRepository: NoteRepository,
@@ -52,7 +56,13 @@ class WidgetSettingsViewModel @Inject constructor(
         favoriteNoteCount,
     ) { cols, favCount ->
         if (favCount > 0) {
-            listOf(Collection(id = -1, name = "Favoritas", noteCount = favCount)) + cols
+            listOf(
+                Collection(
+                    id = -1,
+                    name = context.getString(R.string.widget_favorites_collection_name),
+                    noteCount = favCount,
+                ),
+            ) + cols
         } else {
             cols
         }

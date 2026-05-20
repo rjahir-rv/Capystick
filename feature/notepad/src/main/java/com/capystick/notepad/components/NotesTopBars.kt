@@ -75,7 +75,7 @@ internal fun NotesTopBar(
                 },
             )
         } else {
-            CapyTopAppBar(
+            CapyTopAppBar (
                 title = title,
                 onMenuClick = onMenuClick,
                 showNavigationIcon = showNavigationIcon,

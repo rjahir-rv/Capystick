@@ -19,4 +19,5 @@
     <string name="discard_changes_message">Tienes cambios sin guardar. Si sales ahora, se perderá lo que escribiste.</string>
     <string name="save">Guardar</string>
     <string name="discard">Descartar</string>
+    <string name="checklist_untitled_fallback">Checklist sin título</string>
 </resources>

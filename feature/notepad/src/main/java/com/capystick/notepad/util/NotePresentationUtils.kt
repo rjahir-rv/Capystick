@@ -19,12 +19,15 @@ fun noteContentToPlainText(note: Note): String {
     }
 }
 
-fun noteSupportingText(note: Note): String {
+fun noteSupportingText(
+    note: Note,
+    checklistProgressText: (completed: Int, total: Int) -> String,
+): String {
     return when (note.type) {
         NoteType.TEXT -> noteContentToPlainText(note.content)
         NoteType.CHECKLIST -> buildString {
-            val progress = ChecklistFormatter.progressTextFromJson(note.content)
-            append(progress)
+            val progress = ChecklistFormatter.progressFromJson(note.content)
+            append(checklistProgressText(progress.completed, progress.total))
             val items = ChecklistFormatter.plainTextFromJson(note.content)
             if (items.isNotBlank()) {
                 append('\n')

@@ -18,18 +18,11 @@ enum class ThemeOption {
     DYNAMIC,
 }
 
-enum class ColorPaletteOption(
-    val displayName: String,
-) {
-    DEFAULT(displayName = "Capystick"),
-
-    FOREST(displayName = "Bosque"),
-
-    OCEAN(displayName = "Océano"),
-
-    YELLOW(displayName = "Desierto"),
-
-    ROSE(displayName = "Coral"),
-
-    RED(displayName = "Lava"),
+enum class ColorPaletteOption {
+    DEFAULT,
+    FOREST,
+    OCEAN,
+    YELLOW,
+    ROSE,
+    RED,
 }

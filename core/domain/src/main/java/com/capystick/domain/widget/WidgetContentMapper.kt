@@ -4,6 +4,7 @@ import com.capystick.model.Note
 import com.capystick.model.WidgetConfiguration
 import com.capystick.model.WidgetContentState
 import com.capystick.model.WidgetNoteSummary
+import com.capystick.model.WidgetTitle
 import javax.inject.Inject
 
 class WidgetContentMapper @Inject constructor(
@@ -14,7 +15,7 @@ class WidgetContentMapper @Inject constructor(
         notes: List<Note>,
     ): WidgetContentState =
         notes.toWidgetNotes().toWidgetState(
-            title = "Notas recientes",
+            title = WidgetTitle.RecentNotes,
             configuration = configuration,
             isCollectionContext = false,
         )
@@ -25,7 +26,11 @@ class WidgetContentMapper @Inject constructor(
         notes: List<Note>,
     ): WidgetContentState =
         notes.toWidgetNotes().toWidgetState(
-            title = collectionName,
+            title = if (configuration.collectionId == FAVORITES_COLLECTION_ID) {
+                WidgetTitle.Favorites
+            } else {
+                WidgetTitle.Text(collectionName)
+            },
             configuration = configuration,
             isCollectionContext = true,
         )
@@ -37,7 +42,7 @@ class WidgetContentMapper @Inject constructor(
             .map { it.toWidgetSummary() }
 
     private fun List<WidgetNoteSummary>.toWidgetState(
-        title: String,
+        title: WidgetTitle,
         configuration: WidgetConfiguration,
         isCollectionContext: Boolean,
     ): WidgetContentState =
@@ -65,5 +70,6 @@ class WidgetContentMapper @Inject constructor(
 
     private companion object {
         const val MAX_WIDGET_NOTES = 6
+        const val FAVORITES_COLLECTION_ID = -1
     }
 }

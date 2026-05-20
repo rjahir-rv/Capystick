@@ -8,6 +8,7 @@ import com.capystick.model.Note
 import com.capystick.model.WidgetConfiguration
 import com.capystick.model.WidgetContentState
 import com.capystick.model.WidgetMode
+import com.capystick.model.WidgetTitle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -52,7 +53,7 @@ class GetWidgetContentTest {
         val result = useCase(appWidgetId = 7)
 
         assertTrue(result is WidgetContentState.EmptyNoNotes)
-        assertEquals("Notas recientes", result.title)
+        assertEquals(WidgetTitle.RecentNotes, result.title)
     }
 
     @Test
@@ -117,7 +118,7 @@ class GetWidgetContentTest {
         val result = useCase(appWidgetId = 8)
 
         assertTrue(result is WidgetContentState.EmptyMissingCollection)
-        assertEquals("Trabajo", result.title)
+        assertEquals(WidgetTitle.Text("Trabajo"), result.title)
     }
 
     @Test
@@ -141,7 +142,7 @@ class GetWidgetContentTest {
         val result = useCase(appWidgetId = 8)
 
         assertTrue(result is WidgetContentState.EmptyNoNotes)
-        assertEquals("Trabajo", result.title)
+        assertEquals(WidgetTitle.Text("Trabajo"), result.title)
     }
 
     @Test
@@ -170,7 +171,7 @@ class GetWidgetContentTest {
         val result = useCase(appWidgetId = 8)
 
         val content = result as WidgetContentState.Content
-        assertEquals("Trabajo", content.title)
+        assertEquals(WidgetTitle.Text("Trabajo"), content.title)
         assertEquals(listOf(11, 10), content.notes.map { it.noteId })
     }
 
@@ -274,4 +275,3 @@ private class FakeCollectionRepository(
     override suspend fun addNoteToCollection(noteId: Int, collectionId: Int) = Unit
     override suspend fun removeNoteFromCollection(noteId: Int, collectionId: Int) = Unit
 }
-

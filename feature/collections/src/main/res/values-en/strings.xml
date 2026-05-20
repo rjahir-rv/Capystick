@@ -1,0 +1,29 @@
+<resources>
+    <string name="favorites_collection_name">Favorites</string>
+    <string name="collections_empty_search">No collection matched your search</string>
+    <string name="collections_empty">No collections yet</string>
+    <string name="collections_starter_title">Organize your notes</string>
+    <string name="collections_starter_message">Use the + button to create your first collection.</string>
+    <string name="new_collection_content_description">New collection</string>
+    <string name="new_collection_title">New collection</string>
+    <string name="rename_collection_title">Rename collection</string>
+    <string name="delete_collection_title">Delete collection</string>
+    <string name="delete_collection_message">Are you sure you want to delete the collection \"%1$s\"? Associated notes will not be deleted, only removed from this collection.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="search_collection_placeholder">Search collection...</string>
+    <string name="close_search_content_description">Close search</string>
+    <string name="collections_title">Collections</string>
+    <string name="menu_content_description">Menu</string>
+    <string name="search_content_description">Search</string>
+    <string name="filter_content_description">Filter</string>
+    <string name="sort_name_asc">A-Z</string>
+    <string name="sort_name_desc">Z-A</string>
+    <string name="sort_most_notes">Most notes</string>
+    <string name="sort_fewest_notes">Fewest notes</string>
+    <string name="note_count">%1$d notes</string>
+    <string name="rename_content_description">Rename</string>
+    <string name="delete_content_description">Delete</string>
+    <string name="name_label">Name</string>
+    <string name="confirm">Confirm</string>
+</resources>

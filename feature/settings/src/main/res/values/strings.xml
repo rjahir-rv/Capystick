@@ -60,4 +60,10 @@
     <string name="open_selected_folder_error">No se pudo abrir la carpeta seleccionada</string>
     <string name="create_file_error">No se pudo crear el archivo</string>
     <string name="open_output_stream_error">No se pudo abrir el stream de salida</string>
+    <string name="palette_default">Capystick</string>
+    <string name="palette_forest">Bosque</string>
+    <string name="palette_ocean">Océano</string>
+    <string name="palette_yellow">Desierto</string>
+    <string name="palette_rose">Coral</string>
+    <string name="palette_red">Lava</string>
 </resources>

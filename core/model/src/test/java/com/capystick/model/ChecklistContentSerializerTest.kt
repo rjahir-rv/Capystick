@@ -39,6 +39,6 @@ class ChecklistContentSerializerTest {
         )
 
         assertEquals("[ ] Comprar leche\n[x] Pagar luz", ChecklistFormatter.toPlainText(content))
-        assertEquals("1/3 completados", ChecklistFormatter.progressText(content))
+        assertEquals("1/3", ChecklistFormatter.progressText(content))
     }
 }

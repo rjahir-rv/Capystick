@@ -1,0 +1,23 @@
+<resources>
+    <string name="checklist_saved_to_collection">Checklist saved and added to the collection</string>
+    <string name="checklist_saved">Checklist saved</string>
+    <string name="checklist_default_title">Checklist</string>
+    <string name="back_content_description">Back</string>
+    <string name="save_checklist_content_description">Save checklist</string>
+    <string name="add_item_content_description">Add item</string>
+    <string name="phone_lock_disabled">Phone lock is disabled</string>
+    <string name="remove_lock_and_edit">Remove lock and edit</string>
+    <string name="locked_checklist_message">This checklist is locked</string>
+    <string name="unlock">Unlock</string>
+    <string name="unlock_checklist_title">Unlock checklist</string>
+    <string name="unlock_checklist_subtitle">Authenticate to edit the content</string>
+    <string name="completed_item_content_description">Completed item</string>
+    <string name="pending_item_content_description">Pending item</string>
+    <string name="new_item_placeholder">New item</string>
+    <string name="delete_item_content_description">Delete item</string>
+    <string name="discard_changes_title">Exit without saving</string>
+    <string name="discard_changes_message">You have unsaved changes. If you leave now, what you wrote will be lost.</string>
+    <string name="save">Save</string>
+    <string name="discard">Discard</string>
+    <string name="checklist_untitled_fallback">Untitled checklist</string>
+</resources>

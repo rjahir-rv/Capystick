@@ -6,6 +6,7 @@ import com.capystick.domain.repository.WidgetRepository
 import com.capystick.model.WidgetConfiguration
 import com.capystick.model.WidgetContentState
 import com.capystick.model.WidgetMode
+import com.capystick.model.WidgetTitle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -53,12 +54,12 @@ class GetWidgetContent @Inject constructor(
         if (configuration.collectionId == -1) {
             val resolvedConfiguration = configuration.copy(
                 collectionId = -1,
-                collectionName = "Favoritas",
+                collectionName = null,
             )
             return noteRepository.getFavoriteNotes().map { notes ->
                 widgetContentMapper.collectionNotes(
                     configuration = resolvedConfiguration,
-                    collectionName = "Favoritas",
+                    collectionName = "",
                     notes = notes,
                 )
             }
@@ -73,7 +74,7 @@ class GetWidgetContent @Inject constructor(
             val collection = collections.firstOrNull { it.id == configuration.collectionId }
                 ?: return@flatMapLatest flowOf(
                     WidgetContentState.EmptyMissingCollection(
-                        title = configuration.collectionName ?: "Coleccion",
+                        title = configuration.collectionName?.toWidgetTitle() ?: WidgetTitle.CollectionFallback,
                         configuration = configuration,
                     ),
                 )
@@ -91,4 +92,7 @@ class GetWidgetContent @Inject constructor(
             }
         }
     }
+
+    private fun String.toWidgetTitle(): WidgetTitle =
+        WidgetTitle.Text(this)
 }

@@ -1,7 +1,9 @@
 package com.capystick.checklist.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.capystick.checklist.R
 import com.capystick.domain.repository.CollectionRepository
 import com.capystick.domain.repository.NoteRepository
 import com.capystick.model.ChecklistContent
@@ -10,6 +12,7 @@ import com.capystick.model.ChecklistItem
 import com.capystick.model.Note
 import com.capystick.model.NoteType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChecklistViewModel @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val noteRepository: NoteRepository,
     private val collectionRepository: CollectionRepository,
 ) : ViewModel() {
@@ -103,7 +107,7 @@ class ChecklistViewModel @Inject constructor(
                 .ifEmpty { listOf(ChecklistItem()) }
             val note = Note(
                 id = currentNoteId ?: 0,
-                title = state.title.ifBlank { "Checklist sin titulo" },
+                title = state.title.ifBlank { context.getString(R.string.checklist_untitled_fallback) },
                 content = ChecklistContentSerializer.toJson(ChecklistContent(items)),
                 timestamp = System.currentTimeMillis(),
                 colorHex = 0xFFFFFFFF,

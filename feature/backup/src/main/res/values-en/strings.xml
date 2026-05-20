@@ -1,0 +1,22 @@
+<resources>
+    <string name="backup_export_success">Backup exported successfully</string>
+    <string name="backup_import_success">Notes restored successfully</string>
+    <string name="backup_title">Backup</string>
+    <string name="back_content_description">Back</string>
+    <string name="backup_description">Manage a backup of all your notes and collections in a JSON file.</string>
+    <string name="backup_export_title">Export backup</string>
+    <string name="backup_export_description">Save all your notes and collections to a JSON file on your device.</string>
+    <string name="backup_export_action">Export</string>
+    <string name="backup_import_title">Import backup</string>
+    <string name="backup_import_description">Restore your notes from a JSON file. This will replace all current data if it exists.</string>
+    <string name="backup_import_action">Import</string>
+    <string name="backup_no_notes_title">No notes to back up</string>
+    <string name="backup_no_notes_message">You do not have active notes. Create at least one note before exporting a backup.</string>
+    <string name="understood">Got it</string>
+    <string name="backup_restore_confirmation_title">Restore backup?</string>
+    <string name="backup_restore_confirmation_message">This action will replace ALL current notes and collections with the selected file. This operation cannot be undone.</string>
+    <string name="restore">Restore</string>
+    <string name="cancel">Cancel</string>
+    <string name="backup_export_error">Export error: please check the file</string>
+    <string name="backup_import_error">Import error: %1$s</string>
+</resources>

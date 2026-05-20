@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.capystick.widget.components.WidgetConfigurationContent
@@ -15,10 +16,10 @@ fun WidgetConfigurationScreen(
     modifier: Modifier = Modifier,
     appWidgetId: Int,
     innerPadding: PaddingValues,
-    title: String = "Configurar widget",
+    title: String? = null,
     onBack: () -> Unit,
     onSaved: () -> Unit = onBack,
-    viewModel: WidgetSettingsViewModel = hiltViewModel()
+    viewModel: WidgetSettingsViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(appWidgetId) {
         viewModel.initialize(appWidgetId)
@@ -29,7 +30,7 @@ fun WidgetConfigurationScreen(
     val collections by viewModel.availableCollections.collectAsStateWithLifecycle()
 
     WidgetConfigurationContent(
-        title = title,
+        title = title ?: stringResource(R.string.widget_configuration_title),
         innerPadding = innerPadding,
         selectedMode = selectedMode,
         selectedCollectionId = selectedCollectionId,

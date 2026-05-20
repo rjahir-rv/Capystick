@@ -14,6 +14,11 @@ data class ChecklistItem(
     val checked: Boolean = false,
 )
 
+data class ChecklistProgress(
+    val completed: Int,
+    val total: Int,
+)
+
 object ChecklistContentSerializer {
     private const val VERSION = 1
 
@@ -69,15 +74,21 @@ object ChecklistFormatter {
             }
     }
 
-    fun progressText(content: ChecklistContent): String {
-        val total = content.items.size
-        val completed = content.items.count(ChecklistItem::checked)
-        return "$completed/$total completados"
-    }
+    fun progress(content: ChecklistContent): ChecklistProgress =
+        ChecklistProgress(
+            completed = content.items.count(ChecklistItem::checked),
+            total = content.items.size,
+        )
+
+    fun progressText(content: ChecklistContent): String =
+        progress(content).let { "${it.completed}/${it.total}" }
 
     fun plainTextFromJson(json: String): String =
         toPlainText(ChecklistContentSerializer.fromJson(json))
 
     fun progressTextFromJson(json: String): String =
         progressText(ChecklistContentSerializer.fromJson(json))
+
+    fun progressFromJson(json: String): ChecklistProgress =
+        progress(ChecklistContentSerializer.fromJson(json))
 }

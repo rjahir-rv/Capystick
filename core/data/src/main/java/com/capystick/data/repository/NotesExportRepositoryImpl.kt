@@ -1,6 +1,8 @@
 package com.capystick.data.repository
 
+import android.content.Context
 import android.text.Html
+import com.capystick.core.data.R
 import com.capystick.database.dao.NoteDao
 import com.capystick.database.entities.toDomain
 import com.capystick.domain.repository.NoteTextExport
@@ -9,6 +11,7 @@ import com.capystick.domain.repository.NotesExportResult
 import com.capystick.model.ChecklistFormatter
 import com.capystick.model.Note
 import com.capystick.model.NoteType
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -17,6 +20,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 class NotesExportRepositoryImpl @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val noteDao: NoteDao,
 ) : NotesExportRepository {
 
@@ -50,12 +54,16 @@ class NotesExportRepositoryImpl @Inject constructor(
             .trim()
             .take(60)
 
-        val base = if (sanitizedTitle.isBlank()) "nota_$noteId" else "${sanitizedTitle}_$noteId"
+        val base = if (sanitizedTitle.isBlank()) {
+            context.getString(R.string.export_note_file_name_fallback, noteId)
+        } else {
+            "${sanitizedTitle}_$noteId"
+        }
         return "$base.txt"
     }
 
     private fun buildTxtContent(note: Note): String {
-        val visibleTitle = note.title.trim().ifBlank { "Sin titulo" }
+        val visibleTitle = note.title.trim().ifBlank { context.getString(R.string.export_note_title_fallback) }
         val dateString = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
             .format(Date(note.timestamp))
         val plainText = note.toPlainText()
@@ -63,10 +71,10 @@ class NotesExportRepositoryImpl @Inject constructor(
             .replace("\r", "\n")
 
         return buildString {
-            append("Titulo: ")
+            append(context.getString(R.string.export_note_title_label))
             append(visibleTitle)
             append('\n')
-            append("Fecha: ")
+            append(context.getString(R.string.export_note_date_label))
             append(dateString)
             append("\n\n")
             append(plainText)
