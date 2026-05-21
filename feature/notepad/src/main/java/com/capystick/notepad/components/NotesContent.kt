@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.capystick.designsystem.components.CapyNoteCard
@@ -92,14 +91,14 @@ internal fun NotesList(
     val authenticator = rememberBiometricAuthenticator()
     val secureNoteTitle = stringResource(R.string.unlock_note_title)
     val authenticateToViewContentSubtitle = stringResource(R.string.authenticate_to_view_content)
+    val checklistProgressTemplate = stringResource(R.string.checklist_progress)
     val noteNoTitle = stringResource(R.string.note_no_title)
-    val context = LocalContext.current
 
     @Composable
     fun NoteItem(note: Note) {
-        val plainText = remember(note.content, note.type, context) {
+        val plainText = remember(note.content, note.type, checklistProgressTemplate) {
             noteSupportingText(note) { completed, total ->
-                context.getString(R.string.checklist_progress, completed, total)
+                checklistProgressTemplate.format(completed, total)
             }
         }
         val dateString = remember(note.timestamp) {
