@@ -57,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.glance.color.ColorProvider as DayNightColorProvider
@@ -308,7 +309,7 @@ private fun WidgetNoteRow(
             )
             Spacer(modifier = GlanceModifier.width(8.dp))
             Text(
-                text = formatTimestamp(note.timestamp),
+                text = formatTimestamp(context, note.timestamp),
                 maxLines = 1,
                 style =
                     TextStyle(
@@ -470,9 +471,19 @@ private data class WidgetPalette(
     val onPrimary: ColorProvider,
 )
 
-private fun formatTimestamp(timestamp: Long): String =
-    TIMESTAMP_FORMATTER.format(
-        Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()),
-    )
+private fun formatTimestamp(
+    context: Context,
+    timestamp: Long,
+): String {
+    val zoneId = ZoneId.systemDefault()
+    val noteDate = Instant.ofEpochMilli(timestamp).atZone(zoneId).toLocalDate()
+    val today = LocalDate.now(zoneId)
+
+    return when (noteDate) {
+        today -> context.getString(AppR.string.widget_date_today)
+        today.minusDays(1) -> context.getString(AppR.string.widget_date_yesterday)
+        else -> TIMESTAMP_FORMATTER.format(noteDate)
+    }
+}
 
 private val TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("dd MMM")

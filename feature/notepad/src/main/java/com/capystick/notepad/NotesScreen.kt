@@ -209,6 +209,7 @@ fun NotesScreen(
             NotesContent(
                 notes = notes,
                 collectionId = collectionId,
+                searchQuery = searchQuery,
                 isSelectionMode = isSelectionMode,
                 selectedNoteIds = selectedNoteIds,
                 onNoteClick = onNoteClick,

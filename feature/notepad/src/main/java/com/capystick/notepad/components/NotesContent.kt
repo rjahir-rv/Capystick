@@ -28,6 +28,7 @@ import com.capystick.notepad.util.noteSupportingText
 internal fun NotesContent(
     notes: List<Note>,
     collectionId: Int?,
+    searchQuery: String,
     isSelectionMode: Boolean,
     selectedNoteIds: Set<Int>,
     onNoteClick: (Int) -> Unit,
@@ -39,6 +40,7 @@ internal fun NotesContent(
     if (notes.isEmpty()) {
         EmptyNotesState(
             isCollectionNotes = collectionId != null,
+            isSearchResult = searchQuery.isNotBlank(),
             modifier = modifier,
         )
         return
@@ -59,6 +61,7 @@ internal fun NotesContent(
 @Composable
 private fun EmptyNotesState(
     isCollectionNotes: Boolean,
+    isSearchResult: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -66,10 +69,10 @@ private fun EmptyNotesState(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = if (isCollectionNotes) {
-                stringResource(R.string.no_notes_in_collection)
-            } else {
-                stringResource(R.string.no_notes_yet)
+            text = when {
+                isSearchResult -> stringResource(R.string.no_notes_match_search)
+                isCollectionNotes -> stringResource(R.string.no_notes_in_collection)
+                else -> stringResource(R.string.no_notes_yet)
             },
         )
     }

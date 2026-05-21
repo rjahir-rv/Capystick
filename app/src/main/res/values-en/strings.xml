@@ -15,4 +15,6 @@
     <string name="widget_title_favorites">Favorites</string>
     <string name="widget_title_collections">Collections</string>
     <string name="widget_title_collection_fallback">Collection</string>
+    <string name="widget_date_today">Today</string>
+    <string name="widget_date_yesterday">Yesterday</string>
 </resources>

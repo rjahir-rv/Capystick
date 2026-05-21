@@ -91,7 +91,7 @@ fun CollectionsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (searchQuery.isNotEmpty()) {
+                        text = if (searchQuery.isNotBlank()) {
                             stringResource(R.string.collections_empty_search)
                         } else {
                             stringResource(R.string.collections_empty)

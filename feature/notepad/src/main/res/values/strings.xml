@@ -88,7 +88,6 @@
     <string name="delete_note_message">¿Estás seguro de enviar a la papelera esta nota?</string>
     <string name="loading_note">Cargando nota...</string>
     <string name="remove_lock_and_open">Quitar bloqueo y abrir</string>
-    <string name="note_is_protected">Esta nota está protegida</string>
     <string name="authenticate_to_view_content">Autentícate para ver el contenido</string>
     <string name="note_added_to_collection">Nota añadida a la colección</string>
     <string name="note_added_to_new_collection">Nota añadida a la nueva colección</string>
@@ -100,6 +99,7 @@
     <string name="or_create_new">O crea una nueva:</string>
     <string name="collection_name_placeholder">Nombre de la colección</string>
     <string name="authentication_failed">Autenticación fallida</string>
+    <string name="no_notes_match_search">No se encontró ninguna nota relacionada con tu búsqueda</string>
     <string name="no_notes_in_collection">No hay notas en esta colección</string>
     <string name="no_notes_yet">Aún no hay notas. ¡Crea una!</string>
 </resources>

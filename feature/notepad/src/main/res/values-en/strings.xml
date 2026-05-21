@@ -86,7 +86,6 @@
     <string name="delete_note_message">Are you sure you want to move this note to trash?</string>
     <string name="loading_note">Loading note...</string>
     <string name="remove_lock_and_open">Remove lock and open</string>
-    <string name="note_is_protected">This note is protected</string>
     <string name="authenticate_to_view_content">Authenticate to view the content</string>
     <string name="note_added_to_collection">Note added to the collection</string>
     <string name="note_added_to_new_collection">Note added to the new collection</string>
@@ -98,6 +97,7 @@
     <string name="or_create_new">Or create a new one:</string>
     <string name="collection_name_placeholder">Collection name</string>
     <string name="authentication_failed">Authentication failed</string>
+    <string name="no_notes_match_search">No note matched your search</string>
     <string name="no_notes_in_collection">No notes in this collection</string>
     <string name="no_notes_yet">No notes yet. Create one!</string>
 </resources>
