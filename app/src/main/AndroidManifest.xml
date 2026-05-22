@@ -18,7 +18,7 @@
         android:theme="@style/Theme.Capystick">
         <activity
             android:name=".widget.WidgetConfigurationActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/Theme.Capystick" />
         <activity
             android:name=".MainActivity"

@@ -16,8 +16,8 @@ class NotesWidgetReceiver : GlanceAppWidgetReceiver() {
         context: Context,
         appWidgetIds: IntArray,
     ) {
-        super.onDeleted(context, appWidgetIds)
         val pendingResult = goAsync()
+        super.onDeleted(context, appWidgetIds)
         val entryPoint =
             EntryPointAccessors.fromApplication(
                 context.applicationContext,
@@ -29,7 +29,7 @@ class NotesWidgetReceiver : GlanceAppWidgetReceiver() {
                     entryPoint.getWidgetRepository().deleteWidgetConfiguration(appWidgetId)
                 }
             } finally {
-                pendingResult.finish()
+                pendingResult?.finish()
             }
         }
     }
