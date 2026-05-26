@@ -2,7 +2,6 @@ package com.capystick.settings.viewmodel
 
 import android.content.Context
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capystick.settings.R
@@ -12,7 +11,6 @@ import com.capystick.designsystem.theme.ThemePreferences
 import com.capystick.domain.repository.NotesExportRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,8 +72,7 @@ class SettingsViewModel @Inject constructor(
                     return@launch
                 }
 
-                val exportResult = notesExportRepository.exportActiveNotes()
-                val writeResult = writeNotesToDirectory(directoryUri, exportResult.notes)
+                val writeResult = notesExportRepository.exportActiveNotesToDirectory(directoryUri.toString())
                 if (writeResult.exportedCount == 0) {
                     _uiState.update {
                         it.copy(
@@ -119,30 +114,6 @@ class SettingsViewModel @Inject constructor(
     fun dismissError() = _uiState.update { it.copy(errorMessage = null) }
 
     fun dismissNoNotesWarning() = _uiState.update { it.copy(showNoNotesWarning = false) }
-
-    private suspend fun writeNotesToDirectory(
-        directoryUri: Uri,
-        notes: List<com.capystick.domain.repository.NoteTextExport>,
-    ): ExportWriteResult = withContext(Dispatchers.IO) {
-        val root = DocumentFile.fromTreeUri(context, directoryUri)
-            ?: throw IllegalStateException(context.getString(R.string.open_selected_folder_error))
-
-        var exportedCount = 0
-        var skippedCount = 0
-        notes.forEach { noteExport ->
-            try {
-                val file = root.createFile("text/plain", noteExport.fileName.removeSuffix(".txt"))
-                val fileUri = file?.uri ?: throw IllegalStateException(context.getString(R.string.create_file_error))
-                context.contentResolver.openOutputStream(fileUri)?.use { output ->
-                    output.write(noteExport.content.toByteArray(StandardCharsets.UTF_8))
-                } ?: throw IllegalStateException(context.getString(R.string.open_output_stream_error))
-                exportedCount++
-            } catch (_: Exception) {
-                skippedCount++
-            }
-        }
-        ExportWriteResult(exportedCount = exportedCount, skippedCount = skippedCount)
-    }
 }
 
 data class SettingsUiState(
@@ -150,9 +121,4 @@ data class SettingsUiState(
     val exportSuccessMessage: String? = null,
     val errorMessage: String? = null,
     val showNoNotesWarning: Boolean = false,
-)
-
-private data class ExportWriteResult(
-    val exportedCount: Int,
-    val skippedCount: Int,
 )

@@ -6,6 +6,7 @@ import com.capystick.database.db.CapystickDB
 import com.capystick.database.entities.NoteCollectionCrossRef
 import com.capystick.database.entities.toDomain
 import com.capystick.database.entities.toEntity
+import com.capystick.data.backup.BackupSerializer
 import com.capystick.data.widget.WidgetRefreshRequester
 import androidx.room.withTransaction
 import com.capystick.domain.repository.BackupRepository
@@ -35,6 +36,10 @@ class BackupRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun exportBackupJson(): String = withContext(Dispatchers.IO) {
+        BackupSerializer.toJson(exportBackup())
+    }
+
     override suspend fun importBackup(backupData: BackupData): Unit = withContext(Dispatchers.IO) {
         db.withTransaction {
             // Clear all existing data
@@ -59,6 +64,10 @@ class BackupRepositoryImpl @Inject constructor(
             }
         }
         widgetRefreshRequester.requestRefresh()
+    }
+
+    override suspend fun importBackupJson(json: String) {
+        importBackup(BackupSerializer.fromJson(json))
     }
 
     override suspend fun hasActiveNotes(): Boolean = withContext(Dispatchers.IO) {

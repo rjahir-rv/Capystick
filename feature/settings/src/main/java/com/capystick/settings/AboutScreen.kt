@@ -1,8 +1,5 @@
 package com.capystick.settings
 
-import android.content.Context
-import android.net.Uri
-import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -47,12 +44,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.capystick.settings.util.ABOUT_CONTACT_EMAIL_URI
+import com.capystick.settings.util.ABOUT_GITHUB_URL
+import com.capystick.settings.util.appVersionName
+import com.capystick.settings.util.buildReportIssueUri
 import com.capystick.core.designsystem.R as DesignR
-
-private const val GitHubUrl = "https://github.com/rjahir-rv/Capystick"
-private const val ContactEmail = "support.imaginarydeer@proton.me"
-private const val ContactEmailUri = "mailto:$ContactEmail"
-private const val ReportIssueSubject = "Reporte de problema - Capystick"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -123,7 +119,7 @@ fun AboutScreen(
 
             item {
                 OutlinedButton(
-                    onClick = { uriHandler.openUri(GitHubUrl) },
+                    onClick = { uriHandler.openUri(ABOUT_GITHUB_URL) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
                 ) {
@@ -139,7 +135,7 @@ fun AboutScreen(
 
             item {
                 OutlinedButton(
-                    onClick = { uriHandler.openUri(ContactEmailUri) },
+                    onClick = { uriHandler.openUri(ABOUT_CONTACT_EMAIL_URI) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
                 ) {
@@ -376,36 +372,3 @@ private data class AboutFeature(
     val titleRes: Int,
     val descriptionRes: Int,
 )
-
-private fun buildReportIssueUri(versionName: String): String {
-    val device = listOf(
-        Build.MANUFACTURER,
-        Build.MODEL,
-    ).joinToString(separator = " ").trim()
-    val body = """
-        Describe el problema:
-
-
-        Pasos para reproducirlo:
-        1.
-        2.
-        3.
-
-        Informacion del dispositivo:
-        - App: $versionName
-        - Dispositivo: $device
-        - Android: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
-    """.trimIndent()
-
-    return "mailto:$ContactEmail" +
-        "?subject=${Uri.encode(ReportIssueSubject)}" +
-        "&body=${Uri.encode(body)}"
-}
-
-@Suppress("DEPRECATION")
-private fun Context.appVersionName(): String =
-    runCatching {
-        packageManager.getPackageInfo(packageName, 0).versionName
-    }.getOrNull().orEmpty().ifBlank {
-        "0.9.0"
-    }

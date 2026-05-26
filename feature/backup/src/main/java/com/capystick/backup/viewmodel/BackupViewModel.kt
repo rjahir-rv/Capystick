@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capystick.backup.R
-import com.capystick.data.backup.BackupSerializer
 import com.capystick.domain.repository.BackupRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -40,8 +39,7 @@ class BackupViewModel @Inject constructor(
                     }
                     return@launch
                 }
-                val backupData = backupRepository.exportBackup()
-                val json = BackupSerializer.toJson(backupData)
+                val json = backupRepository.exportBackupJson()
                 outputStream.bufferedWriter().use { it.write(json) }
                 _uiState.update {
                     it.copy(isLoading = false, exportSuccess = true)
@@ -66,8 +64,7 @@ class BackupViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val json = stream.bufferedReader().use { it.readText() }
-                val backupData = BackupSerializer.fromJson(json)
-                backupRepository.importBackup(backupData)
+                backupRepository.importBackupJson(json)
                 _uiState.update { it.copy(isLoading = false, importSuccess = true) }
             } catch (e: Exception) {
                 _uiState.update {

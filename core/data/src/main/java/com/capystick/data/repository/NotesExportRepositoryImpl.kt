@@ -1,10 +1,13 @@
 package com.capystick.data.repository
 
 import android.content.Context
+import android.net.Uri
 import android.text.Html
+import androidx.documentfile.provider.DocumentFile
 import com.capystick.core.data.R
 import com.capystick.database.dao.NoteDao
 import com.capystick.database.entities.toDomain
+import com.capystick.domain.repository.NotesExportDirectoryResult
 import com.capystick.domain.repository.NoteTextExport
 import com.capystick.domain.repository.NotesExportRepository
 import com.capystick.domain.repository.NotesExportResult
@@ -38,6 +41,34 @@ class NotesExportRepositoryImpl @Inject constructor(
             )
         }
         NotesExportResult(notes = exports)
+    }
+
+    override suspend fun exportActiveNotesToDirectory(
+        directoryUriString: String,
+    ): NotesExportDirectoryResult = withContext(Dispatchers.IO) {
+        val notes = exportActiveNotes().notes
+        val root = DocumentFile.fromTreeUri(context, Uri.parse(directoryUriString))
+            ?: throw IllegalStateException(context.getString(R.string.open_selected_folder_error))
+
+        var exportedCount = 0
+        var skippedCount = 0
+        notes.forEach { noteExport ->
+            try {
+                val file = root.createFile("text/plain", noteExport.fileName.removeSuffix(".txt"))
+                val fileUri = file?.uri ?: throw IllegalStateException(context.getString(R.string.create_file_error))
+                context.contentResolver.openOutputStream(fileUri)?.use { output ->
+                    output.write(noteExport.content.toByteArray(Charsets.UTF_8))
+                } ?: throw IllegalStateException(context.getString(R.string.open_output_stream_error))
+                exportedCount++
+            } catch (_: Exception) {
+                skippedCount++
+            }
+        }
+
+        NotesExportDirectoryResult(
+            exportedCount = exportedCount,
+            skippedCount = skippedCount,
+        )
     }
 
     private fun htmlToPlainText(html: String): String =
