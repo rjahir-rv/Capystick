@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 class NotesExportRepositoryImpl @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -47,7 +48,7 @@ class NotesExportRepositoryImpl @Inject constructor(
         directoryUriString: String,
     ): NotesExportDirectoryResult = withContext(Dispatchers.IO) {
         val notes = exportActiveNotes().notes
-        val root = DocumentFile.fromTreeUri(context, Uri.parse(directoryUriString))
+        val root = DocumentFile.fromTreeUri(context, directoryUriString.toUri())
             ?: throw IllegalStateException(context.getString(R.string.open_selected_folder_error))
 
         var exportedCount = 0
