@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.biometric)
+    implementation(libs.play.app.update)
 
     // navigation
     implementation(libs.androidx.navigation3.runtime)

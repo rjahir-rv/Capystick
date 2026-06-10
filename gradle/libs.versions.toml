@@ -1,7 +1,7 @@
 [versions]
 agp = "9.2.1"
 biometric = "1.1.0"
-coreKtx = "1.18.0"
+coreKtx = "1.19.0"
 json = "20260522"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -9,15 +9,15 @@ espressoCore = "3.7.0"
 kotlinxCoroutinesCore = "1.11.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 composeBom = "2026.05.01"
 ktlint = "14.2.0"
 appcompat = "1.7.1"
 material = "1.14.0"
-jetbrainsKotlinJvm = "2.3.21"
+jetbrainsKotlinJvm = "2.4.0"
 uiTextGoogleFonts = "1.11.2"
 room = "2.8.4"
-ksp = "2.3.7"
+ksp = "2.3.9"
 navigation3 = "1.1.2"
 lifecycleNavigation3 = "2.10.0"
 richeditor-compose = "1.0.0-rc13"
@@ -29,9 +29,10 @@ camerax = "1.6.0"
 mlkitTextRecognition = "16.0.1"
 glance = "1.1.1"
 javaxInject = "1"
-firebaseBom = "34.14.0"
+firebaseBom = "34.14.1"
 googleServices = "4.4.4"
 crashlyticsGradle = "3.0.7"
+playAppUpdate = "2.1.0"
 
 
 
@@ -82,12 +83,14 @@ androidx-biometric = { group = "androidx.biometric", name = "biometric", version
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+play-app-update = { group = "com.google.android.play", name = "app-update", version.ref = "playAppUpdate" }
 
 
 
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 compose-compiler-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
+kotlin-metadata-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-metadata-jvm", version.ref = "kotlin" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
@@ -102,5 +105,3 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsGradle" }
-
-

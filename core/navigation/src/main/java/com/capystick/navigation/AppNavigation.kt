@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation3.runtime.entryProvider
@@ -272,7 +273,7 @@ private fun AppNavigationScaffold(
                 }
             }
         ) { innerPadding ->
-            androidx.compose.runtime.LaunchedEffect(externalNavigationCommand) {
+            LaunchedEffect(externalNavigationCommand) {
                 val command = externalNavigationCommand ?: return@LaunchedEffect
                 if (skipInitialExternalNavigationHandling) {
                     onSkipInitialExternalNavigationHandled()

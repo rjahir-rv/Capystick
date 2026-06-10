@@ -17,4 +17,6 @@
     <string name="widget_title_collection_fallback">Colección</string>
     <string name="widget_date_today">Hoy</string>
     <string name="widget_date_yesterday">Ayer</string>
+    <string name="update_ready_message">La actualización está lista.</string>
+    <string name="update_restart_action">Reiniciar</string>
 </resources>
