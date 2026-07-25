@@ -214,13 +214,14 @@ private fun WidgetContentState.EmptyNoNotes.toActionIntent(context: Context): In
         WidgetNavigationIntents.openCreateNote(context)
     }
 
-private fun WidgetTitle.resolve(context: Context): String = when (this) {
-    WidgetTitle.RecentNotes -> context.getString(AppR.string.widget_title_recent_notes)
-    WidgetTitle.Favorites -> context.getString(AppR.string.widget_title_favorites)
-    WidgetTitle.Collections -> context.getString(AppR.string.widget_title_collections)
-    WidgetTitle.CollectionFallback -> context.getString(AppR.string.widget_title_collection_fallback)
-    is WidgetTitle.Text -> value
-}
+private fun WidgetTitle.resolve(context: Context): String =
+    when (this) {
+        WidgetTitle.RecentNotes -> context.getString(AppR.string.widget_title_recent_notes)
+        WidgetTitle.Favorites -> context.getString(AppR.string.widget_title_favorites)
+        WidgetTitle.Collections -> context.getString(AppR.string.widget_title_collections)
+        WidgetTitle.CollectionFallback -> context.getString(AppR.string.widget_title_collection_fallback)
+        is WidgetTitle.Text -> value
+    }
 
 @Composable
 private fun WidgetHeader(
