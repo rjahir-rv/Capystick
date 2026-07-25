@@ -1,0 +1,9 @@
+<resources>
+    <string name="export_note_file_name_fallback">nota_%1$d</string>
+    <string name="export_note_title_fallback">Sin título</string>
+    <string name="export_note_title_label">Título: </string>
+    <string name="export_note_date_label">Fecha: </string>
+    <string name="open_selected_folder_error">No se pudo abrir la carpeta seleccionada</string>
+    <string name="create_file_error">No se pudo crear el archivo</string>
+    <string name="open_output_stream_error">No se pudo abrir el stream de salida</string>
+</resources>

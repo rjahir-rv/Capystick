@@ -1,0 +1,9 @@
+<resources>
+    <string name="export_note_file_name_fallback">note_%1$d</string>
+    <string name="export_note_title_fallback">Untitled</string>
+    <string name="export_note_title_label">Title: </string>
+    <string name="export_note_date_label">Date: </string>
+    <string name="open_selected_folder_error">Could not open the selected folder</string>
+    <string name="create_file_error">Could not create the file</string>
+    <string name="open_output_stream_error">Could not open the output stream</string>
+</resources>

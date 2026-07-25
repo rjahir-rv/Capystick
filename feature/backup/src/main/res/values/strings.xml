@@ -1,0 +1,22 @@
+<resources>
+    <string name="backup_export_success">Backup exportado correctamente</string>
+    <string name="backup_import_success">Notas restauradas correctamente</string>
+    <string name="backup_title">Copia de seguridad</string>
+    <string name="back_content_description">Volver</string>
+    <string name="backup_description">Gestiona una copia de seguridad de todas tus notas y colecciones en un archivo JSON.</string>
+    <string name="backup_export_title">Exportar backup</string>
+    <string name="backup_export_description">Guarda todas tus notas y colecciones en un archivo JSON en tu dispositivo.</string>
+    <string name="backup_export_action">Exportar</string>
+    <string name="backup_import_title">Importar backup</string>
+    <string name="backup_import_description">Restaura tus notas desde un archivo JSON. Esto reemplazará todos los datos actuales si existen.</string>
+    <string name="backup_import_action">Importar</string>
+    <string name="backup_no_notes_title">Sin notas para respaldar</string>
+    <string name="backup_no_notes_message">No tienes notas activas. Crea al menos una nota antes de exportar un backup.</string>
+    <string name="understood">Entendido</string>
+    <string name="backup_restore_confirmation_title">¿Restaurar backup?</string>
+    <string name="backup_restore_confirmation_message">Esta acción reemplazará TODAS las notas y colecciones actuales con las del archivo seleccionado. Esta operación no se puede deshacer.</string>
+    <string name="restore">Restaurar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="backup_export_error">Error al exportar: por favor verifica el archivo</string>
+    <string name="backup_import_error">Error al importar: %1$s</string>
+</resources>

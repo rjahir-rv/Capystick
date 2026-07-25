@@ -11,6 +11,8 @@ dependencies {
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.ui.graphics)
     api(libs.androidx.compose.ui.tooling.preview)
-    testImplementation(libs.junit)
-
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.biometric)
+    api(libs.androidx.activity.compose)
 }

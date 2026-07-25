@@ -1,0 +1,10 @@
+<resources>
+    <string name="menu_content_description">Menu</string>
+    <string name="secure_note_content_description">Secure note</string>
+    <string name="secure_note_locked">This note is locked</string>
+    <string name="biometric_authentication_required">Authentication required</string>
+    <string name="biometric_authentication_subtitle">Use your fingerprint or PIN to continue</string>
+    <string name="biometric_authentication_canceled">Canceled</string>
+    <string name="biometric_authentication_start_error">Could not start authentication</string>
+    <string name="biometric_missing_credential_message">Set up a PIN, pattern, or password to protect notes</string>
+</resources>
