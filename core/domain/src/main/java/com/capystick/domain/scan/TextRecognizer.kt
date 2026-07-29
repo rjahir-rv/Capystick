@@ -2,6 +2,7 @@ package com.capystick.domain.scan
 
 import android.graphics.Bitmap
 
-interface TextRecognizer {
+/** Extracts text from images and owns the resources used by the recognizer. */
+interface TextRecognizer : AutoCloseable {
     suspend fun extractText(bitmap: Bitmap): Result<String>
 }
