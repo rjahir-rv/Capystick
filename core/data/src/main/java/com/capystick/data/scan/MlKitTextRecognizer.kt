@@ -16,10 +16,18 @@ class MlKitTextRecognizer @Inject constructor() : TextRecognizer {
         val image = InputImage.fromBitmap(bitmap, 0)
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
-                continuation.resume(Result.success(visionText.text))
+                if (continuation.isActive) {
+                    continuation.resume(Result.success(visionText.text))
+                }
             }
             .addOnFailureListener { e ->
-                continuation.resume(Result.failure(e))
+                if (continuation.isActive) {
+                    continuation.resume(Result.failure(e))
+                }
             }
+    }
+
+    override fun close() {
+        recognizer.close()
     }
 }

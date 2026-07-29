@@ -12,4 +12,5 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="take_photo">Take photo</string>
+    <string name="scan_error_unknown">Text could not be recognized. Try again.</string>
 </resources>

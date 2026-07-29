@@ -1,11 +1,13 @@
 package com.capystick.scan.viewmodel
 
 import android.graphics.Bitmap
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capystick.domain.repository.NoteRepository
 import com.capystick.domain.scan.TextRecognizer
 import com.capystick.model.Note
+import com.capystick.scan.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,8 +35,8 @@ class ScanViewModel @Inject constructor(
                 .onSuccess { text ->
                     _uiState.value = ScanUiState.TextExtracted(text)
                 }
-                .onFailure { error ->
-                    _uiState.value = ScanUiState.Error(error.message ?: "Error desconocido")
+                .onFailure {
+                    _uiState.value = ScanUiState.Error(R.string.scan_error_unknown)
                 }
         }
     }
@@ -55,6 +57,11 @@ class ScanViewModel @Inject constructor(
     fun onRetry() {
         _uiState.value = ScanUiState.Idle
     }
+
+    override fun onCleared() {
+        textRecognizer.close()
+        super.onCleared()
+    }
 }
 
 sealed interface ScanUiState {
@@ -62,5 +69,5 @@ sealed interface ScanUiState {
     data class PhotoPreview(val bitmap: Bitmap) : ScanUiState
     data object Processing : ScanUiState
     data class TextExtracted(val text: String) : ScanUiState
-    data class Error(val message: String) : ScanUiState
+    data class Error(@param:StringRes val messageRes: Int) : ScanUiState
 }

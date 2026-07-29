@@ -12,4 +12,5 @@
     <string name="cancel">Cancelar</string>
     <string name="save">Guardar</string>
     <string name="take_photo">Tomar foto</string>
+    <string name="scan_error_unknown">No se pudo reconocer el texto. Inténtalo de nuevo.</string>
 </resources>

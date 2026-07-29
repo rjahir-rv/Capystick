@@ -209,7 +209,7 @@ private fun ScanContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
+                Text(text = stringResource(uiState.messageRes), color = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(onClick = onRetry) {
                     Text(stringResource(R.string.retry))
