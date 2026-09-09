@@ -31,7 +31,7 @@ glance = "1.1.1"
 javaxInject = "1"
 firebaseBom = "34.18.0"
 googleServices = "4.5.0"
-crashlyticsGradle = "3.0.7"
+crashlyticsGradle = "3.0.8"
 playAppUpdate = "2.1.0"
 
 
